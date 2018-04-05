@@ -4,7 +4,7 @@
   "description": "Parser for Oxygen Not Included save files.",
   "main": "lib/index.js",
   "scripts": {
-    "clean": "rimraf lib",
+    "clean": "rimraf lib dts",
     "prebuild": "npm run clean",
     "build": "tsc -p src",
     "watch": "tsc -p src -w"
