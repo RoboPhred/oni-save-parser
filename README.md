@@ -4,7 +4,11 @@ Parses save data from Oxygen Not Included.  Supports NodeJS and (eventually) Web
 
 Currently under development
 
-## Compatibility
+## Game Compatibility
+
+This should work for all save files up to the Rancher Update (save file version 7.3).
+
+## Library Compatibility
 
 This project makes use of some ES6 constructs such as Symbols, and a few nodejs libraries.
 The most intrusive external dependency is on node's builtin zlib module.  This should be shimmed on the web
@@ -14,25 +18,59 @@ A webpack build will be produced and included later on.
 
 ## Current Progress
 
-Parser currently performs the following:
-- Loads and understands the file header
-- Loads and understands the serializer templates
-- Checks for and handles compressed game data.
-- Successfully loads the root object by looking up their templates.
+The save file and all templated data objects are loaded.
+This includes most of the interesting stuff, like duplicant stats, building attributes, and so on.
+Some information is still not parsed, such as the general world map and some specific data for a few of
+the more esoteric game objects.
 
-Still to do:
-- Expose the game state data to the outside world.
-- Load and expose the more interesting bits, such as game object data.
+At the moment, this library is not capable of saving the modified save data.  This should be comming soon.
+
+## Still to do
+- Typedefs for the json-format save data (```OniSave.toJSON()```).
+- Save logic.
 - Handle the special-case manual-parse data used by a few of the game object types.
 - Better error handling: Errors should be specific error classes that describe the state of the parser and
     provide more details on why and where the error happened.
-- Save logic.  All of it.
-- Provide, and automatically select from, different container module sets based on the save file version.
-    Currently, this is not needed as the only breaking change has been TU's compression, and that is
-    accounted for in the header parser.
 - Webpack build.
 
-Also, adjust some of the class names to closer fit what they are called in the ONI assembly.
+## Example usage
+
+```
+const {
+    readFileSync,
+    writeFileSync
+} = require("fs");
+
+const {
+    parseOniSave
+} = require("oni-save-parser");
+
+const savePath = "./my-save.sav";
+const outputPath = "./my-save.json";
+
+const fileData = readFileSync(savePath);
+
+// Note that parseOniSave takes an ArrayBuffer, not a node Buffer.
+//  We can get the ArrayBuffer out of a Buffer by using the buffer property.
+const saveData = parseOniSave(fileData.buffer);
+
+
+const saveJson = saveData.toJSON() as any;
+
+// This object contains the binary blobs that represent
+//  the game map, camera position, visibility, and tile damage.
+// This includes a lot of opaque binary arrays that we currently
+//  can't do anything with.
+// Wipe the data from the save object so we do not
+//  make the file impossibly large and difficult to edit.
+const streamData = saveJson["body"]["saveRoot"]["streamed"];
+for (let key of Object.keys(streamData)) {
+    streamData[key] = "<stream data>";
+}
+
+writeFileSync(outputPath, JSON.stringify(saveJson, null, 2));
+```
+
 
 ## Design
 
