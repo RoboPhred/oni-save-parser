@@ -13,6 +13,21 @@
             "problemMatcher": [
                 "$tsc"
             ]
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "group": "build",
+            "isBackground": true,
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "dedicated"
+            },
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
         }
     ]
 }

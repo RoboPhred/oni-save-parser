@@ -1,11 +1,24 @@
+import { Logger } from "../logging";
 import { DataReader } from "../data-reader";
-import { OniSaveHeader } from "../save-header";
 import { TypeDeserializer } from "../type-templates";
 import { OniGameState } from "./services";
-export declare class OniGameStateImpl implements OniGameState {
-    private _header;
+import { GameObject } from "./interfaces";
+export declare class OniGameStateManagerImpl implements OniGameState {
     private _deserializer;
-    constructor(_header: OniSaveHeader, _deserializer: TypeDeserializer);
+    private _logger;
+    static readonly SAVE_HEADER: string;
+    static readonly CURRENT_VERSION_MAJOR: number;
+    static readonly CURRENT_VERSION_MINOR: number;
+    gameObjects: Map<string, GameObject[]>;
+    constructor(_deserializer: TypeDeserializer, _logger: Logger);
     parse(reader: DataReader): void;
-    private _parseState(reader);
+    toJSON(): {
+        gameObjects: {
+            [key: string]: any[];
+        };
+    };
+    private _parsePrefabs(reader);
+    private _parsePrefabSet(reader, prefabName);
+    private _parseGameObject(reader);
+    private _parseGameObjectBehavior(reader, behaviorName);
 }

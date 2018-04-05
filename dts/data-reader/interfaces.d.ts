@@ -1,9 +1,11 @@
 /// <reference types="long" />
 import Long from "long";
+import { Vector3, Quaternion } from "../interfaces";
 /**
  * A little-endian streaming data reader.
  */
 export interface DataReader {
+    readonly position: number;
     readByte(): number;
     readSByte(): number;
     readBytes(length: number): ArrayBufferView;
@@ -16,5 +18,9 @@ export interface DataReader {
     readInt64(): Long;
     readSingle(): number;
     readDouble(): number;
-    readKleiString(): string;
+    readChars(length: number): string;
+    readKleiString(): string | null;
+    skipBytes(length: number): void;
+    readVector3(): Vector3;
+    readQuaternion(): Quaternion;
 }

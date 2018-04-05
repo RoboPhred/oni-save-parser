@@ -6,6 +6,11 @@ import {
 import Long from "long";
 
 import {
+    Vector3,
+    Quaternion
+} from "../interfaces";
+
+import {
     DataReader
 } from "./interfaces";
 
@@ -19,6 +24,10 @@ export class ArrayDataReader implements DataReader {
     constructor(buffer: ArrayBuffer) {
         this._buffer = buffer;
         this._view = new DataView(buffer);
+    }
+
+    get position(): number {
+        return this._byteOffset;
     }
 
     readByte(): number {
@@ -103,20 +112,51 @@ export class ArrayDataReader implements DataReader {
         return val;
     }
 
-    readKleiString(): string {
+    readChars(length: number): string {
+        const bytes = this.readBytes(length);
+        return this._stringDecoder.decode(bytes);
+    }
+
+    readKleiString(): string | null {
         // Shifting _byteOffset is done by our other calls.  We do not need to manage it.
 
         const count = this.readInt32();
-        if (count < 0) {
-            throw new Error("Invalid byte count in readKleiString: " + count);
+        if (count === -1) {
+            return null;
         }
-
+        if (count === 0) {
+            return "";
+        }
         if (count > 0) {
             const bytes = this.readBytes(count);
             return this._stringDecoder.decode(bytes);
         }
-        
-        return null;
+
+        throw new Error("Invalid byte count in readKleiString: " + count);
+    }
+
+    readVector3(): Vector3 {
+        const vec: Vector3 = {
+            x: this.readSingle(),
+            y: this.readSingle(),
+            z: this.readSingle()
+        };
+        return vec;
+    }
+
+    readQuaternion(): Quaternion {
+        const q: Quaternion = {
+            x: this.readSingle(),
+            y: this.readSingle(),
+            z: this.readSingle(),
+            w: this.readSingle()
+        };
+        return q;
+    }
+
+    skipBytes(length: number) {
+        this._checkCanRead(length);
+        this._byteOffset += length;
     }
 
     private _checkCanRead(length: number) {

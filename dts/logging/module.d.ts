@@ -1,2 +1,3 @@
 import { ContainerModule } from "microinject";
-export declare function createModule(): ContainerModule;
+import { ConsoleLoggerConfig } from "./console-logger";
+export declare function createModule(config?: Partial<ConsoleLoggerConfig>): ContainerModule;

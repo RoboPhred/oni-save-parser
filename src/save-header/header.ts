@@ -10,6 +10,10 @@ import {
 
 
 import {
+    ensureNotNull
+} from "../utils";
+
+import {
     JsonObjectSerializable
 } from "../interfaces";
 
@@ -18,8 +22,8 @@ import {
 } from "../data-reader";
 
 import {
-    OniSaveData
-} from "../save-data";
+    OniSave
+} from "../oni-save";
 
 import {
     OniSaveHeader
@@ -27,23 +31,39 @@ import {
 
 
 @injectable(OniSaveHeader)
-@inScope(OniSaveData)
+@inScope(OniSave)
 export class OniSaveHeaderImpl implements OniSaveHeader, JsonObjectSerializable {
 
-    buildVersion: number;
-    headerVersion: number;
-    isCompressed: boolean;
-    gameData: object;
+    private _buildVersion: number | null = null;
+    private _headerVersion: number | null = null;
+    private _isCompressed: boolean | null = null;
+    private _gameData: object | null = null;
+
+    get buildVersion(): number {
+        return ensureNotNull(this._buildVersion);
+    }
+
+    get headerVersion(): number {
+        return ensureNotNull(this._headerVersion);
+    }
+
+    get isCompressed(): boolean {
+        return ensureNotNull(this._isCompressed);
+    }
+
+    get gameData(): object {
+        return ensureNotNull(this._gameData);
+    }
 
     parse(reader: DataReader) {
-        this.buildVersion = reader.readUInt32();
+        this._buildVersion = reader.readUInt32();
         const headerSize = reader.readUInt32();
-        this.headerVersion = reader.readUInt32();
-        this.isCompressed = this.headerVersion >= 1 ? Boolean(reader.readUInt32()) : false;
+        this._headerVersion = reader.readUInt32();
+        this._isCompressed = this._headerVersion >= 1 ? Boolean(reader.readUInt32()) : false;
 
         const data = reader.readBytes(headerSize);
         const dataStr = new TextDecoder("utf-8").decode(data);
-        this.gameData = JSON.parse(dataStr);
+        this._gameData = JSON.parse(dataStr);
     }
 
     toJSON() {

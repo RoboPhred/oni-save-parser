@@ -1,5 +1,6 @@
 /// <reference types="long" />
 import Long from "long";
+import { Vector3, Quaternion } from "../interfaces";
 import { DataReader } from "./interfaces";
 export declare class ArrayDataReader implements DataReader {
     private _buffer;
@@ -7,6 +8,7 @@ export declare class ArrayDataReader implements DataReader {
     private _byteOffset;
     private _stringDecoder;
     constructor(buffer: ArrayBuffer);
+    readonly position: number;
     readByte(): number;
     readSByte(): number;
     readBytes(length: number): ArrayBufferView;
@@ -19,6 +21,10 @@ export declare class ArrayDataReader implements DataReader {
     readInt64(): Long;
     readSingle(): number;
     readDouble(): number;
-    readKleiString(): string;
+    readChars(length: number): string;
+    readKleiString(): string | null;
+    readVector3(): Vector3;
+    readQuaternion(): Quaternion;
+    skipBytes(length: number): void;
     private _checkCanRead(length);
 }

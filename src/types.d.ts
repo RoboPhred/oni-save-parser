@@ -3,11 +3,11 @@
 declare module "text-encoding" {
     export class TextDecoder {
         constructor(encoding: string);
-        decode(view: ArrayBufferView);
+        decode(view: ArrayBufferView): string;
     }
 
     export class TextEncoder {
         constructor(encoding: string);
-        encode(view: ArrayBufferView);
+        encode(view: ArrayBufferView): string;
     }
 }
