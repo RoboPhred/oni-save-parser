@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "outDir": "../lib",
+        "allowUnreachableCode": false,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "declarationDir": "../dts",
+        "sourceMap": true
+    }
+}
