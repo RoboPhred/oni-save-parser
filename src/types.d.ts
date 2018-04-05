@@ -8,6 +8,6 @@ declare module "text-encoding" {
 
     export class TextEncoder {
         constructor(encoding: string);
-        encode(view: ArrayBufferView): string;
+        encode(view: string): Uint8Array;
     }
 }

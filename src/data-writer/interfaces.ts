@@ -1,0 +1,41 @@
+
+import Long from "long";
+
+import {
+    Vector3,
+    Quaternion
+} from "../interfaces";
+
+/**
+ * A little-endian streaming data writer.
+ */
+export interface DataWriter {
+    readonly position: number;
+
+    writeByte(value: number): void;
+    writeSByte(value: number): void;
+    writeBytes(value: ArrayBufferView): void;
+
+    writeUInt16(value: number): void;
+    writeInt16(value: number): void;
+    
+    writeUInt32(value: number): void;
+    writeInt32(value: number): void;
+
+    writeUInt64(value: Long): void;
+    writeInt64(value: Long): void;
+
+    writeSingle(value: number): void;
+    writeDouble(value: number): void;
+
+    writeChars(value: string): void;
+    writeKleiString(value: string | null): void;
+
+    writeVector3(value: Vector3): void;
+    writeQuaternion(value: Quaternion): void;
+
+    /**
+     * Gets the current content of the DataWriter.
+     */
+    getBytes(): ArrayBuffer;
+}
