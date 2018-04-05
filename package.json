@@ -12,9 +12,14 @@
   },
   "keywords": [
     "ONI",
-    "OxygenNotIncluded"
+    "Oxygen Not Included",
+    "save editor"
   ],
-  "author": "robophred@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RoboPhred/oni-save-parser.git"
+  },
+  "author": "William Matthews",
   "license": "MIT",
   "devDependencies": {
     "@types/long": "^3.0.32",
