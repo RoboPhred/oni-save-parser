@@ -4,11 +4,11 @@ import {
 } from "microinject";
 
 import {
-    OniGameStateImpl
+    OniGameStateManagerImpl
 } from "./game-state";
 
 export function createModule() {
     return new ContainerModule(bind => {
-        bind(OniGameStateImpl);
+        bind(OniGameStateManagerImpl);
     });
 }

@@ -4,12 +4,18 @@ import {
 } from "microinject";
 
 import {
-    LoggerImpl
-} from "./logger";
+    ConsoleLoggerConfig,
+    ConsoleLoggerImpl,
+    defaultConsoleLoggerConfig
+} from "./console-logger";
 
 
-export function createModule() {
+export function createModule(config?: Partial<ConsoleLoggerConfig>) {
     return new ContainerModule(bind => {
-        bind(LoggerImpl);
+        bind(ConsoleLoggerConfig).toConstantValue<ConsoleLoggerConfig>({
+            ...(config || {}),
+            ...defaultConsoleLoggerConfig
+        });
+        bind(ConsoleLoggerImpl);
     });
 }

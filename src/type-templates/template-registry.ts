@@ -7,38 +7,48 @@ import {
 } from "microinject"
 
 import {
-    Logger
-} from "../logging/services";
+    Colour,
+    JsonObjectSerializable,
+    Vector2
+} from "../interfaces";
 
 import {
-    JsonObjectSerializable
-} from "../interfaces";
+    validateDotNetIdentifierName
+} from "../utils";
+
+import {
+    Logger
+} from "../logging/services";
 
 import {
     DataReader
 } from "../data-reader";
 
 import {
-    OniSaveData
-} from "../save-data";
+    OniSave
+} from "../oni-save";
+
+import {
+    AssemblyTypeName
+} from "../assembly-types";
 
 import {
     TypeDescriptor,
     TypeInfo,
-    TypeTemplate
+    TypeTemplate,
+    NamedTypeDescriptor
 } from "./interfaces";
 
 import {
     TypeDeserializer,
     TypeTemplateRegistry
 } from "./services";
-import { NamedTypeDescriptor } from ".";
 
 
 @injectable()
 @provides(TypeTemplateRegistry)
 @provides(TypeDeserializer)
-@inScope(OniSaveData)
+@inScope(OniSave)
 export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeserializer, JsonObjectSerializable {
 
     private _templates = new Map<string, TypeTemplate>();
@@ -53,7 +63,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
         const templateCount = reader.readInt32();
         this._logger.trace(`${templateCount} templates found.`);
         for (let i = 0; i < templateCount; i++) {
-            const templateName = reader.readKleiString();
+            const templateName = validateTypeName(reader.readKleiString());
 
             this._logger.trace(`Parsing template "${templateName}".`);
 
@@ -65,23 +75,24 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
         }
     }
 
-    deserialize(reader: DataReader, templateName?: string): object {
-        if (!templateName) {
-            templateName = reader.readKleiString();
+    hasType(typeName: string): boolean {
+        return this._templates.has(typeName);
+    }
+
+    deserialize<T>(reader: DataReader, expectedType?: AssemblyTypeName<T>): T {
+        const templateName = validateTypeName(reader.readKleiString());
+
+        if (templateName !== expectedType) {
+            throw new Error(`Expected to deserialize type "${expectedType}", but received "${templateName}"`);
         }
 
-        if (templateName.length >= 512) {
-            // We can reasonably assume anything over 512 characters is a bad parse and not a real template.
-            //  Specifically, anything at or over 512 makes a "CS0645: Identifier too long." error in Microsoft's C# compiler.
-            //  The .Net standard itself does not specify any limit.
-            // We want to bail out in these cases without trying to include the template name in the error, as it is likely to be
-            //  enormous.
-            throw new Error("Received templateName >= 512 characters.  This most likely indicates a failure to parse the template name.");
-        }
+        return this.deserializeType(reader, templateName);
+    }
 
-        const template = this._templates.get(templateName);
+    deserializeType<T>(reader: DataReader, typeName: AssemblyTypeName<T>): T {
+        const template = this._templates.get(typeName);
         if (!template) {
-            throw new Error(`Cannot deserialize type template "${templateName}": Template does not exist.`);
+            throw new Error(`Cannot deserialize type template "${typeName}": Template does not exist.`);
         }
 
         const obj: any = {};
@@ -119,7 +130,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
 
         const fields: NamedTypeDescriptor[] = [];
         for (let i = 0; i < fieldCount; i++) {
-            const typeName = reader.readKleiString();
+            const typeName = validateMemberName(reader.readKleiString());
             this._logger.trace(`Parsing field "${typeName}".`);
             fields[i] = {
                 typeName,
@@ -131,7 +142,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
 
         const properties: NamedTypeDescriptor[] = [];
         for (let i = 0; i < propCount; i++) {
-            const typeName = reader.readKleiString();
+            const typeName = validateMemberName(reader.readKleiString());
             this._logger.trace(`Parsing property "${typeName}".`);
             properties[i] = {
                 typeName,
@@ -150,11 +161,20 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
     }
 
     private _deserializeType(reader: DataReader, descriptor: TypeDescriptor): any {
-        switch(descriptor.typeInfo) {
+        const {
+            typeInfo,
+            subTypes,
+            templateName
+        } = descriptor;
+
+        switch (typeInfo) {
             case TypeInfo.UserDefined: {
+                if (!templateName) {
+                    throw new Error(`Expected user-defined type to have a template name, but none was defined.`);
+                }
                 // First value seems to indicate nullability.
-                if (reader.readInt32() >= 0)  {
-                    return this.deserialize(reader, descriptor.templateName);
+                if (reader.readInt32() >= 0) {
+                    return this.deserializeType(reader, templateName);
                 }
                 else {
                     return null;
@@ -185,35 +205,39 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
             case TypeInfo.String:
                 return reader.readKleiString();
             case TypeInfo.Enumeration:
-                return reader.readInt32();
-            case TypeInfo.Vector2I:
-                return {
+                return reader.readUInt32();
+            case TypeInfo.Vector2I: {
+                const vector: Vector2 = {
                     x: reader.readInt32(),
                     y: reader.readInt32()
                 };
-            case TypeInfo.Vector2:
-                return {
+                return vector;
+            }
+            case TypeInfo.Vector2: {
+                const vector: Vector2 = {
                     x: reader.readSingle(),
                     y: reader.readSingle()
                 };
+                return vector;
+            }
             case TypeInfo.Vector3:
-                return {
-                    x: reader.readSingle(),
-                    y: reader.readSingle(),
-                    z: reader.readSingle()
-                }
+                return reader.readVector3();
             case TypeInfo.Array:
             case TypeInfo.List:
             case TypeInfo.HashSet: {
+                if (!subTypes || subTypes.length !== 1) {
+                    throw new Error(`Expected Array | List | HashSet types to have one subtype.`);
+                }
+
                 // Always read and discarded.
                 //  No idea what this is, its variable
                 //  seems to be optimized out in the ONI assembly.
                 reader.readInt32();
                 const length = reader.readInt32();
                 if (length >= 0) {
-                    const subType = descriptor.subTypes[0];
+                    const subType = subTypes[0];
                     const array = new Array(length);
-                    for(let i = 0; i < length; i++) {
+                    for (let i = 0; i < length; i++) {
                         const value = this._deserializeType(reader, subType);
                         array[i] = value;
                     }
@@ -224,28 +248,36 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                 }
             }
             case TypeInfo.Pair: {
-                const [ type1, type2 ] = descriptor.subTypes;
+                if (!subTypes || subTypes.length !== 2) {
+                    throw new Error(`Expected Pair type to have two subtypes.`);
+                }
+
+                const [type1, type2] = subTypes;
                 return {
                     key: this._deserializeType(reader, type1),
                     value: this._deserializeType(reader, type2)
                 };
             }
             case TypeInfo.Dictionary: {
+                if (!subTypes || subTypes.length !== 2) {
+                    throw new Error(`Expected Dictionary type to have two subtypes.`);
+                }
+
+                const [keyType, valueType] = subTypes;
+
                 // Again, read and discarded.
                 //  Similar to TypeInfo.Array
                 reader.readInt32();
                 const length = reader.readInt32();
                 if (length > 0) {
-                    const [ keyType, valueType ] = descriptor.subTypes;
-
                     const pairs: [any, any][] = [];
 
                     // We load values first, then keys.
-                    for(let i = 0; i < length; i++) {
+                    for (let i = 0; i < length; i++) {
                         pairs[i] = new Array(2) as [any, any];
                         pairs[i][1] = this._deserializeType(reader, valueType);
                     }
-                    for(let i = 0; i < length; i++) {
+                    for (let i = 0; i < length; i++) {
                         pairs[i][0] = this._deserializeType(reader, keyType);
                     }
 
@@ -256,12 +288,13 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                 }
             }
             case TypeInfo.Colour: {
-                return {
+                const color: Colour = {
                     r: reader.readByte() / 255,
                     b: reader.readByte() / 255,
                     g: reader.readByte() / 255,
                     a: reader.readByte() / 255
-                }
+                };
+                return color;
             }
             default:
                 throwUnknownTypeInfo(descriptor.typeInfo);
@@ -289,7 +322,7 @@ function readType(reader: DataReader): TypeDescriptor {
         //  does a lookup of the template here, so presumably it will error out
         //  if it has not been previously parsed.
         // We will skip that step for now, since we look things up dynamically.
-        descriptor.templateName = reader.readKleiString();
+        descriptor.templateName = validateTypeName(reader.readKleiString());
     }
 
     if (isGeneric) {
@@ -308,4 +341,24 @@ function readType(reader: DataReader): TypeDescriptor {
     }
 
     return descriptor;
+}
+
+/**
+ * Ensures that a template name looks valid.
+ * If valid, it will return the input name.
+ * If invalid, it will throw.
+ * @param templateName The name to validate.
+ */
+function validateTypeName(templateName: string | null | undefined): string {
+    return validateDotNetIdentifierName(templateName);
+}
+
+/**
+ * Ensures that a member name looks valid.
+ * If valid, it will return the input name.
+ * If invalid, it will throw.
+ * @param memberName The name to validate.
+ */
+function validateMemberName(memberName: string | null | undefined): string {
+    return validateDotNetIdentifierName(memberName);
 }

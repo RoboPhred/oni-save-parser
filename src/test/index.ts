@@ -1,30 +1,23 @@
 
 import {
-    readFileSync
+    readFileSync,
+    writeFileSync
 } from "fs";
 
 import {
-    Container
-} from "microinject";
-
-
-import {
-    ArrayDataReader
-} from "../data-reader";
-
-import {
-    OniSaveData
-} from "../save-data";
-
-import appModule from "./app-module";
+    parseOniSave
+} from "../index";
 
 const fileData = readFileSync("./test-data/Rancher-Test.sav");
-const reader = new ArrayDataReader(fileData.buffer);
 
-const container = new Container();
-container.load(appModule);
+const saveData = parseOniSave(fileData.buffer);
 
-const saveData = container.get(OniSaveData);
-saveData.parse(reader);
+const saveJson = saveData.toJSON() as any;
+const streamData = saveJson["body"]["saveRoot"]["streamed"];
+for (let key of Object.keys(streamData)) {
+    streamData[key] = "<stream data>";
+}
 
-console.log(JSON.stringify(saveData, null, 2));
+writeFileSync("./test-data/Rancher-Test.json", JSON.stringify(saveJson, null, 2));
+
+console.log(JSON.stringify(saveJson, null, 2));

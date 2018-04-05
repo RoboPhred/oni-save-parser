@@ -24,6 +24,8 @@ Still to do:
 - Expose the game state data to the outside world.
 - Load and expose the more interesting bits, such as game object data.
 - Handle the special-case manual-parse data used by a few of the game object types.
+- Better error handling: Errors should be specific error classes that describe the state of the parser and
+    provide more details on why and where the error happened.
 - Save logic.  All of it.
 - Provide, and automatically select from, different container module sets based on the save file version.
     Currently, this is not needed as the only breaking change has been TU's compression, and that is
