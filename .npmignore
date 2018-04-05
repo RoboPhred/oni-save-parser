@@ -1,7 +1,7 @@
 .vscode/
 src/
 lib/test/
-lib/**.map
+lib/**/*.map
 src/
 test-data/
 TODO.md
