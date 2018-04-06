@@ -8,9 +8,15 @@ export interface GameObject extends JsonObjectSerializable {
      * This is used to look up the object's unity prefab.
      */
     readonly folder: number;
-    readonly behaviors: ReadonlyMap<string, GameObjectBehavior>;
+    /**
+     * Behaviors for this game object.
+     * The order may matter to ONI; needs more investigation.
+     */
+    readonly behaviors: GameObjectBehavior[];
 }
 export interface GameObjectBehavior {
+    readonly name: string;
+    readonly hasParseData: boolean;
     readonly parsedData: any;
-    readonly extraData: ArrayBufferView | null;
+    readonly extraData: ArrayBuffer | null;
 }

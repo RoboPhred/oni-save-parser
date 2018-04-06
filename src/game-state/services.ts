@@ -4,9 +4,12 @@ import {
 } from "microinject";
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
+
+import {
+    BinarySerializable
+} from "../binary-serializer";
 
 import {
     GameObject
@@ -20,7 +23,7 @@ import {
  * structure, while this explicitly deals with instantiating
  * game objects.
  */
-export interface OniGameState extends JsonObjectSerializable, Parseable {
+export interface OniGameState extends JsonObjectSerializable, BinarySerializable {
     readonly gameObjects: ReadonlyMap<string, GameObject[]>;
 }
 export const OniGameState: Identifier<OniGameState> = Symbol("OniGameState");

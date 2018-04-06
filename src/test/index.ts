@@ -12,6 +12,7 @@ const fileData = readFileSync("./test-data/Rancher-Test.sav");
 
 const saveData = parseOniSave(fileData.buffer);
 
+
 const saveJson = saveData.toJSON() as any;
 const streamData = saveJson["body"]["saveRoot"]["streamed"];
 for (let key of Object.keys(streamData)) {

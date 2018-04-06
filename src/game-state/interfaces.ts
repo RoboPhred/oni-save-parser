@@ -15,10 +15,17 @@ export interface GameObject extends JsonObjectSerializable {
      */
     readonly folder: number;
 
-    readonly behaviors: ReadonlyMap<string, GameObjectBehavior>;
+    /**
+     * Behaviors for this game object.
+     * The order may matter to ONI; needs more investigation.
+     */
+    // TODO: Figure out the madness of indexing inside ONI SaveLoadRoot.LoadInternal
+    readonly behaviors: GameObjectBehavior[];
 }
 
 export interface GameObjectBehavior {
+    readonly name: string;
+    readonly hasParseData: boolean;
     readonly parsedData: any;
-    readonly extraData: ArrayBufferView | null;
+    readonly extraData: ArrayBuffer | null;
 }

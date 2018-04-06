@@ -1,5 +1,5 @@
 import { JsonObjectSerializable } from "../interfaces";
-import { DataReader } from "../data-reader";
+import { DataReader, DataWriter } from "../binary-serializer";
 import { OniSaveHeader } from "./services";
 export declare class OniSaveHeaderImpl implements OniSaveHeader, JsonObjectSerializable {
     private _buildVersion;
@@ -11,6 +11,7 @@ export declare class OniSaveHeaderImpl implements OniSaveHeader, JsonObjectSeria
     readonly isCompressed: boolean;
     readonly gameData: object;
     parse(reader: DataReader): void;
+    write(writer: DataWriter): void;
     toJSON(): {
         buildVersion: number;
         headerVersion: number;

@@ -20,6 +20,7 @@ export interface NamedTypeDescriptor extends TypeDescriptor {
 export interface TypeDescriptor {
     typeInfo: TypeInfo;
     templateName?: string;
+    isGeneric?: boolean;
     subTypes?: TypeDescriptor[];
 }
 

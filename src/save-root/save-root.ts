@@ -10,15 +10,17 @@ import {
 } from "../utils"
 
 import {
-    DataReader
-} from "../data-reader";
+    DataReader,
+    DataWriter
+} from "../binary-serializer";
 
 import {
     OniSave
 } from "../oni-save";
 
 import {
-    TypeDeserializer
+    TypeReader,
+    TypeWriter
 } from "../type-templates";
 
 import {
@@ -33,31 +35,31 @@ import {
 @injectable(OniSaveRoot)
 @inScope(OniSave)
 export class OniSaveRootImpl implements OniSaveRoot {
-    private _widthInCells: number | null = null;
-    private _heightInCells: number | null = null;
-    private _streamed: ReadonlyMap<string, ArrayBufferView> | null = null;
+    private _saveFileRoot: SaveFileRoot | null = null;
 
     constructor(
-        @inject(TypeDeserializer) private _deserializer: TypeDeserializer
+        @inject(TypeReader) private _typeReader: TypeReader,
+        @inject(TypeWriter) private _typeWriter: TypeWriter
     ) {}
 
     get widthInCells(): number {
-        return ensureNotNull(this._widthInCells);
+        return ensureNotNull(this._saveFileRoot).WidthInCells;
     }
 
     get heightInCells(): number {
-        return ensureNotNull(this._heightInCells);
+        return ensureNotNull(this._saveFileRoot).HeightInCells;
     }
 
     get streamed(): ReadonlyMap<string, ArrayBufferView> {
-        return ensureNotNull(this._streamed);
+        return ensureNotNull(this._saveFileRoot).streamed;
     }
 
     parse(reader: DataReader) {
-        const saveFileRoot = this._deserializer.deserialize(reader, SaveFileRoot);
-        this._widthInCells = saveFileRoot.WidthInCells;
-        this._heightInCells = saveFileRoot.HeightInCells;
-        this._streamed = saveFileRoot.streamed;
+        this._saveFileRoot = this._typeReader.deserialize(reader, SaveFileRoot);
+    }
+
+    write(writer: DataWriter) {
+        this._typeWriter.serialize(writer, SaveFileRoot, this._saveFileRoot);
     }
 
     toJSON() {

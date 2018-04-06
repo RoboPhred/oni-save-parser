@@ -14,15 +14,18 @@ import {
 } from "../logging";
 
 import {
-    DataReader
-} from "../data-reader";
+    ArrayDataWriter,
+    DataReader,
+    DataWriter
+} from "../binary-serializer";
 
 import {
     OniSave
 } from "../oni-save";
 
 import {
-    TypeDeserializer
+    TypeReader,
+    TypeWriter
 } from "../type-templates";
 
 import {
@@ -45,9 +48,13 @@ export class OniGameStateManagerImpl implements OniGameState {
     static readonly CURRENT_VERSION_MINOR = 3;
 
     gameObjects = new Map<string, GameObject[]>();
+    private _gameObjectOrdering: string[] = [];
+
+    private _versionMinor: number | null = null;
 
     constructor(
-        @inject(TypeDeserializer) private _deserializer: TypeDeserializer,
+        @inject(TypeReader) private _typeReader: TypeReader,
+        @inject(TypeWriter) private _typeWriter: TypeWriter,
         @inject(Logger) private _logger: Logger
     ) {}
 
@@ -75,7 +82,22 @@ export class OniGameStateManagerImpl implements OniGameState {
             this._logger.warn(`Game state version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
         }
 
+        this._versionMinor = versionMinor;
+
         this._parsePrefabs(reader);
+    }
+
+    write(writer: DataWriter): void {
+        if (this._versionMinor == null) {
+            throw new Error("Game state has not been parsed.");
+        }
+
+        writer.writeChars(OniGameStateManagerImpl.SAVE_HEADER);
+
+        writer.writeInt32(OniGameStateManagerImpl.CURRENT_VERSION_MAJOR);
+        writer.writeInt32(this._versionMinor);
+
+        this._writePrefabs(writer);
     }
 
     toJSON() {
@@ -95,6 +117,7 @@ export class OniGameStateManagerImpl implements OniGameState {
         const prefabCount = reader.readInt32();
         for(let i = 0; i < prefabCount; i++) {
             const prefabName = validatePrefabName(reader.readKleiString());
+            this._gameObjectOrdering.push(prefabName);
             this._logger.trace(`Parsing prefab "${prefabName}"`);
 
             const prefabSet = this._parsePrefabSet(reader, prefabName);
@@ -103,6 +126,15 @@ export class OniGameStateManagerImpl implements OniGameState {
         }
 
         this._logger.trace("Prefab parsing complete.");        
+    }
+
+    private _writePrefabs(writer: DataWriter): void {
+        writer.writeInt32(this._gameObjectOrdering.length);
+        for (let name of this._gameObjectOrdering) {
+            writer.writeKleiString(name);
+            const prefab = this.gameObjects.get(name)!;
+            this._writePrefabSet(writer, prefab);
+        }
     }
 
     private _parsePrefabSet(reader: DataReader, prefabName: string): GameObject[] {
@@ -122,11 +154,29 @@ export class OniGameStateManagerImpl implements OniGameState {
             throw new Error(`Prefab "${prefabName}" parse consumed ${-bytesRemaining} more bytes than its declared length of ${dataLength}.`);
         }
         else if (bytesRemaining > 0) {
-            this._logger.warn(`Prefab "${prefabName}" parse consumed ${bytesRemaining} less bytes than expected.  Remaining data will be skipped.`);
-            reader.skipBytes(bytesRemaining);
+            // We could skip the bytes, but if we want to write data back, we better know what those bytes were.
+            //  Each GameObject itself tracks data length, so we should be covered.  Anything that is missing
+            //  is a sign of a parse issue.
+            throw new Error(`Prefab "${prefabName}" parse consumed ${bytesRemaining} less bytes than its declared length of ${dataLength}.`);
         }
 
         return prefabObjects;
+    }
+
+    private _writePrefabSet(writer: DataWriter, prefabSet: GameObject[]) {
+
+        // We need to know the data length.
+        //  Write the data to another buffer, so we can
+        //  figure out its length and write its data out.
+        const setWriter = new ArrayDataWriter();
+        for (let gameObject of prefabSet) {
+            this._writeGameObject(setWriter, gameObject);
+        }
+        const gameObjectData = setWriter.getBytes();
+
+        writer.writeInt32(prefabSet.length);
+        writer.writeInt32(gameObjectData.byteLength);
+        writer.writeBytes(gameObjectData);
     }
 
     private _parseGameObject(reader: DataReader): GameObject {
@@ -142,13 +192,10 @@ export class OniGameStateManagerImpl implements OniGameState {
 
         this._logger.trace(`Parsing ${behaviorCount} game object behaviors.`);
 
-        const behaviors = new Map<string, GameObjectBehavior>();
+        const behaviors: GameObjectBehavior[] = [];
 
         for(let i = 0; i < behaviorCount; i++) {
-            const behaviorName = validateBehaviorName(reader.readKleiString());
-            this._logger.trace(`Parsing game object behavior "${behaviorName}".`);
-            const behavior = this._parseGameObjectBehavior(reader, behaviorName);
-            behaviors.set(behaviorName, behavior);
+            behaviors[i] = this._parseGameObjectBehavior(reader);
         }
 
         this._logger.trace("Game object parsing complete.");
@@ -163,36 +210,81 @@ export class OniGameStateManagerImpl implements OniGameState {
         };
     }
 
-    private _parseGameObjectBehavior(reader: DataReader, behaviorName: string): GameObjectBehavior {
+    private _writeGameObject(writer: DataWriter, gameObject: GameObject) {
+        const {
+            position,
+            rotation,
+            scale,
+            folder,
+            behaviors
+        } = gameObject;
+
+        writer.writeVector3(position);
+        writer.writeQuaternion(rotation);
+        writer.writeVector3(scale);
+        writer.writeByte(folder);
+
+        writer.writeInt32(behaviors.length);
+        for (let behavior of behaviors) {
+            this._writeGameObjectBehavior(writer, behavior);
+        }
+    }
+
+    private _parseGameObjectBehavior(reader: DataReader): GameObjectBehavior {
+        const name = validateBehaviorName(reader.readKleiString());
+        this._logger.trace(`Parsing game object behavior "${name}".`);
+
         const dataLength = reader.readInt32();
         const preParsePosition = reader.position;
 
-        if (!this._deserializer.hasType(behaviorName)) {
-            this._logger.warn(`GameObjectBehavior "${behaviorName} could not be found in the type directory.  Storing remaining data as extraData.`);
+        if (!this._typeReader.hasType(name)) {
+            this._logger.warn(`GameObjectBehavior "${name} could not be found in the type directory.  Storing remaining data as extraData.`);
             return {
+                name,
+                hasParseData: false,
                 parsedData: null,
                 extraData: reader.readBytes(dataLength)
             };
         }
 
-        const parsedData = this._deserializer.deserializeType(reader, behaviorName);
+        const parsedData = this._typeReader.deserializeRawType(reader, name);
         let extraData = null;
 
         const dataRemaining = dataLength - (reader.position - preParsePosition);
         if (dataRemaining < 0) {
-            throw new Error(`GameObjectBehavior "${behaviorName}" deserialized more type data than expected.`);
+            throw new Error(`GameObjectBehavior "${name}" deserialized more type data than expected.`);
         }
         else if (dataRemaining > 0) {
             // We know these exists, but for now we don't know what to do with them.
             //  TODO: Implement extra data parsing for specific behaviors that implement ISaveLoadableDetails.
-            this._logger.warn(`GameObjectBehavior "${behaviorName}" has extra data.  This object should be inspected for a ISaveLoadableDetails implementation.`);
+            this._logger.warn(`GameObjectBehavior "${name}" has extra data.  This object should be inspected for a ISaveLoadableDetails implementation.`);
             extraData = reader.readBytes(dataRemaining);
         }
 
         return {
+            name,
+            hasParseData: true,
             parsedData,
             extraData
         };
+    }
+
+    private _writeGameObjectBehavior(writer: DataWriter, behavior: GameObjectBehavior): void {
+        const {
+            name,
+            hasParseData,
+            parsedData,
+            extraData
+        } = behavior;
+
+        writer.writeKleiString(name);
+        if (hasParseData) {
+            this._typeWriter.serializeRawType(writer, name, parsedData);
+        }
+
+        if (extraData) {
+            writer.writeBytes(extraData);
+        }
     }
 }
 
@@ -214,16 +306,11 @@ function validateBehaviorName(name: string | null | undefined): string {
 }
 
 function gameObjectToJson(this: GameObject) {
-    const behaviors: {[key: string]: GameObjectBehavior} = {};
-    for(let pair of this.behaviors) {
-        behaviors[pair[0]] = pair[1];
-    }
-
     return {
         position: this.position,
         rotation: this.rotation,
         scale: this.scale,
         folder: this.folder,
-        behaviors
+        behaviors: this.behaviors
     };
 }

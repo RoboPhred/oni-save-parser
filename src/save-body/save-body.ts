@@ -8,8 +8,10 @@ import {
 
 import {
     DataReader,
-    ZlibDataReader
-} from "../data-reader";
+    DataWriter,
+    ZlibDataReader,
+    ZlibDataWriter
+} from "../binary-serializer";
 
 import {
     OniSave
@@ -36,8 +38,6 @@ import {
 } from "../game-state";
 
 
-
-
 @injectable(OniSaveBody)
 @inScope(OniSave)
 export class OniSaveBodyImpl implements OniSaveBody {
@@ -51,11 +51,22 @@ export class OniSaveBodyImpl implements OniSaveBody {
 
     parse(reader: DataReader): void {
         if (this._header.isCompressed) {
-            const deflatedReader = new ZlibDataReader(reader.readAllBytes());
+            const deflatedReader = new ZlibDataReader(reader.viewAllBytes());
             this._parseState(deflatedReader);
         }
         else {
             this._parseState(reader);
+        }
+    }
+
+    write(writer: DataWriter): void {
+        if (this._header.isCompressed) {
+            const deflateWriter = new ZlibDataWriter();
+            this._writeState(deflateWriter);
+            writer.writeBytes(deflateWriter.getBytesView());
+        }
+        else {
+            this._writeState(writer);
         }
     }
 
@@ -81,5 +92,12 @@ export class OniSaveBodyImpl implements OniSaveBody {
         this.saveRoot.parse(reader);
         this.gameSettings.parse(reader);
         this.gameState.parse(reader);
+    }
+
+    private _writeState(writer: DataWriter): void {
+        writer.writeKleiString("world");
+        this.saveRoot.write(writer);
+        this.gameSettings.write(writer);
+        this.gameState.write(writer);
     }
 }

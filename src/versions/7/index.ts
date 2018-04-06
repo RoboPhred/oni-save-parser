@@ -5,7 +5,7 @@ import {
 
 import {
     ArrayDataReader
-} from "../../data-reader";
+} from "../../binary-serializer";
 
 import {
     OniSave

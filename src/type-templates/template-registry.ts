@@ -21,8 +21,10 @@ import {
 } from "../logging/services";
 
 import {
-    DataReader
-} from "../data-reader";
+    DataReader,
+    DataWriter,
+    ArrayDataWriter
+} from "../binary-serializer";
 
 import {
     OniSave
@@ -40,18 +42,21 @@ import {
 } from "./interfaces";
 
 import {
-    TypeDeserializer,
-    TypeTemplateRegistry
+    TypeReader,
+    TypeTemplateRegistry,
+    TypeWriter
 } from "./services";
 
 
 @injectable()
 @provides(TypeTemplateRegistry)
-@provides(TypeDeserializer)
+@provides(TypeReader)
+@provides(TypeWriter)
 @inScope(OniSave)
-export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeserializer, JsonObjectSerializable {
+export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
 
     private _templates = new Map<string, TypeTemplate>();
+    private _orderedTemplateNames: string[] = [];
 
     constructor(
         @inject(Logger) private _logger: Logger
@@ -64,6 +69,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
         this._logger.trace(`${templateCount} templates found.`);
         for (let i = 0; i < templateCount; i++) {
             const templateName = validateTypeName(reader.readKleiString());
+            this._orderedTemplateNames.push(templateName);
 
             this._logger.trace(`Parsing template "${templateName}".`);
 
@@ -72,6 +78,19 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
             this._logger.trace(`Done parsing template "${templateName}".`);
 
             this._templates.set(templateName, template);
+        }
+    }
+
+    write(writer: DataWriter): void {
+        writer.writeInt32(this._orderedTemplateNames.length);
+
+        // ONI checks existence of sub-templates while parsing templates,
+        //  so we should ensure the order we write them back in is the same
+        //  as we read them.
+        for (let templateName of this._orderedTemplateNames) {
+            const template = this._templates.get(templateName)!;
+            writer.writeKleiString(templateName);
+            this._writeTemplate(writer, template);
         }
     }
 
@@ -86,10 +105,10 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
             throw new Error(`Expected to deserialize type "${expectedType}", but received "${templateName}"`);
         }
 
-        return this.deserializeType(reader, templateName);
+        return this.deserializeRawType(reader, templateName);
     }
 
-    deserializeType<T>(reader: DataReader, typeName: AssemblyTypeName<T>): T {
+    deserializeRawType<T>(reader: DataReader, typeName: AssemblyTypeName<T>): T {
         const template = this._templates.get(typeName);
         if (!template) {
             throw new Error(`Cannot deserialize type template "${typeName}": Template does not exist.`);
@@ -108,6 +127,31 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
         }
 
         return obj;
+    }
+
+    serialize<T = any>(writer: DataWriter, typeName: AssemblyTypeName<T>, value: T): void {
+        const template = this._templates.get(typeName);
+        if (!template) {
+            throw new Error(`Cannot serialize type template "${typeName}": Template does not exist.`);
+        }
+
+        writer.writeKleiString(typeName);
+        this.serializeRawType(writer, typeName, value);
+    }
+
+    serializeRawType<T = any>(writer: DataWriter, typeName: AssemblyTypeName<T>, value: T): void {
+        const template = this._templates.get(typeName);
+        if (!template) {
+            throw new Error(`Cannot serialize type template "${typeName}": Template does not exist.`);
+        }
+
+        for (let field of template.fields) {
+            this._serializeType(writer, field, (value as any)[field.typeName]);
+        }
+
+        for (let prop of template.properties) {
+            this._serializeType(writer, prop, (value as any)[prop.typeName]);
+        }
     }
 
     toJSON(): object {
@@ -160,6 +204,21 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
         return template;
     }
 
+    private _writeTemplate(writer: DataWriter, template: TypeTemplate): void {
+        writer.writeInt32(template.fields.length);
+        writer.writeInt32(template.properties.length);
+
+        for (let field of template.fields) {
+            writer.writeKleiString(field.typeName);
+            writeType(writer, field);
+        }
+
+        for (let prop of template.properties) {
+            writer.writeKleiString(prop.typeName);
+            writeType(writer, prop);
+        }
+    }
+
     private _deserializeType(reader: DataReader, descriptor: TypeDescriptor): any {
         const {
             typeInfo,
@@ -172,9 +231,11 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                 if (!templateName) {
                     throw new Error(`Expected user-defined type to have a template name, but none was defined.`);
                 }
-                // First value seems to indicate nullability.
+
+                // First value indicates the size of the written data.
+                //  ONI writes the size, but only checks if >= 0
                 if (reader.readInt32() >= 0) {
-                    return this.deserializeType(reader, templateName);
+                    return this.deserializeRawType(reader, templateName);
                 }
                 else {
                     return null;
@@ -229,9 +290,10 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                     throw new Error(`Expected Array | List | HashSet types to have one subtype.`);
                 }
 
-                // Always read and discarded.
-                //  No idea what this is, its variable
-                //  seems to be optimized out in the ONI assembly.
+                // Stores the size of the data
+                //  ONI writes this, but discards it on read.
+                // ONI BUG: ONI does NOT include the count in the data length if the value is not null,
+                //  but includes the length if it is null.
                 reader.readInt32();
                 const length = reader.readInt32();
                 if (length >= 0) {
@@ -253,10 +315,20 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                 }
 
                 const [type1, type2] = subTypes;
-                return {
-                    key: this._deserializeType(reader, type1),
-                    value: this._deserializeType(reader, type2)
-                };
+
+                // ONI BUG: The ONI serializer serializes a null pair as [4,-1],
+                //  which seems to be a copy/paste bug from array or dictionary.
+                // As such, this will always attempt to parse, even if the value is null.
+                //  This will lead to Very Very Bad Things
+                if (reader.readInt32() >= 0) {
+                    return {
+                        key: this._deserializeType(reader, type1),
+                        value: this._deserializeType(reader, type2)
+                    };
+                }
+                else {
+                    return null;
+                }
             }
             case TypeInfo.Dictionary: {
                 if (!subTypes || subTypes.length !== 2) {
@@ -265,11 +337,12 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
 
                 const [keyType, valueType] = subTypes;
 
-                // Again, read and discarded.
-                //  Similar to TypeInfo.Array
+                // Stores the size of the data
+                //  ONI writes this, but discards it on read.
                 reader.readInt32();
+                // This is weird, as a length of 0 is valid, a length of -1 is invalid
                 const length = reader.readInt32();
-                if (length > 0) {
+                if (length >= 0) {
                     const pairs: [any, any][] = [];
 
                     // We load values first, then keys.
@@ -300,6 +373,189 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeDeser
                 throwUnknownTypeInfo(descriptor.typeInfo);
         }
     }
+
+    private _serializeType(writer: DataWriter, descriptor: TypeDescriptor, value: any) {
+        const {
+            typeInfo,
+            subTypes,
+            templateName
+        } = descriptor;
+
+        switch (typeInfo) {
+            case TypeInfo.UserDefined: {
+                if (!templateName) {
+                    throw new Error(`Expected user-defined type to have a template name, but none was defined.`);
+                }
+                if (value == null) {
+                    // Unlike the collection types, we simply store -1 for data length
+                    //  when the value is null.
+                    writer.writeInt32(-1);
+                }
+                else {
+                    // TODO: ONI writes the size of the serialized data here.
+                    //  We could do this like ONI does by tracking the position offset
+                    //  of the writer and rewriting the value, but we currently do not
+                    //  expose that functionality on the writer.
+                    //  However, it is absolutely possible to do; the writer
+                    //  uses an array buffer internally.
+                    const dataWriter = new ArrayDataWriter();
+                    this.serializeRawType(dataWriter, templateName, value);
+                    writer.writeInt32(dataWriter.position);
+                    writer.writeBytes(dataWriter.getBytesView());
+                }
+                return;
+            }
+            case TypeInfo.SByte:
+                return writer.writeSByte(value);
+            case TypeInfo.Byte:
+                return writer.writeByte(value);
+            case TypeInfo.Boolean:
+                return writer.writeByte(value ? 1 : 0);
+            case TypeInfo.Int16:
+                return writer.writeInt16(value);
+            case TypeInfo.UInt16:
+                return writer.writeUInt16(value);
+            case TypeInfo.Int32:
+                return writer.writeInt32(value);
+            case TypeInfo.UInt32:
+                return writer.writeUInt32(value);
+            case TypeInfo.Int64:
+                return writer.writeInt64(value);
+            case TypeInfo.UInt64:
+                return writer.writeUInt64(value);
+            case TypeInfo.Single:
+                return writer.writeSingle(value);
+            case TypeInfo.Double:
+                return writer.writeDouble(value);
+            case TypeInfo.String:
+                return writer.writeKleiString(value);
+            case TypeInfo.Enumeration:
+                return writer.writeUInt32(value);
+            case TypeInfo.Vector2I: {
+                writer.writeInt32(value.x),
+                    writer.writeInt32(value.y)
+                return;
+            }
+            case TypeInfo.Vector2: {
+                writer.writeSingle(value.x),
+                    writer.writeSingle(value.y)
+                return;
+            }
+            case TypeInfo.Vector3:
+                return writer.writeVector3(value);
+            case TypeInfo.Array:
+            case TypeInfo.List:
+            case TypeInfo.HashSet: {
+                if (!subTypes || subTypes.length !== 1) {
+                    throw new Error(`Expected Array | List | HashSet types to have one subtype.`);
+                }
+
+                // ONI BUG: ONI does NOT include the count in the data length if the value is not null,
+                //  but includes the length if it is null.
+
+                if (value == null) {
+                    // ONI BUG: data length includes size bytes when value is null.
+                    writer.writeInt32(4);
+                    writer.writeInt32(-1);
+                }
+                else {
+                    // TODO: ONI writes the size of the serialized data here.
+                    //  We could do this like ONI does by tracking the position offset
+                    //  of the writer and rewriting the value, but we currently do not
+                    //  expose that functionality on the writer.
+                    //  However, it is absolutely possible to do; the writer
+                    //  uses an array buffer internally.
+                    const dataWriter = new ArrayDataWriter();
+
+                    const array = value as any[];
+                    if (array.length >= 0) {
+                        const subType = subTypes[0];
+                        for (let item of array) {
+                            this._serializeType(dataWriter, subType, item);
+                        }
+                    }
+
+                    // ONI BUG: data length does NOT include size bytes when value is not null.
+                    writer.writeInt32(dataWriter.position);
+                    writer.writeInt32(array.length);
+                    writer.writeBytes(dataWriter.getBytesView());
+                }
+                return;
+            }
+            case TypeInfo.Pair: {
+                if (!subTypes || subTypes.length !== 2) {
+                    throw new Error(`Expected Pair type to have two subtypes.`);
+                }
+                const [type1, type2] = subTypes;
+
+                if (value == null) {
+                    // ONI BUG: ONI writes out [4, -1] when pair is null,
+                    //  as if they were storing a count in the second value.
+                    // This is DIFFERENT than the parse logic, which checks the first value
+                    //  to be greater or equal to 0 for non-null.
+                    //  Nor do we, in order to stay as close to the save logic as possible.
+                    writer.writeInt32(4);
+                    writer.writeInt32(-1);
+                }
+                else {
+                    this._serializeType(writer, type1, value.key);
+                    this._serializeType(writer, type2, value.value);
+                }
+                return;
+            }
+            case TypeInfo.Dictionary: {
+                if (!subTypes || subTypes.length !== 2) {
+                    throw new Error(`Expected Dictionary type to have two subtypes.`);
+                }
+                const [keyType, valueType] = subTypes;
+
+                if (value == null) {
+                    writer.writeInt32(4);
+                    writer.writeInt32(-1);
+                }
+                else {
+                    // TODO: ONI writes the size of the serialized data here.
+                    //  We could do this like ONI does by tracking the position offset
+                    //  of the writer and rewriting the value, but we currently do not
+                    //  expose that functionality on the writer.
+                    //  However, it is absolutely possible to do; the writer
+                    //  uses an array buffer internally.
+                    const dataWriter = new ArrayDataWriter();
+
+                    const map = value as Map<any, any>;
+                    const pairs = Array.from(map.entries());
+                    // We store values first, then keys.
+                    for (let pair of pairs) {
+                        this._serializeType(writer, valueType, pair[1]);
+                    }
+                    for (let pair of pairs) {
+                        this._serializeType(writer, valueType, pair[0]);
+                    }
+
+                    // ONI BUG: data length does NOT include size bytes when value is not null.
+                    writer.writeInt32(dataWriter.position);
+                    writer.writeInt32(pairs.length);
+                    writer.writeBytes(dataWriter.getBytesView());
+                }
+                return;
+            }
+            case TypeInfo.Colour: {
+                const color = value as Colour;
+                writer.writeByte(clamp(color.r * 255, 0, 255));
+                writer.writeByte(clamp(color.g * 255, 0, 255));
+                writer.writeByte(clamp(color.b * 255, 0, 255));
+                writer.writeByte(clamp(color.a * 255, 0, 255));
+            }
+            default:
+                throwUnknownTypeInfo(descriptor.typeInfo);
+        }
+    }
+}
+
+function clamp(value: number, low: number, high: number): number {
+    if (value < low) return low;
+    if (value > high) return high;
+    return value;
 }
 
 function throwUnknownTypeInfo(typeInfo: TypeInfo): never {
@@ -326,6 +582,7 @@ function readType(reader: DataReader): TypeDescriptor {
     }
 
     if (isGeneric) {
+        descriptor.isGeneric = true;
         const subTypeCount = reader.readByte();
         const subTypes = descriptor.subTypes = new Array(subTypeCount);
         for (let i = 0; i < subTypeCount; i++) {
@@ -341,6 +598,41 @@ function readType(reader: DataReader): TypeDescriptor {
     }
 
     return descriptor;
+}
+
+function writeType(writer: DataWriter, type: TypeDescriptor) {
+    const {
+        typeInfo,
+        templateName,
+        isGeneric,
+        subTypes
+    } = type;
+
+    let typeData = typeInfo;
+
+    if (isGeneric) {
+        // Can't trust the presense of subTypes to indicate this
+        typeData |= TypeInfo.IS_GENERIC_TYPE;
+    }
+
+    writer.writeByte(typeData);
+
+    if (templateName) {
+        if (typeInfo !== TypeInfo.UserDefined && typeInfo !== TypeInfo.Enumeration) {
+            throw new Error("Cannot define a template name when type is not UserDefined or Enumeration.");
+        }
+        writer.writeKleiString(templateName)
+    }
+
+    if (subTypes) {
+        if (!isGeneric && (typeInfo !== TypeInfo.Array || subTypes.length !== 1)) {
+            throw new Error("Invalid subtype configuration.  Subtypes can only be used for generics, or with a single type for arrays.");
+        }
+        writer.writeByte(subTypes.length);
+        for (let subType of subTypes) {
+            writeType(writer, subType);
+        }
+    }
 }
 
 /**

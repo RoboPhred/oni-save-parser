@@ -1,6 +1,6 @@
 
 import {
-    TextDecoder
+    TextDecoder, TextEncoder
 } from "text-encoding";
 
 import {
@@ -18,8 +18,9 @@ import {
 } from "../interfaces";
 
 import {
-    DataReader
-} from "../data-reader";
+    DataReader,
+    DataWriter
+} from "../binary-serializer";
 
 import {
     OniSave
@@ -62,8 +63,26 @@ export class OniSaveHeaderImpl implements OniSaveHeader, JsonObjectSerializable 
         this._isCompressed = this._headerVersion >= 1 ? Boolean(reader.readUInt32()) : false;
 
         const data = reader.readBytes(headerSize);
-        const dataStr = new TextDecoder("utf-8").decode(data);
+        const dataStr = new TextDecoder("utf-8").decode(new DataView(data));
         this._gameData = JSON.parse(dataStr);
+    }
+
+    write(writer: DataWriter) {
+        const buildVersion = ensureNotNull(this._buildVersion);
+        const headerVersion = ensureNotNull(this._headerVersion);
+        const isCompressed = ensureNotNull(this._isCompressed);
+
+        const dataStr = JSON.stringify(ensureNotNull(this._gameData));
+        const headerBytes = new TextEncoder("utf-8").encode(dataStr);
+
+        writer.writeUInt32(buildVersion);
+        writer.writeUInt32(headerBytes.byteLength);
+        writer.writeUInt32(headerVersion);
+        if (headerVersion >= 1) {
+            writer.writeUInt32(isCompressed ? 1 : 0);
+        }
+
+        writer.writeBytes(headerBytes.buffer);
     }
 
     toJSON() {
