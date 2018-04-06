@@ -46,9 +46,16 @@ export class ArrayDataReader implements DataReader {
 
     readBytes(length: number): ArrayBuffer {
         this._checkCanRead(length);
-        const newBuffer = this._buffer.slice(this._byteOffset, length - this._byteOffset);
+        const newBuffer = this._buffer.slice(this._byteOffset, length + this._byteOffset);
         this._byteOffset += length;        
         return newBuffer;
+    }
+
+    viewBytes(length: number): ArrayBufferView {
+        this._checkCanRead(length);
+        const view = new DataView(this._buffer, this._byteOffset, length);
+        this._byteOffset += length;
+        return view;
     }
 
     readAllBytes(): ArrayBuffer {

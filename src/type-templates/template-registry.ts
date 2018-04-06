@@ -298,6 +298,12 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                 const length = reader.readInt32();
                 if (length >= 0) {
                     const subType = subTypes[0];
+
+                    if (subType.typeInfo === TypeInfo.Byte) {
+                        const data = reader.readBytes(length);
+                        return Array.from(new Uint8Array(data));
+                    }
+
                     const array = new Array(length);
                     for (let i = 0; i < length; i++) {
                         const value = this._deserializeType(reader, subType);
@@ -340,7 +346,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                 // Stores the size of the data
                 //  ONI writes this, but discards it on read.
                 reader.readInt32();
-                // This is weird, as a length of 0 is valid, a length of -1 is invalid
+                // In contrast to UserDefined, a length of -1 means null.
                 const length = reader.readInt32();
                 if (length >= 0) {
                     const pairs: [any, any][] = [];
@@ -354,7 +360,9 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                         pairs[i][0] = this._deserializeType(reader, keyType);
                     }
 
-                    return new Map(pairs);
+                    // Returning a pair array for now, so we can have idiompotency.
+                    //  Trying to figure out where the save or load code is diverging.
+                    return pairs;
                 }
                 else {
                     return null;
@@ -432,13 +440,13 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
             case TypeInfo.Enumeration:
                 return writer.writeUInt32(value);
             case TypeInfo.Vector2I: {
-                writer.writeInt32(value.x),
-                    writer.writeInt32(value.y)
+                writer.writeInt32(value.x);
+                writer.writeInt32(value.y);
                 return;
             }
             case TypeInfo.Vector2: {
-                writer.writeSingle(value.x),
-                    writer.writeSingle(value.y)
+                writer.writeSingle(value.x);
+                writer.writeSingle(value.y);
                 return;
             }
             case TypeInfo.Vector3:
@@ -470,8 +478,14 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     const array = value as any[];
                     if (array.length >= 0) {
                         const subType = subTypes[0];
-                        for (let item of array) {
-                            this._serializeType(dataWriter, subType, item);
+
+                        if (subType.typeInfo === TypeInfo.Byte) {
+                            dataWriter.writeBytes(new Uint8Array(array));
+                        }
+                        else {
+                            for (let item of array) {
+                                this._serializeType(dataWriter, subType, item);
+                            }
                         }
                     }
 
@@ -522,14 +536,15 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     //  uses an array buffer internally.
                     const dataWriter = new ArrayDataWriter();
 
-                    const map = value as Map<any, any>;
-                    const pairs = Array.from(map.entries());
+                    // Might consider making this an OrderedMap, so load/save is idiompotent.
+                    const pairs = value as [any, any][];
                     // We store values first, then keys.
+                    
                     for (let pair of pairs) {
-                        this._serializeType(writer, valueType, pair[1]);
+                        this._serializeType(dataWriter, valueType, pair[1]);
                     }
                     for (let pair of pairs) {
-                        this._serializeType(writer, valueType, pair[0]);
+                        this._serializeType(dataWriter, keyType, pair[0]);
                     }
 
                     // ONI BUG: data length does NOT include size bytes when value is not null.
@@ -545,6 +560,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                 writer.writeByte(clamp(color.g * 255, 0, 255));
                 writer.writeByte(clamp(color.b * 255, 0, 255));
                 writer.writeByte(clamp(color.a * 255, 0, 255));
+                return;
             }
             default:
                 throwUnknownTypeInfo(descriptor.typeInfo);
@@ -569,7 +585,8 @@ function readType(reader: DataReader): TypeDescriptor {
     const isGeneric = Boolean(typeData & TypeInfo.IS_GENERIC_TYPE);
 
     const descriptor: TypeDescriptor = {
-        typeInfo
+        typeInfo,
+        isGeneric
     };
 
     // This occurs before generic resolution, if we are a generic.
@@ -582,7 +599,6 @@ function readType(reader: DataReader): TypeDescriptor {
     }
 
     if (isGeneric) {
-        descriptor.isGeneric = true;
         const subTypeCount = reader.readByte();
         const subTypes = descriptor.subTypes = new Array(subTypeCount);
         for (let i = 0; i < subTypeCount; i++) {
@@ -617,20 +633,34 @@ function writeType(writer: DataWriter, type: TypeDescriptor) {
 
     writer.writeByte(typeData);
 
-    if (templateName) {
-        if (typeInfo !== TypeInfo.UserDefined && typeInfo !== TypeInfo.Enumeration) {
-            throw new Error("Cannot define a template name when type is not UserDefined or Enumeration.");
+    if (typeInfo === TypeInfo.UserDefined || typeInfo === TypeInfo.Enumeration) {
+        if (!templateName || templateName.length === 0) {
+            throw new Error("UserDefined or Enumeration types must supply a templateName.");
         }
         writer.writeKleiString(templateName)
+    }
+
+    if (isGeneric) {
+        if (!subTypes) {
+            throw new Error("Generics must have subtypes.");
+        }
+        // Generic types write out their subType count
+        writer.writeByte(subTypes.length);
+        for (let subType of subTypes) {
+            writeType(writer, subType);
+        }
+    }
+    else if (typeInfo === TypeInfo.Array) {
+        if (!subTypes || subTypes.length !== 1) {
+            throw new Error("Array types must have exactly 1 subtype.");
+        }
+        // Arrays have one subtype and do NOT emit a count.
+        writeType(writer, subTypes[0]);
     }
 
     if (subTypes) {
         if (!isGeneric && (typeInfo !== TypeInfo.Array || subTypes.length !== 1)) {
             throw new Error("Invalid subtype configuration.  Subtypes can only be used for generics, or with a single type for arrays.");
-        }
-        writer.writeByte(subTypes.length);
-        for (let subType of subTypes) {
-            writeType(writer, subType);
         }
     }
 }

@@ -19,7 +19,7 @@ export class ZlibDataWriter extends ArrayDataWriter {
         }).buffer;
     }
 
-    getBytesView(): ArrayBufferView {
+    getBytesView(): Uint8Array {
         // Cannot make a nice efficient view here, since we deflate on-demand.
         return new Uint8Array(this.getBytes());
     }

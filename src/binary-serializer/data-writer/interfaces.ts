@@ -42,5 +42,5 @@ export interface DataWriter {
     /**
      * Gets a view into the current content of the DataWriter.
      */
-    getBytesView(): ArrayBufferView;
+    getBytesView(): Uint8Array;
 }

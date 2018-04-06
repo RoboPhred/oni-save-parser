@@ -9,6 +9,7 @@ export interface DataReader {
     readByte(): number;
     readSByte(): number;
     readBytes(length: number): ArrayBuffer;
+    viewBytes(length: number): ArrayBufferView;
     /**
      * Read all remaining bytes in the reader into a new ArrayBuffer.
      * This is not efficient for one-off passes of the data.
