@@ -24,7 +24,7 @@ export declare class ArrayDataWriter implements DataWriter {
     writeVector3(value: Vector3): void;
     writeQuaternion(value: Quaternion): void;
     getBytes(): ArrayBuffer;
-    getBytesView(): ArrayBufferView;
+    getBytesView(): Uint8Array;
     /**
      * Ensure there is enough room in the buffer to write
      * the specified amount of bytes.

@@ -62,8 +62,8 @@ export class OniSaveHeaderImpl implements OniSaveHeader, JsonObjectSerializable 
         this._headerVersion = reader.readUInt32();
         this._isCompressed = this._headerVersion >= 1 ? Boolean(reader.readUInt32()) : false;
 
-        const data = reader.readBytes(headerSize);
-        const dataStr = new TextDecoder("utf-8").decode(new DataView(data));
+        const data = reader.viewBytes(headerSize);
+        const dataStr = new TextDecoder("utf-8").decode(data);
         this._gameData = JSON.parse(dataStr);
     }
 

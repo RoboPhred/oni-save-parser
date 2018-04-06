@@ -8,9 +8,17 @@ import {
     parseOniSave
 } from "../index";
 
+import {
+    ArrayDataWriter
+} from "../binary-serializer";
+
 const fileData = readFileSync("./test-data/Rancher-Test.sav");
 
 const saveData = parseOniSave(fileData.buffer);
+
+const writeTest = new ArrayDataWriter();
+saveData.write(writeTest);
+writeFileSync("./test-data/writeback.sav", writeTest.getBytesView());
 
 
 const saveJson = saveData.toJSON() as any;

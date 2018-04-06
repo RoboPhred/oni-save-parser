@@ -163,18 +163,18 @@ export class OniGameStateManagerImpl implements OniGameState {
         return prefabObjects;
     }
 
-    private _writePrefabSet(writer: DataWriter, prefabSet: GameObject[]) {
+    private _writePrefabSet(writer: DataWriter, prefabObjects: GameObject[]) {
 
         // We need to know the data length.
         //  Write the data to another buffer, so we can
         //  figure out its length and write its data out.
         const setWriter = new ArrayDataWriter();
-        for (let gameObject of prefabSet) {
+        for (let gameObject of prefabObjects) {
             this._writeGameObject(setWriter, gameObject);
         }
-        const gameObjectData = setWriter.getBytes();
+        const gameObjectData = setWriter.getBytesView();
 
-        writer.writeInt32(prefabSet.length);
+        writer.writeInt32(prefabObjects.length);
         writer.writeInt32(gameObjectData.byteLength);
         writer.writeBytes(gameObjectData);
     }
@@ -278,13 +278,19 @@ export class OniGameStateManagerImpl implements OniGameState {
         } = behavior;
 
         writer.writeKleiString(name);
+
+        var dataWriter = new ArrayDataWriter();
+
         if (hasParseData) {
-            this._typeWriter.serializeRawType(writer, name, parsedData);
+            this._typeWriter.serializeRawType(dataWriter, name, parsedData);
         }
 
         if (extraData) {
-            writer.writeBytes(extraData);
+            dataWriter.writeBytes(extraData);
         }
+
+        writer.writeInt32(dataWriter.position);
+        writer.writeBytes(dataWriter.getBytesView());
     }
 }
 

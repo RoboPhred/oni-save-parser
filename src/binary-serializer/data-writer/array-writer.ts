@@ -116,7 +116,7 @@ export class ArrayDataWriter implements DataWriter {
 
     writeChars(value: string): void {
         const encoded = this._textEncoder.encode(value);
-        this._ensureCanWrite(encoded.length);
+        this._ensureCanWrite(encoded.byteLength);
         this._buffer.set(encoded, this._byteOffset);
         this._byteOffset += encoded.byteLength;
     }
@@ -149,11 +149,11 @@ export class ArrayDataWriter implements DataWriter {
 
     getBytes(): ArrayBuffer {
         const buffer = new ArrayBuffer(this._byteOffset);
-        (new Uint8Array(buffer)).set(this._buffer, this._byteOffset);
+        (new Uint8Array(buffer)).set(this.getBytesView());
         return buffer;
     }
 
-    getBytesView(): ArrayBufferView {
+    getBytesView(): Uint8Array {
         return new Uint8Array(this._buffer.buffer, 0, this._byteOffset);
     }
 

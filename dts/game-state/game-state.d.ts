@@ -24,7 +24,7 @@ export declare class OniGameStateManagerImpl implements OniGameState {
     private _parsePrefabs(reader);
     private _writePrefabs(writer);
     private _parsePrefabSet(reader, prefabName);
-    private _writePrefabSet(writer, prefabSet);
+    private _writePrefabSet(writer, prefabObjects);
     private _parseGameObject(reader);
     private _writeGameObject(writer, gameObject);
     private _parseGameObjectBehavior(reader);
