@@ -4,9 +4,12 @@ import {
 } from "microinject";
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
+
+import {
+    BinarySerializable
+} from "../binary-serializer";
 
 import {
     OniSaveHeader
@@ -17,7 +20,7 @@ import {
 } from "../save-body";
 
 
-export interface OniSave extends JsonObjectSerializable, Parseable {
+export interface OniSave extends JsonObjectSerializable, BinarySerializable {
     readonly header: OniSaveHeader;
     readonly body: OniSaveBody;
 }

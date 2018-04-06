@@ -4,15 +4,18 @@ import {
 } from "microinject";
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
+
+import {
+    BinarySerializable
+} from "../binary-serializer";
 
 /**
  * Contains basic world data and additional data streams.
  * Corresponds to Klei.SaveFileRoot
  */
-export interface OniSaveRoot extends JsonObjectSerializable, Parseable {
+export interface OniSaveRoot extends JsonObjectSerializable, BinarySerializable {
     /**
      * The width of the map in cells.
      */

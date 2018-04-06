@@ -10,11 +10,13 @@ import {
 } from "../utils";
 
 import {
-    DataReader
-} from "../data-reader";
+    DataReader,
+    DataWriter
+} from "../binary-serializer";
 
 import {
-    TypeDeserializer
+    TypeReader,
+    TypeWriter
 } from "../type-templates";
 
 import {
@@ -33,31 +35,31 @@ import {
 @injectable(OniGameSettings)
 @inScope(OniSave)
 export class OniGameSettingsImpl implements OniGameSettings {
-    private _baseAlreadyCreated: boolean | null = null;
-    private _nextUniqueID: number | null = null;
-    private _gameID: number | null = null;
+    private _settings: GameSettings | null = null;
 
     constructor(
-        @inject(TypeDeserializer) private _deserializer: TypeDeserializer
+        @inject(TypeReader) private _typeReader: TypeReader,
+        @inject(TypeWriter) private _typeWriter: TypeWriter
     ) {}
 
     get baseAlreadyCreated(): boolean {
-        return ensureNotNull(this._baseAlreadyCreated, "The value has not yet been parsed.");
+        return ensureNotNull(this._settings, "The value has not yet been parsed.").baseAlreadyCreated;
     }
 
     get nextUniqueID(): number {
-        return ensureNotNull(this._nextUniqueID, "The value has not yet been parsed.");
+        return ensureNotNull(this._settings, "The value has not yet been parsed.").nextUniqueID;
     }
 
     get gameID(): number {
-        return ensureNotNull(this._gameID, "The value has not yet been parsed.");
+        return ensureNotNull(this._settings, "The value has not yet been parsed.").gameID;
     }
 
     parse(reader: DataReader): void {
-        const settings = this._deserializer.deserialize(reader, GameSettings);
-        this._baseAlreadyCreated = settings.baseAlreadyCreated;
-        this._nextUniqueID = settings.nextUniqueID;
-        this._gameID = settings.gameID;
+        this._settings = this._typeReader.deserialize(reader, GameSettings);
+    }
+
+    write(writer: DataWriter): void {
+        this._typeWriter.serialize(writer, GameSettings, this._settings);
     }
 
     toJSON() {

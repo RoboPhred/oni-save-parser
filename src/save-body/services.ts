@@ -5,9 +5,12 @@ import {
 
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
+
+import {
+    BinarySerializable
+} from "../binary-serializer";
 
 import {
     OniSaveRoot
@@ -28,7 +31,7 @@ import {
  * 
  * This is equivalent to the data that is handled by the ONI code ```SaveLoader.Load(IReader)```
  */
-export interface OniSaveBody extends JsonObjectSerializable, Parseable {
+export interface OniSaveBody extends JsonObjectSerializable, BinarySerializable {
     readonly saveRoot: OniSaveRoot;
     readonly gameSettings: OniGameSettings;
     readonly gameState: OniGameState;

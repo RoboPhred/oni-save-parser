@@ -4,12 +4,15 @@ import {
 } from "microinject";
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
 
+import {
+    BinarySerializable
+} from "../binary-serializer";
 
-export interface OniGameSettings extends JsonObjectSerializable, Parseable {
+
+export interface OniGameSettings extends JsonObjectSerializable, BinarySerializable {
     readonly baseAlreadyCreated: boolean;
     readonly nextUniqueID: number;
     readonly gameID: number;

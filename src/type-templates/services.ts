@@ -8,24 +8,25 @@ import {
 } from "../assembly-types";
 
 import {
-    JsonObjectSerializable,
-    Parseable
+    JsonObjectSerializable
 } from "../interfaces";
 
 import {
-    DataReader
-} from "../data-reader";
+    BinarySerializable,
+    DataReader,
+    DataWriter,
+} from "../binary-serializer";
 
-export interface TypeTemplateRegistry extends JsonObjectSerializable, Parseable { }
-export const TypeTemplateRegistry: Identifier<TypeTemplateRegistry> = Symbol("TypeTemplateRegistry");
-
-export interface TypeDeserializer {
+export interface TypeRegistryCommonServices {
     /**
      * Indicates if the deserializer can handle the specified type.
      * @param typeName The name of the type to check.
      */
     hasType(typeName: string): boolean;
+}
 
+
+export interface TypeReader extends TypeRegistryCommonServices {
     /**
      * Deserialize a named type from the data reader.
      * The type name should be the next item to be read.
@@ -50,6 +51,30 @@ export interface TypeDeserializer {
      * @param reader The data reader to deserialize from.
      * @param typeName The type to deserialize from the reader.
      */
-    deserializeType<T = any>(reader: DataReader, typeName: string): T;
+    deserializeRawType<T = any>(reader: DataReader, typeName: string): T;
 }
-export const TypeDeserializer: Identifier<TypeDeserializer> = Symbol("TypeDeserializer");
+export const TypeReader: Identifier<TypeReader> = Symbol("TypeReader");
+
+
+export interface TypeWriter extends TypeRegistryCommonServices {
+    /**
+     * Serialize a type to the data writer, including the type name.
+     * @param writer The writer to write to.
+     * @param value The value to write.
+     * @param typeName The name of the type to write the value as.
+     */
+    serialize<T = any>(writer: DataWriter, typeName: AssemblyTypeName<T>, value: T): void;
+
+    /**
+     * Serialize a type to the data writer, without writing the type name.
+     * @param writer The writer to write to.
+     * @param value The value to write.
+     * @param typeName The name of the type to write the value as.
+     */
+    serializeRawType<T = any>(writer: DataWriter, typeName: AssemblyTypeName<T>, value: T): void;
+}
+export const TypeWriter: Identifier<TypeWriter> = Symbol("TypeWriter");
+
+
+export interface TypeTemplateRegistry extends JsonObjectSerializable, BinarySerializable, TypeReader, TypeWriter { };
+export const TypeTemplateRegistry: Identifier<TypeTemplateRegistry> = Symbol("TypeTemplateRegistry");

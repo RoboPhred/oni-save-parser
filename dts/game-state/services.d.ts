@@ -1,5 +1,6 @@
 import { Identifier } from "microinject";
-import { JsonObjectSerializable, Parseable } from "../interfaces";
+import { JsonObjectSerializable } from "../interfaces";
+import { BinarySerializable } from "../binary-serializer";
 import { GameObject } from "./interfaces";
 /**
  * This is anagolous to the ONI assembly's ```SaveManager``.
@@ -9,7 +10,7 @@ import { GameObject } from "./interfaces";
  * structure, while this explicitly deals with instantiating
  * game objects.
  */
-export interface OniGameState extends JsonObjectSerializable, Parseable {
+export interface OniGameState extends JsonObjectSerializable, BinarySerializable {
     readonly gameObjects: ReadonlyMap<string, GameObject[]>;
 }
 export declare const OniGameState: Identifier<OniGameState>;

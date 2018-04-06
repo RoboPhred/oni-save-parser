@@ -10,8 +10,9 @@ import {
 } from "../interfaces";
 
 import {
-    DataReader
-} from "../data-reader";
+    DataReader,
+    DataWriter
+} from "../binary-serializer";
 
 import {
     TypeTemplateRegistry
@@ -32,7 +33,7 @@ import {
 
 @injectable(OniSave)
 @asScope(OniSave)
-export class OniSaveImpl implements OniSave, JsonObjectSerializable {
+export class OniSaveImpl implements OniSave {
 
     constructor(
         @inject(OniSaveHeader) public header: OniSaveHeader,
@@ -44,6 +45,12 @@ export class OniSaveImpl implements OniSave, JsonObjectSerializable {
         this.header.parse(reader);
         this._templates.parse(reader);
         this.body.parse(reader);
+    }
+
+    write(writer: DataWriter) {
+        this.header.write(writer);
+        this._templates.write(writer);
+        this.body.write(writer);
     }
 
     toJSON() {
