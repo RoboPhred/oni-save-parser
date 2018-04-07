@@ -38,38 +38,29 @@ the more esoteric game objects.
 
 ```
 const {
-    readFileSync,
-    writeFileSync
-} = require("fs");
-
-const {
-    parseOniSave
+    parseOniSave,
+    writeOniSave
 } = require("oni-save-parser");
 
-const savePath = "./my-save.sav";
-const outputPath = "./my-save.json";
+const fileData = readFileSync("./test-data/Rancher-Test.sav");
 
-const fileData = readFileSync(savePath);
-
-// Note that parseOniSave takes an ArrayBuffer, not a node Buffer.
-//  We can get the ArrayBuffer out of a Buffer by using the buffer property.
 const saveData = parseOniSave(fileData.buffer);
 
+const minions = saveData.body.gameState.gameObjects.get("Minion");
+for(let minion of minions) {
+    // Change every minion to 1/3 the size.
+    minion["scale"]["x"] = 0.3;
+    minion["scale"]["y"] = 0.3;
+    minion["scale"]["z"] = 0.3;
 
-const saveJson = saveData.toJSON() as any;
-
-// This object contains the binary blobs that represent
-//  the game map, camera position, visibility, and tile damage.
-// This includes a lot of opaque binary arrays that we currently
-//  can't do anything with.
-// Wipe the data from the save object so we do not
-//  make the file impossibly large and difficult to edit.
-const streamData = saveJson["body"]["saveRoot"]["streamed"];
-for (let key of Object.keys(streamData)) {
-    streamData[key] = "<stream data>";
+    // Set all attribute levels to 100.
+    const attrBehavior = minion["behaviors"].find(x => x["name"] === "Klei.AI.AttributeLevels");
+    const levels = attrBehavior["parsedData"].saveLoadLevels;
+    levels.forEach(x => x["level"] = 100);
 }
 
-writeFileSync(outputPath, JSON.stringify(saveJson, null, 2));
+const writeData = writeOniSave(saveData);
+writeFileSync("./test-data/writeback.sav", new Uint8Array(writeData));
 ```
 
 
