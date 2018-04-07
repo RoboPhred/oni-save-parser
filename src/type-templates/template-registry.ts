@@ -266,7 +266,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
             case TypeInfo.String:
                 return reader.readKleiString();
             case TypeInfo.Enumeration:
-                return reader.readUInt32();
+                return reader.readInt32();
             case TypeInfo.Vector2I: {
                 const vector: Vector2 = {
                     x: reader.readInt32(),
@@ -438,7 +438,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
             case TypeInfo.String:
                 return writer.writeKleiString(value);
             case TypeInfo.Enumeration:
-                return writer.writeUInt32(value);
+                return writer.writeInt32(value);
             case TypeInfo.Vector2I: {
                 writer.writeInt32(value.x);
                 writer.writeInt32(value.y);
