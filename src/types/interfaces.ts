@@ -7,13 +7,6 @@ export interface TypeDescriptor<T = any> {
     name: string;
 }
 
-export interface TypeSerializationInfo<TType, TDescriptor extends TypeDescriptor = TypeDescriptor> {
-    id: TypeInfo;
-    name: string;
-    parse(reader: DataReader, descriptor: TDescriptor): TType;
-    write(writer: DataWriter, descriptor: TDescriptor, value: TType): void;
-}
-
 export enum TypeInfo {
     UserDefined = 0,
     SByte = 1,

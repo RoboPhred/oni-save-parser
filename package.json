@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "long": "^4.0.0",
-    "microinject": "^0.4.1",
+    "microinject": "^0.5.0",
     "text-encoding": "^0.6.4"
   }
 }
