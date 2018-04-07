@@ -7,6 +7,7 @@ import {
 
 
 import {
+    ArrayDataWriter,
     DataReader,
     DataWriter,
     ZlibDataReader,
@@ -37,6 +38,10 @@ import {
     OniGameState
 } from "../game-state";
 
+import {
+    OniGameData
+} from "../game-data";
+
 
 @injectable(OniSaveBody)
 @inScope(OniSave)
@@ -46,7 +51,8 @@ export class OniSaveBodyImpl implements OniSaveBody {
         @inject(OniSaveHeader) private _header: OniSaveHeader,
         @inject(OniSaveRoot) public saveRoot: OniSaveRoot,
         @inject(OniGameSettings) public gameSettings: OniGameSettings,
-        @inject(OniGameState) public gameState: OniGameState
+        @inject(OniGameState) public gameState: OniGameState,
+        @inject(OniGameData) public gameData: OniGameData
     ) {}
 
     parse(reader: DataReader): void {
@@ -74,7 +80,8 @@ export class OniSaveBodyImpl implements OniSaveBody {
         return {
             saveRoot: this.saveRoot.toJSON(),
             gameSettings: this.gameSettings.toJSON(),
-            gameState: this.gameState.toJSON()
+            gameState: this.gameState.toJSON(),
+            gameData: this.gameData.toJSON()
         };
     }
 
@@ -92,12 +99,15 @@ export class OniSaveBodyImpl implements OniSaveBody {
         this.saveRoot.parse(reader);
         this.gameSettings.parse(reader);
         this.gameState.parse(reader);
+        this.gameData.parse(reader);
     }
 
     private _writeState(writer: DataWriter): void {
         writer.writeKleiString("world");
+
         this.saveRoot.write(writer);
         this.gameSettings.write(writer);
         this.gameState.write(writer);
+        this.gameData.write(writer);
     }
 }

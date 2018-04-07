@@ -39,6 +39,10 @@ import {
     createModule as createGameStateModule
 } from "../../game-state/module";
 
+import {
+    createModule as createGameDataModule
+} from "../../game-data/module";
+
 
 export default composeModules(
     createLoggingModule(),
@@ -48,5 +52,6 @@ export default composeModules(
     createSaveBodyModule(),
     createSaveRootModule(),
     createGameSettingsModule(),
-    createGameStateModule()
+    createGameStateModule(),
+    createGameDataModule()
 );
