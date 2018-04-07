@@ -1,6 +1,6 @@
 # oni-save-parser
 
-Parses save data from Oxygen Not Included.  Supports NodeJS and (eventually) Web.
+Parses and writes save data from Oxygen Not Included.  Supports NodeJS and (eventually) Web.
 
 Currently under development
 
@@ -18,16 +18,17 @@ A webpack build will be produced and included later on.
 
 ## Current Progress
 
+Data can be loaded by ```parseOniSave(source: ArrayBuffer)```, and the data written out using ```writeOniSave(save: OniSave): ArrayBuffer```.
+Brand new saves cannot be created, as the world data format is not understood.  This data is preserved as-is when a save is parsed then re-written.
+
 The save file and all templated data objects are loaded.
 This includes most of the interesting stuff, like duplicant stats, building attributes, and so on.
 Some information is still not parsed, such as the general world map and some specific data for a few of
 the more esoteric game objects.
 
-At the moment, this library is not capable of saving the modified save data.  This should be comming soon.
 
 ## Still to do
 - Typedefs for the json-format save data (```OniSave.toJSON()```).
-- Save logic.
 - Handle the special-case manual-parse data used by a few of the game object types.
 - Better error handling: Errors should be specific error classes that describe the state of the parser and
     provide more details on why and where the error happened.
