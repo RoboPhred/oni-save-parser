@@ -1,0 +1,1 @@
+{"version":3,"file":"serialization.js","sourceRoot":"","sources":["../../src/types/serialization.ts"],"names":[],"mappings":";;AAWA,eAAyB,MAAkB,EAAE,UAA6B;IACtE,MAAM,IAAI,KAAK,CAAC,kBAAkB,CAAC,CAAC;AACxC,CAAC;AAFD,sBAEC;AAED,eAAyB,MAAkB,EAAE,UAA6B,EAAE,KAAQ;IAChF,MAAM,IAAI,KAAK,CAAC,kBAAkB,CAAC,CAAC;AACxC,CAAC;AAFD,sBAEC"}
