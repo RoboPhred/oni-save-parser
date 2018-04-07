@@ -4,7 +4,8 @@ import {
 } from "microinject";
 
 import {
-    ArrayDataReader
+    ArrayDataReader,
+    ArrayDataWriter
 } from "../../binary-serializer";
 
 import {
@@ -20,4 +21,10 @@ export function parseOniSave(data: ArrayBuffer): OniSave {
     const reader = new ArrayDataReader(data);
     save.parse(reader);
     return save;
+}
+
+export function writeOniSave(save: OniSave): ArrayBuffer {
+    const writer = new ArrayDataWriter();
+    save.write(writer);
+    return writer.getBytes();
 }
