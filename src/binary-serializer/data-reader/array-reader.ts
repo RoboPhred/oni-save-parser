@@ -172,7 +172,7 @@ export class ArrayDataReader implements DataReader {
     }
 
     private _checkCanRead(length: number) {
-        if (this._byteOffset + length >= this._view.byteLength) {
+        if (this._byteOffset + length > this._view.byteLength) {
             throw new Error(`Cannot read ${length} byte${length != 1 ? "s" : ""}: Buffer length exceeded.`);
         }
     }
