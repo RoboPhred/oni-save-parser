@@ -14,7 +14,7 @@ export declare class ArrayDataReader implements DataReader {
     readBytes(length: number): ArrayBuffer;
     viewBytes(length: number): ArrayBufferView;
     readAllBytes(): ArrayBuffer;
-    viewAllBytes(): ArrayBufferView;
+    viewAllBytes(): Uint8Array;
     readUInt16(): number;
     readInt16(): number;
     readUInt32(): number;

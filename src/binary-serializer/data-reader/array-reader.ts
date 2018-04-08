@@ -64,8 +64,8 @@ export class ArrayDataReader implements DataReader {
         return newBuffer;
     }
 
-    viewAllBytes(): ArrayBufferView {
-        const view = new DataView(this._buffer, this._byteOffset);
+    viewAllBytes(): Uint8Array {
+        const view = new Uint8Array(this._buffer, this._byteOffset);
         this._byteOffset = this._buffer.byteLength;
         return view;
     }

@@ -30,7 +30,7 @@ export interface DataReader {
      * Useful for one-off passes, not not recommended
      * when the data is going to be kept around.
      */
-    viewAllBytes(): ArrayBufferView;
+    viewAllBytes(): Uint8Array;
 
     readUInt16(): number;
     readInt16(): number;

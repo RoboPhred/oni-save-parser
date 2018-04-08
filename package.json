@@ -24,12 +24,14 @@
   "devDependencies": {
     "@types/long": "^3.0.32",
     "@types/node": "^8.10.2",
+    "@types/pako": "^1.0.0",
     "rimraf": "^2.6.2",
     "typescript": "^2.8.1"
   },
   "dependencies": {
     "long": "^4.0.0",
     "microinject": "^0.4.1",
+    "pako": "^1.0.6",
     "text-encoding": "^0.6.4"
   }
 }
