@@ -4,4 +4,5 @@ import {
 
 export interface EnumerationTypeDescriptor extends TypeDescriptor<number>{
     name: "enumeration";
+    enumerationName: string;
 }

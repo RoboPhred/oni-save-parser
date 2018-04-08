@@ -29,11 +29,11 @@ export class Int16TypeSerializer implements TypeSerializationInfo<number, Int16T
     readonly id = TypeInfo.Int16;
     readonly name = "int-16";
 
-    parse(reader: DataReader, descriptor: Int16TypeDescriptor): number {
+    parseType(reader: DataReader, descriptor: Int16TypeDescriptor): number {
         return reader.readInt16();
     }
 
-    write(writer: DataWriter, descriptor: Int16TypeDescriptor, value: number): void {
+    writeType(writer: DataWriter, descriptor: Int16TypeDescriptor, value: number): void {
         writer.writeInt16(value);
     }
 };

@@ -31,11 +31,11 @@ export class Int64TypeSerializer implements TypeSerializationInfo<Long, Int64Typ
     readonly id = TypeInfo.Int64;
     readonly name = "int-64";
 
-    parse(reader: DataReader, descriptor: Int64TypeDescriptor): Long {
+    parseType(reader: DataReader, descriptor: Int64TypeDescriptor): Long {
         return reader.readInt64();
     }
 
-    write(writer: DataWriter, descriptor: Int64TypeDescriptor, value: Long): void {
+    writeType(writer: DataWriter, descriptor: Int64TypeDescriptor, value: Long): void {
         writer.writeInt64(value);
     }
 };

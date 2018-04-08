@@ -16,6 +16,7 @@ import {
 } from "../../interfaces";
 
 import {
+    TypeDescriptorSerializer,
     TypeSerializer,
     TypeSerializationInfo
 } from "../../services";
@@ -33,10 +34,22 @@ export class HashSetTypeSerializer implements TypeSerializationInfo<Set<any> | n
     readonly name = "hashset";
 
     constructor(
+        @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
 
-    parse(reader: DataReader, descriptor: HashSetTypeDescriptor): Set<any> | null {
+    parseDescriptor(reader: DataReader): HashSetTypeDescriptor {
+        return {
+            name: this.name,
+            itemType: this._descriptorSerializer.parseDescriptor(reader)
+        };
+    }
+
+    writeDescriptor(writer: DataWriter, descriptor: HashSetTypeDescriptor): void {
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.itemType);
+    }
+
+    parseType(reader: DataReader, descriptor: HashSetTypeDescriptor): Set<any> | null {
         const elementType = descriptor.itemType;
 
         // data-length
@@ -58,7 +71,7 @@ export class HashSetTypeSerializer implements TypeSerializationInfo<Set<any> | n
             else {
                 const elements = new Array(length);
                 for (let i = 0; i < length; i++) {
-                    const element = this._typeSerializer.parse(reader, elementType);
+                    const element = this._typeSerializer.parseType(reader, elementType);
                     elements[i] = element;
                 }
 
@@ -70,7 +83,7 @@ export class HashSetTypeSerializer implements TypeSerializationInfo<Set<any> | n
         }
     }
     
-    write(writer: DataWriter, descriptor: HashSetTypeDescriptor, value: Set<any> | null): void {
+    writeType(writer: DataWriter, descriptor: HashSetTypeDescriptor, value: Set<any> | null): void {
         const elementType = descriptor.itemType;
         
         if (value == null) {
@@ -87,7 +100,7 @@ export class HashSetTypeSerializer implements TypeSerializationInfo<Set<any> | n
             // TODO: Mantain element order for load/save cycle consistency.
             const elementWriter = new ArrayDataWriter();
             for(let element of value) {
-                this._typeSerializer.write(elementWriter, elementType, element);
+                this._typeSerializer.writeType(elementWriter, elementType, element);
             }
 
             // ONI inconsistancy: Element count is not included

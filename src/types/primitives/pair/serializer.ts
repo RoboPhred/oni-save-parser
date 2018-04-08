@@ -48,7 +48,7 @@ export class PairTypeSerializer implements TypeSerializationInfo<Pair | null, Pa
     //  into an incorrect state.
     // We reproduce the faulty behavior here to remain accurate to ONI.
 
-    parse(reader: DataReader, descriptor: PairTypeDescriptor): Pair | null {
+    parseType(reader: DataReader, descriptor: PairTypeDescriptor): Pair | null {
         // Writer mirrors ONI code and writes unparsable data.  See ONI bug description above.
         const dataLength = reader.readInt32();
         if (dataLength >= 0) {
@@ -60,8 +60,8 @@ export class PairTypeSerializer implements TypeSerializationInfo<Pair | null, Pa
                 valueType
             } = descriptor;
             return {
-                key: this._typeSerializer.parse(reader, keyType),
-                value: this._typeSerializer.parse(reader, valueType)
+                key: this._typeSerializer.parseType(reader, keyType),
+                value: this._typeSerializer.parseType(reader, valueType)
             };
         }
         else {
@@ -69,7 +69,7 @@ export class PairTypeSerializer implements TypeSerializationInfo<Pair | null, Pa
         }
     }
 
-    write(writer: DataWriter, descriptor: PairTypeDescriptor, value: Pair | null): void {
+    writeType(writer: DataWriter, descriptor: PairTypeDescriptor, value: Pair | null): void {
         // Writer mirrors ONI code and writes unparsable data.  See ONI bug description above.
         if (value == null) {
             writer.writeInt32(4);
@@ -86,8 +86,8 @@ export class PairTypeSerializer implements TypeSerializationInfo<Pair | null, Pa
             // TODO: Write directly to writer with ability to
             //  retroactively update data length.
             const dataWriter = new ArrayDataWriter();
-            this._typeSerializer.write(dataWriter, keyType, value.key);
-            this._typeSerializer.write(dataWriter, valueType, value.value);
+            this._typeSerializer.writeType(dataWriter, keyType, value.key);
+            this._typeSerializer.writeType(dataWriter, valueType, value.value);
 
             writer.writeInt32(dataWriter.position);
             writer.writeBytes(dataWriter.getBytesView());

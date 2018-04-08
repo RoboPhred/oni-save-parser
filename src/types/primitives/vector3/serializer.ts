@@ -33,7 +33,7 @@ export class Vector2TypeSerializer implements TypeSerializationInfo<Vector3, Vec
     readonly id = TypeInfo.Vector3;
     readonly name = "vector3";
 
-    parse(reader: DataReader, descriptor: Vector3TypeDescriptor): Vector3 {
+    parseType(reader: DataReader, descriptor: Vector3TypeDescriptor): Vector3 {
         return {
             x: reader.readSingle(),
             y: reader.readSingle(),
@@ -41,7 +41,7 @@ export class Vector2TypeSerializer implements TypeSerializationInfo<Vector3, Vec
         };
     }
 
-    write(writer: DataWriter, descriptor: Vector3TypeDescriptor, value: Vector3): void {
+    writeType(writer: DataWriter, descriptor: Vector3TypeDescriptor, value: Vector3): void {
         writer.writeSingle(value.x);
         writer.writeSingle(value.y);
         writer.writeSingle(value.z);

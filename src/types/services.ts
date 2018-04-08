@@ -16,13 +16,25 @@ import {
 export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDescriptor<TType> = TypeDescriptor<TType>> {
     id: TypeInfo;
     name: TDescriptor["name"];
-    parse(reader: DataReader, descriptor: TDescriptor): TType;
-    write(writer: DataWriter, descriptor: TDescriptor, value: TType): void;
+
+    parseDescriptor(reader: DataReader): TDescriptor;
+    writeDescriptor(writer: DataWriter, descriptor: TDescriptor): void;
+
+    parseType(reader: DataReader, descriptor: TDescriptor): TType;
+    writeType(writer: DataWriter, descriptor: TDescriptor, value: TType): void;
 }
 export const TypeSerializationInfo: Identifier<TypeSerializationInfo> = Symbol("TypeSerializationInfo");
 
+
+export interface TypeDescriptorSerializer {
+    parseDescriptor(reader: DataReader): TypeDescriptor;
+    writeDescriptor(writer: DataWriter, descriptor: TypeDescriptor): void;
+}
+export const TypeDescriptorSerializer: Identifier<TypeDescriptorSerializer> = Symbol("TypeDescriptorSerializer");
+
+
 export interface TypeSerializer {
-    parse<T = any>(reader: DataReader, descriptor: TypeDescriptor<T>): T;
-    write<T = any>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void;
+    parseType<T = any>(reader: DataReader, descriptor: TypeDescriptor<T>): T;
+    writeType<T = any>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void;
 }
 export const TypeSerializer: Identifier<TypeSerializer> = Symbol("TypeSerializer");

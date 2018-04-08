@@ -29,11 +29,11 @@ export class SByteTypeSerializer implements TypeSerializationInfo<number, SByteT
     readonly id = TypeInfo.SByte;
     readonly name = "byte-signed";
 
-    parse(reader: DataReader, descriptor: SByteTypeDescriptor): number {
+    parseType(reader: DataReader, descriptor: SByteTypeDescriptor): number {
         return reader.readSByte();
     }
 
-    write(writer: DataWriter, descriptor: SByteTypeDescriptor, value: number): void {
+    writeType(writer: DataWriter, descriptor: SByteTypeDescriptor, value: number): void {
         writer.writeSByte(value);
     }
 };

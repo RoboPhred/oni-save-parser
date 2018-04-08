@@ -29,11 +29,11 @@ export class SingleTypeSerializer implements TypeSerializationInfo<number, Singl
     readonly id = TypeInfo.Single;
     readonly name = "single";
 
-    parse(reader: DataReader, descriptor: SingleTypeDescriptor): number {
+    parseType(reader: DataReader, descriptor: SingleTypeDescriptor): number {
         return reader.readSingle();
     }
 
-    write(writer: DataWriter, descriptor: SingleTypeDescriptor, value: number): void {
+    writeType(writer: DataWriter, descriptor: SingleTypeDescriptor, value: number): void {
         writer.writeSingle(value);
     }
 };

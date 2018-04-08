@@ -38,14 +38,14 @@ export class TypeSerializerImpl implements TypeSerializer {
     private _infoByName = new Map<string, TypeSerializationInfo>();
     private _infoByType = new Map<TypeInfo, TypeSerializationInfo>();
 
-    parse<T>(reader: DataReader, descriptor: TypeDescriptor<T>): T {
+    parseType<T>(reader: DataReader, descriptor: TypeDescriptor<T>): T {
         const serializer = this._getSerializationInfo(descriptor);
-        return serializer.parse(reader, descriptor);
+        return serializer.parseType(reader, descriptor);
     }
 
-    write<T>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void {
+    writeType<T>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void {
         const serializer = this._getSerializationInfo(descriptor);
-        serializer.write(writer, descriptor, value);
+        serializer.writeType(writer, descriptor, value);
     }
 
     private _getSerializationInfo(descriptor: TypeDescriptor): TypeSerializationInfo {
