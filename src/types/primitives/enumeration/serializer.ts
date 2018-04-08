@@ -10,7 +10,7 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -26,7 +26,7 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class EnumerationTypeSerializer implements TypeSerializationInfo<number, EnumerationTypeDescriptor> {
-    readonly id = TypeInfo.Enumeration;
+    readonly id = TypeID.Enumeration;
     readonly name = "enumeration";
 
     parseDescriptor(reader: DataReader): EnumerationTypeDescriptor {

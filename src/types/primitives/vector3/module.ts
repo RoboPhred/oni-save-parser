@@ -4,11 +4,11 @@ import {
 } from "microinject";
 
 import {
-    Vector2TypeSerializer
+    Vector3TypeSerializer
 } from "./serializer";
 
 export function createModule() {
     return new ContainerModule(bind => {
-        bind(Vector2TypeSerializer)
+        bind(Vector3TypeSerializer)
     });
 }

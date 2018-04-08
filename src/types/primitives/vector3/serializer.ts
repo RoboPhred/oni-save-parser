@@ -1,21 +1,20 @@
 
-import {
-    injectable,
-    singleton
-} from "microinject";
+import Long from "long";
+
 
 import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-import {
-    TypeInfo
+    TypeDescriptor,
+    TypeID
 } from "../../interfaces";
 
 import {
     TypeSerializationInfo
 } from "../../services";
+
+
+import {
+    createSimpleSerializationInfo
+} from "../simple-serializer";
 
 
 import {
@@ -27,23 +26,17 @@ import {
 } from "./descriptor";
 
 
-@injectable(TypeSerializationInfo)
-@singleton()
-export class Vector2TypeSerializer implements TypeSerializationInfo<Vector3, Vector3TypeDescriptor> {
-    readonly id = TypeInfo.Vector3;
-    readonly name = "vector3";
-
-    parseType(reader: DataReader, descriptor: Vector3TypeDescriptor): Vector3 {
-        return {
-            x: reader.readSingle(),
-            y: reader.readSingle(),
-            z: reader.readSingle()
-        };
+export const Vector3TypeSerializer = createSimpleSerializationInfo<Vector3, Vector3TypeDescriptor>(
+    TypeID.Vector3,
+    "vector3",
+    reader => ({
+        x: reader.readSingle(),
+        y: reader.readSingle(),
+        z: reader.readSingle()
+    }),
+    (writer, value) => {
+        writer.writeSingle(value.x)
+        writer.writeSingle(value.y)
+        writer.writeSingle(value.z)
     }
-
-    writeType(writer: DataWriter, descriptor: Vector3TypeDescriptor, value: Vector3): void {
-        writer.writeSingle(value.x);
-        writer.writeSingle(value.y);
-        writer.writeSingle(value.z);
-    }
-};
+);

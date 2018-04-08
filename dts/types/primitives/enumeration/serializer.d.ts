@@ -1,10 +1,12 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
-import { TypeInfo } from "../../interfaces";
+import { TypeID } from "../../interfaces";
 import { TypeSerializationInfo } from "../../services";
 import { EnumerationTypeDescriptor } from "./descriptor";
 export declare class EnumerationTypeSerializer implements TypeSerializationInfo<number, EnumerationTypeDescriptor> {
-    readonly id: TypeInfo;
+    readonly id: TypeID;
     readonly name: string;
-    parse(reader: DataReader, descriptor: EnumerationTypeDescriptor): number;
-    write(writer: DataWriter, descriptor: EnumerationTypeDescriptor, value: number): void;
+    parseDescriptor(reader: DataReader): EnumerationTypeDescriptor;
+    writeDescriptor(writer: DataWriter, descriptor: EnumerationTypeDescriptor): void;
+    parseType(reader: DataReader, descriptor: EnumerationTypeDescriptor): number;
+    writeType(writer: DataWriter, descriptor: EnumerationTypeDescriptor, value: number): void;
 }

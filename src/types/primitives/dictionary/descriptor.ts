@@ -9,7 +9,7 @@ import {
 
 
 export interface DictionaryTypeDescriptor<TKey = any, TValue = any> extends TypeDescriptor<Dictionary<TKey, TValue>> {
-    name: "dictionary";
+    name: "dictionary-typed";
     keyType: TypeDescriptor<TKey>;
     valueType: TypeDescriptor<TValue>;
 }

@@ -1,13 +1,16 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
-import { TypeInfo } from "../../interfaces";
-import { TypeSerializer, TypeSerializationInfo } from "../../services";
+import { TypeID } from "../../interfaces";
+import { TypeSerializer, TypeSerializationInfo, TypeDescriptorSerializer } from "../../services";
 import { Pair } from "./interfaces";
 import { PairTypeDescriptor } from "./descriptor";
 export declare class PairTypeSerializer implements TypeSerializationInfo<Pair | null, PairTypeDescriptor> {
+    private _descriptorSerializer;
     private _typeSerializer;
-    readonly id: TypeInfo;
+    readonly id: TypeID;
     readonly name: string;
-    constructor(_typeSerializer: TypeSerializer);
-    parse(reader: DataReader, descriptor: PairTypeDescriptor): Pair | null;
-    write(writer: DataWriter, descriptor: PairTypeDescriptor, value: Pair | null): void;
+    constructor(_descriptorSerializer: TypeDescriptorSerializer, _typeSerializer: TypeSerializer);
+    parseDescriptor(reader: DataReader): PairTypeDescriptor;
+    writeDescriptor(writer: DataWriter, descriptor: PairTypeDescriptor): void;
+    parseType(reader: DataReader, descriptor: PairTypeDescriptor): Pair | null;
+    writeType(writer: DataWriter, descriptor: PairTypeDescriptor, value: Pair | null): void;
 }

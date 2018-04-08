@@ -12,7 +12,7 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -30,7 +30,7 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class HashSetTypeSerializer implements TypeSerializationInfo<Set<any> | null, HashSetTypeDescriptor> {
-    readonly id = TypeInfo.HashSet;
+    readonly id = TypeID.HashSet;
     readonly name = "hashset";
 
     constructor(

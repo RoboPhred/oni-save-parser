@@ -10,11 +10,11 @@ import {
 
 import {
     TypeDescriptor,
-    TypeInfo
+    TypeID
 } from "./interfaces";
 
 export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDescriptor<TType> = TypeDescriptor<TType>> {
-    id: TypeInfo;
+    id: TypeID;
     name: TDescriptor["name"];
 
     parseDescriptor(reader: DataReader): TDescriptor;

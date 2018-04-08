@@ -1,16 +1,7 @@
 
 import {
-    injectable,
-    singleton
-} from "microinject";
-
-import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-import {
-    TypeInfo
+    TypeDescriptor,
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -19,21 +10,17 @@ import {
 
 
 import {
+    createSimpleSerializationInfo
+} from "../simple-serializer";
+
+
+import {
     StringTypeDescriptor
 } from "./descriptor";
 
-
-@injectable(TypeSerializationInfo)
-@singleton()
-export class StringTypeSerializer implements TypeSerializationInfo<string | null, StringTypeDescriptor> {
-    readonly id = TypeInfo.Double;
-    readonly name = "string";
-
-    parseType(reader: DataReader, descriptor: StringTypeDescriptor): string | null {
-        return reader.readKleiString();
-    }
-
-    writeType(writer: DataWriter, descriptor: StringTypeDescriptor, value: string | null): void {
-        writer.writeKleiString(value);
-    }
-};
+export const StringTypeSerializer = createSimpleSerializationInfo<string | null, StringTypeDescriptor>(
+    TypeID.String,
+    "string",
+    reader => reader.readKleiString(),
+    (writer, value) => writer.writeKleiString(value)
+);

@@ -12,12 +12,13 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
     TypeSerializer,
-    TypeSerializationInfo
+    TypeSerializationInfo,
+    TypeDescriptorSerializer
 } from "../../services";
 
 
@@ -29,12 +30,33 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class ListTypeSerializer implements TypeSerializationInfo<any[] | null, ListTypeDescriptor> {
-    readonly id = TypeInfo.List;
+    readonly id = TypeID.List;
     readonly name = "list";
 
     constructor(
+        @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
+
+    parseDescriptor(reader: DataReader): ListTypeDescriptor {
+        // Unlike Array, list uses the standard generic system.
+        const subTypeCount = reader.readByte();
+        if (subTypeCount !== 1) {
+            throw new Error("List must have a sub-type.");
+        }
+
+        const itemType = this._descriptorSerializer.parseDescriptor(reader);
+
+        return {
+            name: this.name,
+            itemType
+        };
+    }
+
+    writeDescriptor(writer: DataWriter, descriptor: ListTypeDescriptor): void {
+        writer.writeByte(1);
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.itemType);
+    }
 
     parseType(reader: DataReader, descriptor: ListTypeDescriptor): any[] | null {
         const elementType = descriptor.itemType;

@@ -12,12 +12,13 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
     TypeSerializer,
-    TypeSerializationInfo
+    TypeSerializationInfo,
+    TypeDescriptorSerializer
 } from "../../services";
 
 
@@ -33,12 +34,35 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class PairTypeSerializer implements TypeSerializationInfo<Pair | null, PairTypeDescriptor> {
-    readonly id = TypeInfo.Pair;
+    readonly id = TypeID.Pair;
     readonly name = "pair";
 
     constructor(
+        @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
+
+    parseDescriptor(reader: DataReader): PairTypeDescriptor {
+        const subTypeCount = reader.readByte();
+        if (subTypeCount !== 2) {
+            // Note: We are being stricter here than the ONI code.
+            //  Technically they can handle more than 2 sub-types, if that
+            //  ends up getting written out.
+            throw new Error("Pair types require 2 sub-types.");
+        }
+        
+        return {
+            name: this.name,
+            keyType: this._descriptorSerializer.parseDescriptor(reader),
+            valueType: this._descriptorSerializer.parseDescriptor(reader)
+        }
+    }
+
+    writeDescriptor(writer: DataWriter, descriptor: PairTypeDescriptor) {
+        writer.writeByte(2);
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.keyType);
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.valueType);
+    }
 
     // ONI BUG:
     //  On null pair, ONI writes out [4, -1], as if it was

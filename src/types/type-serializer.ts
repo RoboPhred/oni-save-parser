@@ -13,7 +13,7 @@ import {
 
 import {
     TypeDescriptor,
-    TypeInfo
+    TypeID
 } from "./interfaces";
 
 import {
@@ -36,7 +36,7 @@ export class TypeSerializerImpl implements TypeSerializer {
     public serializerInfos: TypeSerializationInfo[] | undefined;
 
     private _infoByName = new Map<string, TypeSerializationInfo>();
-    private _infoByType = new Map<TypeInfo, TypeSerializationInfo>();
+    private _infoByType = new Map<TypeID, TypeSerializationInfo>();
 
     parseType<T>(reader: DataReader, descriptor: TypeDescriptor<T>): T {
         const serializer = this._getSerializationInfo(descriptor);

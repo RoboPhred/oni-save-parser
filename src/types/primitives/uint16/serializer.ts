@@ -1,16 +1,7 @@
 
 import {
-    injectable,
-    singleton
-} from "microinject";
-
-import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-import {
-    TypeInfo
+    TypeDescriptor,
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -19,21 +10,17 @@ import {
 
 
 import {
+    createSimpleSerializationInfo
+} from "../simple-serializer";
+
+
+import {
     UInt16TypeDescriptor
 } from "./descriptor";
 
-
-@injectable(TypeSerializationInfo)
-@singleton()
-export class UInt16TypeSerializer implements TypeSerializationInfo<number, UInt16TypeDescriptor> {
-    readonly id = TypeInfo.UInt16;
-    readonly name = "int-16-unsigned";
-
-    parseType(reader: DataReader, descriptor: UInt16TypeDescriptor): number {
-        return reader.readUInt16();
-    }
-
-    writeType(writer: DataWriter, descriptor: UInt16TypeDescriptor, value: number): void {
-        writer.writeUInt16(value);
-    }
-};
+export const UInt16TypeSerializer = createSimpleSerializationInfo<number, UInt16TypeDescriptor>(
+    TypeID.UInt16,
+    "int-16-unsigned",
+    reader => reader.readUInt16(),
+    (writer, value) => writer.writeUInt16(value)
+);

@@ -12,7 +12,7 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -30,7 +30,7 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, ArrayTypeDescriptor> {
-    readonly id = TypeInfo.Array;
+    readonly id = TypeID.Array;
     readonly name = "array";
 
     constructor(
@@ -39,6 +39,8 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
     ) { }
 
     parseDescriptor(reader: DataReader): ArrayTypeDescriptor {
+        // Array does not write its generic count, as it is not
+        //  considered a generic to ONI.
         return {
             name: this.name,
             itemType: this._descriptorSerializer.parseDescriptor(reader)

@@ -1,19 +1,7 @@
 
 import {
-    injectable,
-    singleton
-} from "microinject";
-
-
-import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-
-import {
     TypeDescriptor,
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -25,9 +13,13 @@ import {
     createSimpleSerializationInfo
 } from "../simple-serializer";
 
+import {
+    ByteTypeDescriptor
+} from "./descriptor";
 
-export const ByteTypeSerializer = createSimpleSerializationInfo(
-    TypeInfo.Byte,
+
+export const ByteTypeSerializer = createSimpleSerializationInfo<number, ByteTypeDescriptor>(
+    TypeID.Byte,
     "byte",
     reader => reader.readByte(),
     (writer, value) => writer.writeByte(value)
