@@ -1,19 +1,7 @@
 
 import {
-    injectable,
-    singleton
-} from "microinject";
-
-
-import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-
-import {
     TypeDescriptor,
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -26,8 +14,17 @@ import {
 } from "../simple-serializer";
 
 
-export const ByteTypeSerializer = createSimpleSerializationInfo(
-    TypeInfo.Colour,
+import {
+    Colour
+} from "./interfaces";
+
+import {
+    ColourTypeDescriptor
+} from "./descriptor";
+
+
+export const ColourTypeSerializer = createSimpleSerializationInfo<Colour, ColourTypeDescriptor>(
+    TypeID.Colour,
     "colour",
     reader => ({
         r: reader.readByte() / 255,

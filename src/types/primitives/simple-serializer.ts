@@ -16,7 +16,7 @@ import {
 } from "../services";
 
 import {
-    TypeInfo, TypeDescriptor
+    TypeID, TypeDescriptor
 } from "../interfaces";
 
 
@@ -24,35 +24,31 @@ export type TypeSerializationInfoClass = {
     new(...args: any[]): TypeSerializationInfo
 }
 
-interface NamedTypeDescriptor<TName extends string, TValue> extends TypeDescriptor<TValue> {
-    name: TName
-}
-
-export function createSimpleSerializationInfo<T, TName extends string>(
-    id: TypeInfo,
-    name: TName,
+export function createSimpleSerializationInfo<T, TDescriptor extends TypeDescriptor<T>>(
+    id: TypeID,
+    name: TDescriptor["name"],
     parse: ((reader: DataReader) => T),
     write: ((writer: DataWriter, value: T) => void),
 ): TypeSerializationInfoClass {
-    const simpleClassCtor = class implements TypeSerializationInfo<T, NamedTypeDescriptor<TName, T>> {
-        readonly id: TypeInfo = id;
-        readonly name: TName = name;
+    const simpleClassCtor = class implements TypeSerializationInfo<T, TDescriptor> {
+        readonly id = id;
+        readonly name: TDescriptor["name"] = name;
         
-        parseDescriptor(reader: DataReader): NamedTypeDescriptor<TName, T> {
+        parseDescriptor(reader: DataReader): TDescriptor {
             return {
                 name
-            };
+            } as TDescriptor;
         }
 
-        writeDescriptor(writer: DataWriter, descriptor: NamedTypeDescriptor<TName, T>): void {
+        writeDescriptor(writer: DataWriter, descriptor: TDescriptor): void {
             // No additional data.
         }
 
-        parseType(reader: DataReader, descriptor: NamedTypeDescriptor<TName, T>): T {
+        parseType(reader: DataReader, descriptor: TDescriptor): T {
             return parse(reader);
         }
 
-        writeType(writer: DataWriter, descriptor: NamedTypeDescriptor<TName, T>, value: T): void {
+        writeType(writer: DataWriter, descriptor: TDescriptor, value: T): void {
             write(writer, value);
         }
     }

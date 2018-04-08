@@ -4,11 +4,11 @@ import {
 } from "microinject";
 
 import {
-    Int64TypeSerializer
+    UInt64TypeSerializer
 } from "./serializer";
 
 export function createModule() {
     return new ContainerModule(bind => {
-        bind(Int64TypeSerializer)
+        bind(UInt64TypeSerializer)
     });
 }

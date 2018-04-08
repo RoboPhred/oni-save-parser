@@ -1,16 +1,7 @@
 
 import {
-    injectable,
-    singleton
-} from "microinject";
-
-import {
-    DataReader,
-    DataWriter
-} from "../../../binary-serializer";
-
-import {
-    TypeInfo
+    TypeDescriptor,
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -19,21 +10,17 @@ import {
 
 
 import {
+    createSimpleSerializationInfo
+} from "../simple-serializer";
+
+
+import {
     SingleTypeDescriptor
 } from "./descriptor";
 
-
-@injectable(TypeSerializationInfo)
-@singleton()
-export class SingleTypeSerializer implements TypeSerializationInfo<number, SingleTypeDescriptor> {
-    readonly id = TypeInfo.Single;
-    readonly name = "single";
-
-    parseType(reader: DataReader, descriptor: SingleTypeDescriptor): number {
-        return reader.readSingle();
-    }
-
-    writeType(writer: DataWriter, descriptor: SingleTypeDescriptor, value: number): void {
-        writer.writeSingle(value);
-    }
-};
+export const SingleTypeSerializer = createSimpleSerializationInfo<number, SingleTypeDescriptor>(
+    TypeID.Single,
+    "single",
+    reader => reader.readSingle(),
+    (writer, value) => writer.writeSingle(value)
+);

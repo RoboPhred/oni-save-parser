@@ -13,7 +13,7 @@ import {
 
 import {
     TypeDescriptor,
-    TypeInfo
+    TypeID
 } from "../../interfaces";
 
 import {
@@ -27,7 +27,7 @@ import {
 
 
 export const BooleanTypeSerializer = createSimpleSerializationInfo(
-    TypeInfo.Boolean,
+    TypeID.Boolean,
     "boolean",
     reader => reader.readByte() == 1,
     (writer, value) => writer.writeByte(value ? 1 : 0)

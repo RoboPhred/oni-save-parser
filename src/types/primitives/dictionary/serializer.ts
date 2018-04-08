@@ -13,7 +13,7 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo, TypeDescriptor
+    TypeID, TypeDescriptor
 } from "../../interfaces";
 
 import {
@@ -34,8 +34,8 @@ import {
 @injectable(TypeSerializationInfo)
 @singleton()
 export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionary | null, DictionaryTypeDescriptor> {
-    readonly id = TypeInfo.Dictionary;
-    readonly name = "dictionary";
+    readonly id = TypeID.Dictionary;
+    readonly name = "dictionary-typed";
 
     constructor(
         @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,

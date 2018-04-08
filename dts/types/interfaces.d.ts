@@ -1,8 +1,9 @@
 export interface TypeDescriptor<T = any> {
     name: string;
 }
-export declare enum TypeInfo {
+export declare enum TypeID {
     UserDefined = 0,
+    UserDefinedGeneric,
     SByte = 1,
     Byte = 2,
     Boolean = 3,
@@ -20,11 +21,9 @@ export declare enum TypeInfo {
     Vector2 = 15,
     Vector3 = 16,
     Array = 17,
-    Pair = 18,
-    Dictionary = 19,
-    List = 20,
-    HashSet = 21,
+    Pair,
+    Dictionary,
+    List,
+    HashSet,
     Colour = 22,
-    VALUE_MASK = 127,
-    IS_GENERIC_TYPE = 128,
 }
