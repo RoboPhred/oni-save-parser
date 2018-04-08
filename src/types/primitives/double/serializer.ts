@@ -4,12 +4,15 @@ import {
     singleton
 } from "microinject";
 
+
 import {
     DataReader,
     DataWriter
 } from "../../../binary-serializer";
 
+
 import {
+    TypeDescriptor,
     TypeInfo
 } from "../../interfaces";
 
@@ -19,21 +22,13 @@ import {
 
 
 import {
-    DoubleTypeDescriptor
-} from "./descriptor";
+    createSimpleSerializationInfo
+} from "../simple-serializer";
 
 
-@injectable(TypeSerializationInfo)
-@singleton()
-export class DoubleTypeSerializer implements TypeSerializationInfo<number, DoubleTypeDescriptor> {
-    readonly id = TypeInfo.Double;
-    readonly name = "double";
-
-    parse(reader: DataReader, descriptor: DoubleTypeDescriptor): number {
-        return reader.readDouble();
-    }
-
-    write(writer: DataWriter, descriptor: DoubleTypeDescriptor, value: number): void {
-        writer.writeDouble(value);
-    }
-};
+export const DoubleTypeSerializer = createSimpleSerializationInfo(
+    TypeInfo.Double,
+    "double",
+    reader => reader.readDouble(),
+    (writer, value) => writer.writeDouble(value)
+);

@@ -36,7 +36,7 @@ export class ListTypeSerializer implements TypeSerializationInfo<any[] | null, L
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
 
-    parse(reader: DataReader, descriptor: ListTypeDescriptor): any[] | null {
+    parseType(reader: DataReader, descriptor: ListTypeDescriptor): any[] | null {
         const elementType = descriptor.itemType;
 
         // data-length
@@ -58,7 +58,7 @@ export class ListTypeSerializer implements TypeSerializationInfo<any[] | null, L
             else {
                 const elements = new Array(length);
                 for (let i = 0; i < length; i++) {
-                    const element = this._typeSerializer.parse(reader, elementType);
+                    const element = this._typeSerializer.parseType(reader, elementType);
                     elements[i] = element;
                 }
 
@@ -70,7 +70,7 @@ export class ListTypeSerializer implements TypeSerializationInfo<any[] | null, L
         }
     }
 
-    write(writer: DataWriter, descriptor: ListTypeDescriptor, value: any[] | null): void {
+    writeType(writer: DataWriter, descriptor: ListTypeDescriptor, value: any[] | null): void {
         const elementType = descriptor.itemType;
         
         if (value == null) {
@@ -86,7 +86,7 @@ export class ListTypeSerializer implements TypeSerializationInfo<any[] | null, L
             //  retroactively update data length.
             const elementWriter = new ArrayDataWriter();
             for(let element of value) {
-                this._typeSerializer.write(elementWriter, elementType, element);
+                this._typeSerializer.writeType(elementWriter, elementType, element);
             }
 
             // ONI inconsistancy: Element count is not included

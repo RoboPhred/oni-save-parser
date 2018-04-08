@@ -29,11 +29,11 @@ export class UInt32TypeSerializer implements TypeSerializationInfo<number, UInt3
     readonly id = TypeInfo.UInt32;
     readonly name = "int-32-unsigned";
 
-    parse(reader: DataReader, descriptor: UInt32TypeDescriptor): number {
+    parseType(reader: DataReader, descriptor: UInt32TypeDescriptor): number {
         return reader.readUInt32();
     }
 
-    write(writer: DataWriter, descriptor: UInt32TypeDescriptor, value: number): void {
+    writeType(writer: DataWriter, descriptor: UInt32TypeDescriptor, value: number): void {
         writer.writeUInt32(value);
     }
 };

@@ -33,14 +33,14 @@ export class Vector2ITypeSerializer implements TypeSerializationInfo<Vector2I, V
     readonly id = TypeInfo.Vector2I;
     readonly name = "vector2I";
 
-    parse(reader: DataReader, descriptor: Vector2ITypeDescriptor): Vector2I {
+    parseType(reader: DataReader, descriptor: Vector2ITypeDescriptor): Vector2I {
         return {
             x: reader.readInt32(),
             y: reader.readInt32()
         };
     }
     
-    write(writer: DataWriter, descriptor: Vector2ITypeDescriptor, value: Vector2I): void {
+    writeType(writer: DataWriter, descriptor: Vector2ITypeDescriptor, value: Vector2I): void {
         writer.writeInt32(value.x);
         writer.writeInt32(value.y);
     }

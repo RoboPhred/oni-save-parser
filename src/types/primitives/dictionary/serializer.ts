@@ -5,6 +5,7 @@ import {
     singleton
 } from "microinject";
 
+
 import {
     ArrayDataWriter,
     DataReader,
@@ -12,14 +13,14 @@ import {
 } from "../../../binary-serializer";
 
 import {
-    TypeInfo
+    TypeInfo, TypeDescriptor
 } from "../../interfaces";
 
 import {
+    TypeDescriptorSerializer,
     TypeSerializer,
     TypeSerializationInfo
 } from "../../services";
-
 
 import {
     Dictionary
@@ -37,10 +38,33 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
     readonly name = "dictionary";
 
     constructor(
+        @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
 
-    parse(reader: DataReader, descriptor: DictionaryTypeDescriptor): Dictionary | null {
+    parseDescriptor(reader: DataReader): DictionaryTypeDescriptor {
+        const subTypeCount = reader.readByte();
+        if (subTypeCount !== 2) {
+            // Note: We are being stricter here than the ONI code.
+            //  Technically they can handle more than 2 sub-types, if that
+            //  ends up getting written out.
+            throw new Error("Dictionary types require 2 sub-types.");
+        }
+        
+        return {
+            name: this.name,
+            keyType: this._descriptorSerializer.parseDescriptor(reader),
+            valueType: this._descriptorSerializer.parseDescriptor(reader)
+        }
+    }
+
+    writeDescriptor(writer: DataWriter, descriptor: DictionaryTypeDescriptor) {
+        writer.writeByte(2);
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.keyType);
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.valueType);
+    }
+
+    parseType(reader: DataReader, descriptor: DictionaryTypeDescriptor): Dictionary | null {
         const {
             keyType,
             valueType
@@ -57,11 +81,11 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
             // Values are parsed first
             for(let i = 0; i < count; i++) {
                 pairs[i] = new Array(2) as [any, any];
-                pairs[i][1] = this._typeSerializer.parse(reader, valueType);
+                pairs[i][1] = this._typeSerializer.parseType(reader, valueType);
             }
 
             for(let i = 0; i < count; i++) {
-                pairs[i][0] = this._typeSerializer.parse(reader, keyType);
+                pairs[i][0] = this._typeSerializer.parseType(reader, keyType);
             }
 
             return new Map(pairs);
@@ -71,7 +95,7 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
         }
     }
 
-    write(writer: DataWriter, descriptor: DictionaryTypeDescriptor, value: Dictionary | null) {
+    writeType(writer: DataWriter, descriptor: DictionaryTypeDescriptor, value: Dictionary | null) {
         if (value == null) {
             // ONI inconsistancy: Element count is only included
             //  in the data-length when the dictionary is null.
@@ -92,10 +116,10 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
 
             // Values come first.
             for(let element of value) {
-                this._typeSerializer.write(dataWriter, valueType, element[1]);
+                this._typeSerializer.writeType(dataWriter, valueType, element[1]);
             }
             for(let element of value) {
-                this._typeSerializer.write(dataWriter, keyType, element[0]);
+                this._typeSerializer.writeType(dataWriter, keyType, element[0]);
             }
 
             // ONI inconsistancy: Element count is not included

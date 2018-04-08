@@ -29,11 +29,11 @@ export class StringTypeSerializer implements TypeSerializationInfo<string | null
     readonly id = TypeInfo.Double;
     readonly name = "string";
 
-    parse(reader: DataReader, descriptor: StringTypeDescriptor): string | null {
+    parseType(reader: DataReader, descriptor: StringTypeDescriptor): string | null {
         return reader.readKleiString();
     }
 
-    write(writer: DataWriter, descriptor: StringTypeDescriptor, value: string | null): void {
+    writeType(writer: DataWriter, descriptor: StringTypeDescriptor, value: string | null): void {
         writer.writeKleiString(value);
     }
 };

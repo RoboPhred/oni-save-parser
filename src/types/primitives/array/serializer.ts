@@ -17,7 +17,8 @@ import {
 
 import {
     TypeSerializer,
-    TypeSerializationInfo
+    TypeSerializationInfo,
+    TypeDescriptorSerializer
 } from "../../services";
 
 
@@ -33,10 +34,22 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
     readonly name = "array";
 
     constructor(
+        @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
         @inject(TypeSerializer) private _typeSerializer: TypeSerializer
     ) { }
 
-    parse(reader: DataReader, descriptor: ArrayTypeDescriptor): any[] | null {
+    parseDescriptor(reader: DataReader): ArrayTypeDescriptor {
+        return {
+            name: this.name,
+            itemType: this._descriptorSerializer.parseDescriptor(reader)
+        };
+    }
+
+    writeDescriptor(writer: DataWriter, descriptor: ArrayTypeDescriptor): void {
+        this._descriptorSerializer.writeDescriptor(writer, descriptor.itemType);
+    }
+
+    parseType(reader: DataReader, descriptor: ArrayTypeDescriptor): any[] | null {
         const elementType = descriptor.itemType;
 
         // data-length
@@ -58,7 +71,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
             else {
                 const elements = new Array(length);
                 for (let i = 0; i < length; i++) {
-                    const element = this._typeSerializer.parse(reader, elementType);
+                    const element = this._typeSerializer.parseType(reader, elementType);
                     elements[i] = element;
                 }
 
@@ -70,7 +83,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
         }
     }
 
-    write(writer: DataWriter, descriptor: ArrayTypeDescriptor, value: any[] | null): void {
+    writeType(writer: DataWriter, descriptor: ArrayTypeDescriptor, value: any[] | null): void {
         const elementType = descriptor.itemType;
         
         if (value == null) {
@@ -86,7 +99,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
             //  retroactively update data length.
             const elementWriter = new ArrayDataWriter();
             for(let element of value) {
-                this._typeSerializer.write(elementWriter, elementType, element);
+                this._typeSerializer.writeType(elementWriter, elementType, element);
             }
 
             // ONI inconsistancy: Element count is not included

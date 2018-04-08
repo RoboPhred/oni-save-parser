@@ -4,12 +4,15 @@ import {
     singleton
 } from "microinject";
 
+
 import {
     DataReader,
     DataWriter
 } from "../../../binary-serializer";
 
+
 import {
+    TypeDescriptor,
     TypeInfo
 } from "../../interfaces";
 
@@ -19,21 +22,13 @@ import {
 
 
 import {
-    BooleanTypeDescriptor
-} from "./descriptor";
+    createSimpleSerializationInfo
+} from "../simple-serializer";
 
 
-@injectable(TypeSerializationInfo)
-@singleton()
-export class BooleanTypeSerializer implements TypeSerializationInfo<boolean, BooleanTypeDescriptor> {
-    readonly id = TypeInfo.Boolean;
-    readonly name = "boolean";
-
-    parse(reader: DataReader, descriptor: BooleanTypeDescriptor): boolean {
-        return reader.readByte() === 1;
-    }
-    
-    write(writer: DataWriter, descriptor: BooleanTypeDescriptor, value: boolean): void {
-        writer.writeByte(value ? 1 : 0);
-    }
-};
+export const BooleanTypeSerializer = createSimpleSerializationInfo(
+    TypeInfo.Boolean,
+    "boolean",
+    reader => reader.readByte() == 1,
+    (writer, value) => writer.writeByte(value ? 1 : 0)
+);

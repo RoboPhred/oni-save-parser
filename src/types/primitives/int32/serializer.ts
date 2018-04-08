@@ -29,11 +29,11 @@ export class Int32TypeSerializer implements TypeSerializationInfo<number, Int32T
     readonly id = TypeInfo.Int32;
     readonly name = "int-32";
 
-    parse(reader: DataReader, descriptor: Int32TypeDescriptor): number {
+    parseType(reader: DataReader, descriptor: Int32TypeDescriptor): number {
         return reader.readInt32();
     }
 
-    write(writer: DataWriter, descriptor: Int32TypeDescriptor, value: number): void {
+    writeType(writer: DataWriter, descriptor: Int32TypeDescriptor, value: number): void {
         writer.writeInt32(value);
     }
 };
