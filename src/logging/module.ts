@@ -13,8 +13,8 @@ import {
 export function createModule(config?: Partial<ConsoleLoggerConfig>) {
     return new ContainerModule(bind => {
         bind(ConsoleLoggerConfig).toConstantValue<ConsoleLoggerConfig>({
-            ...(config || {}),
-            ...defaultConsoleLoggerConfig
+            ...defaultConsoleLoggerConfig,
+            ...(config || {})
         });
         bind(ConsoleLoggerImpl);
     });
