@@ -1,6 +1,6 @@
 {
   "name": "oni-save-parser",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "Parser for Oxygen Not Included save files.",
   "main": "lib/index.js",
   "types": "dts/index.d.ts",
@@ -24,12 +24,14 @@
   "devDependencies": {
     "@types/long": "^3.0.32",
     "@types/node": "^8.10.2",
+    "@types/pako": "^1.0.0",
     "rimraf": "^2.6.2",
     "typescript": "^2.8.1"
   },
   "dependencies": {
     "long": "^4.0.0",
     "microinject": "^0.5.0",
+    "pako": "^1.0.6",
     "text-encoding": "^0.6.4"
   }
 }

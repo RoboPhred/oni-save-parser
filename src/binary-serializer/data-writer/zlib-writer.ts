@@ -1,7 +1,7 @@
 
 import {
-    deflateSync
-} from "zlib";
+    deflate
+} from "pako";
 
 import {
     DataWriter
@@ -14,7 +14,7 @@ import {
 export class ZlibDataWriter extends ArrayDataWriter {
     getBytes(): ArrayBuffer {
         const bytes = super.getBytesView();
-        return deflateSync(bytes as any, {
+        return deflate(bytes as any, {
             windowBits: 15,
         }).buffer;
     }

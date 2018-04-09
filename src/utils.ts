@@ -2,7 +2,8 @@
 // Serialization seems to use . for namespaces and + for inner classes.
 //  We can also see explicit types, such as
 //  "SerializedList`1[[Message, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"
-const REGEX_IDENTIFIER = /^[a-zA-Z0-9\_\+\.]+(\`\d+)?(\[\[.+\]\])?$/;
+// "WorkChore`1+StatesInstance[[Clinic, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+const REGEX_IDENTIFIER = /^[a-zA-Z0-9\_\+\.]+(\`\d+)?(\+[a-zA-Z0-9\_\+\.]+)?(\[\[.+\]\])?$/;
 
 export function ensureNotNull<T>(value: T | null | undefined, message?: string): T {
     if (value == null) {
