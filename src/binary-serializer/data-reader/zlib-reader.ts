@@ -1,7 +1,7 @@
 
 import {
-    inflateSync
-} from "zlib";
+    inflate
+} from "pako";
 
 import {
     DataReader
@@ -12,14 +12,12 @@ import {
 } from "./array-reader";
 
 export class ZlibDataReader extends ArrayDataReader {
-    constructor(data: ArrayBufferView) {
+    constructor(data: Uint8Array) {
 
         // ONI uses Ionic.Zlib.  More specifically, this:
         //  https://github.com/jstedfast/Ionic.Zlib/blob/master/Ionic.Zlib/ZlibStream.cs
 
-        // nodejs typedefs are wrong: It wants a view,
-        //  and DO NOT accept an ArrayBuffer directly.
-        const deflated = inflateSync(data as any, {
+        const deflated = inflate(data, {
             windowBits: 15,
         });
         super(deflated.buffer);

@@ -10,11 +10,8 @@ This should work for all save files up to the Rancher Update (save file version 
 
 ## Library Compatibility
 
-This project makes use of some ES6 constructs such as Symbols, and a few nodejs libraries.
-The most intrusive external dependency is on node's builtin zlib module.  This should be shimmed on the web
-using something like [browserify-zlib](https://www.npmjs.com/package/browserify-zlib).
-
-A webpack build will be produced and included later on.
+This project makes use of some newer constructs such as Set, Map, and Symbol.  It should be supported
+when these constructs are present.
 
 ## Current Progress
 
