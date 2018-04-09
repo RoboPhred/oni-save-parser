@@ -45,7 +45,10 @@ import {
 
 
 export default composeModules(
-    createLoggingModule(),
+    createLoggingModule({
+        trace: false,
+        warn: false
+    }),
     createSaveModule(),
     createSaveHeaderModule(),
     createTypeTemplateModule(),
