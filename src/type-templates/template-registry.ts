@@ -301,7 +301,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
 
                     if (subType.typeInfo === TypeInfo.Byte) {
                         const data = reader.readBytes(length);
-                        return Array.from(new Uint8Array(data));
+                        return new Uint8Array(data);
                     }
 
                     const array = new Array(length);
@@ -467,6 +467,8 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     writer.writeInt32(-1);
                 }
                 else {
+                    const subType = subTypes[0];
+
                     // TODO: ONI writes the size of the serialized data here.
                     //  We could do this like ONI does by tracking the position offset
                     //  of the writer and rewriting the value, but we currently do not
@@ -475,12 +477,10 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     //  uses an array buffer internally.
                     const dataWriter = new ArrayDataWriter();
 
-                    const array = value as any[];
-                    if (array.length >= 0) {
-                        const subType = subTypes[0];
-
+                    const array = value as (any[] | Uint8Array);
+                    if (array.length > 0) {
                         if (subType.typeInfo === TypeInfo.Byte) {
-                            dataWriter.writeBytes(new Uint8Array(array));
+                            dataWriter.writeBytes(array as Uint8Array);
                         }
                         else {
                             for (let item of array) {
@@ -488,14 +488,14 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                             }
                         }
                     }
-
+                    
                     // ONI BUG: data length does NOT include size bytes when value is not null.
                     writer.writeInt32(dataWriter.position);
                     writer.writeInt32(array.length);
                     writer.writeBytes(dataWriter.getBytesView());
                 }
                 return;
-            }
+            }                
             case TypeInfo.Pair: {
                 if (!subTypes || subTypes.length !== 2) {
                     throw new Error(`Expected Pair type to have two subtypes.`);
@@ -539,7 +539,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     // Might consider making this an OrderedMap, so load/save is idiompotent.
                     const pairs = value as [any, any][];
                     // We store values first, then keys.
-                    
+
                     for (let pair of pairs) {
                         this._serializeType(dataWriter, valueType, pair[1]);
                     }
