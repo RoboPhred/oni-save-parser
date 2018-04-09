@@ -301,7 +301,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
 
                     if (subType.typeInfo === TypeInfo.Byte) {
                         const data = reader.readBytes(length);
-                        return Array.from(new Uint8Array(data));
+                        return new Uint8Array(data);
                     }
 
                     const array = new Array(length);
@@ -474,15 +474,13 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
                     //  However, it is absolutely possible to do; the writer
                     //  uses an array buffer internally.
                     const dataWriter = new ArrayDataWriter();
-
-                    const array = value as any[];
-                    if (array.length >= 0) {
-                        const subType = subTypes[0];
-
-                        if (subType.typeInfo === TypeInfo.Byte) {
-                            dataWriter.writeBytes(new Uint8Array(array));
-                        }
-                        else {
+                    const subType = subTypes[0];
+                    const array = value as (any[] | Uint8Array);
+                    if (subType.typeInfo === TypeInfo.Byte) {
+                        dataWriter.writeBytes(array as Uint8Array);
+                    }
+                    else {
+                        if (array.length >= 0) {
                             for (let item of array) {
                                 this._serializeType(dataWriter, subType, item);
                             }
