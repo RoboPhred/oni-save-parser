@@ -29,7 +29,7 @@ import {
 
 @injectable(TypeSerializationInfo)
 @singleton()
-export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, ArrayTypeDescriptor> {
+export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | Uint8Array | null, ArrayTypeDescriptor> {
     readonly id = TypeID.Array;
     readonly name = "array";
 
@@ -51,7 +51,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
         this._descriptorSerializer.writeDescriptor(writer, descriptor.itemType);
     }
 
-    parseType(reader: DataReader, descriptor: ArrayTypeDescriptor): any[] | null {
+    parseType(reader: DataReader, descriptor: ArrayTypeDescriptor): any[] | Uint8Array | null {
         const elementType = descriptor.itemType;
 
         // data-length
@@ -68,7 +68,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
         else if (length >= 0) {
             if (elementType.name === "byte") {
                 const data = reader.readBytes(length);
-                return Array.from(new Uint8Array(data));
+                return new Uint8Array(data);
             }
             else {
                 const elements = new Array(length);
@@ -85,7 +85,7 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
         }
     }
 
-    writeType(writer: DataWriter, descriptor: ArrayTypeDescriptor, value: any[] | null): void {
+    writeType(writer: DataWriter, descriptor: ArrayTypeDescriptor, value: any[] | Uint8Array | null): void {
         const elementType = descriptor.itemType;
         
         if (value == null) {
@@ -100,8 +100,16 @@ export class ArrayTypeSerializer implements TypeSerializationInfo<any[] | null, 
             // TODO: Write directly to writer with ability to
             //  retroactively update data length.
             const elementWriter = new ArrayDataWriter();
-            for(let element of value) {
-                this._typeSerializer.writeType(elementWriter, elementType, element);
+            if (elementType.name === "byte") {
+                if (!(value instanceof Uint8Array)) {
+                    throw new Error("Expected byte array value to be Uint8Array.");
+                }
+                elementWriter.writeBytes(value);
+            }
+            else {
+                for(let element of value) {
+                    this._typeSerializer.writeType(elementWriter, elementType, element);
+                }
             }
 
             // ONI inconsistancy: Element count is not included
