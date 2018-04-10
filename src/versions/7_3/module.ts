@@ -1,3 +1,4 @@
+
 import {
     ContainerModule,
     composeModules
@@ -5,45 +6,30 @@ import {
 
 
 import {
-    createModule as createSaveModule
-} from "../../oni-save/module";
-
-import {
-    createModule as createSaveHeaderModule
-} from "../../save-header/module";
-
-import {
     createModule as createTypesModule
-} from "../../type-serializer/module";
-
-import {
-    createModule as createSaveBodyModule
-} from "../../save-body/module";
-
-import {
-    createModule as createSaveRootModule
-} from "../../save-root/module";
-
-import {
-    createModule as createGameSettingsModule
-} from "../../game-settings/module";
-
-import {
-    createModule as createGameStateModule
-} from "../../game-state/module";
-
-import {
-    createModule as createGameDataModule
-} from "../../game-data/module";
+} from "./type-serializer/module";
 
 
-export default composeModules(
-    createSaveModule(),
-    createSaveHeaderModule(),
-    createTypesModule(),
-    createSaveBodyModule(),
-    createSaveRootModule(),
-    createGameSettingsModule(),
-    createGameStateModule(),
-    createGameDataModule()
-);
+import { GameObjectManagerImpl } from "./implementations/game-object-manager";
+import { GameSaveDataInstanceImpl } from "./implementations/game-save-data";
+import { GameSaveRootInstanceImpl } from "./implementations/game-save-root";
+import { GameSettingsInstanceImpl } from "./implementations/game-settings";
+import { SaveBodyInstanceImpl } from "./implementations/save-body";
+import { SaveGameHeaderInstanceImpl } from "./implementations/save-game-header";
+import { SaveGameInstanceImpl } from "./implementations/save-game";
+
+
+export function createModule() {
+    return composeModules(
+        createTypesModule(),
+        new ContainerModule(bind => {
+            bind(GameObjectManagerImpl);
+            bind(GameSaveDataInstanceImpl);
+            bind(GameSaveRootInstanceImpl);
+            bind(GameSettingsInstanceImpl);
+            bind(SaveBodyInstanceImpl);
+            bind(SaveGameHeaderInstanceImpl);
+            bind(SaveGameInstanceImpl);
+        })
+    );
+} 
