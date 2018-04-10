@@ -28,7 +28,6 @@ import { createModule as createUint64Module } from "./uint64/module";
 import { createModule as createVector2Module } from "./vector2/module";
 import { createModule as createVector2IModule } from "./vector2I/module";
 import { createModule as createVector3Module } from "./vector3/module";
-import { createHash } from "crypto";
 
 export function createModule() {
     return composeModules(
