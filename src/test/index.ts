@@ -5,21 +5,21 @@ import {
 } from "fs";
 
 import {
-    parseOniSave,
-    writeOniSave
+    parseSaveGame,
+    writeSaveGame
 } from "../index";
 
-const fileName = "Rancher-Test-writeback";
+const fileName = "Rancher-Test";
 const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
 console.log("Loading save");
-const saveData = parseOniSave(fileData.buffer);
+const saveData = parseSaveGame(fileData.buffer);
 
 function testWriteback() {
     console.log("Modding minions for writeback");
     
     let logBehaviors = true;
-    const minions = saveData.body.gameState.gameObjects.get("Minion") as any[];
+    const minions = saveData.body.gameObjects.get("Minion") as any[];
     for(let minion of minions) {
         if (logBehaviors) {
             logBehaviors = false;
@@ -34,24 +34,24 @@ function testWriteback() {
     }
 
     console.log("Serializing");
-    const writeData = writeOniSave(saveData);
+    const writeData = writeSaveGame(saveData);
     console.log("Writing to file");
     writeFileSync(`./test-data/${fileName}-writeback.sav`, new Uint8Array(writeData));
     console.log("writeback completed");
 }
 
-function testDumpJson() {
-    console.log("jsonifying");
-    const saveJson = saveData.toJSON() as any;
-    const streamData = saveJson["body"]["saveRoot"]["streamed"];
-    for (let key of Object.keys(streamData)) {
-        streamData[key] = "<stream data>";
-    }
+// function testDumpJson() {
+//     console.log("jsonifying");
+//     const saveJson = saveData.toJSON() as any;
+//     const streamData = saveJson["body"]["saveRoot"]["streamed"];
+//     for (let key of Object.keys(streamData)) {
+//         streamData[key] = "<stream data>";
+//     }
 
-    console.log("writing json");
-    writeFileSync(`./test-data/${fileName}-dump.json`, JSON.stringify(saveJson, null, 2));
-    console.log("json dump completed");
-}
+//     console.log("writing json");
+//     writeFileSync(`./test-data/${fileName}-dump.json`, JSON.stringify(saveJson, null, 2));
+//     console.log("json dump completed");
+// }
 
-testDumpJson();
-// testWriteback();
+//testDumpJson();
+testWriteback();

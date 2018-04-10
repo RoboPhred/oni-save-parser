@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "long": "^4.0.0",
-    "microinject": "^0.5.1",
+    "microinject": "^0.5.2",
     "pako": "^1.0.6",
     "text-encoding": "^0.6.4"
   }

@@ -8,6 +8,11 @@ export interface Vector2 {
     y: number;
 }
 
+export interface Vector2I {
+    x: number;
+    y: number;
+}
+
 export interface Vector3 {
     x: number;
     y: number;
