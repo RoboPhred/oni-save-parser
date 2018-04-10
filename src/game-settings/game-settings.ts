@@ -16,7 +16,7 @@ import {
 } from "../binary-serializer";
 
 import {
-    TypeSerializer
+    TypeTemplateSerializer
 } from "../type-serializer";
 
 import {
@@ -41,7 +41,7 @@ export class OniGameSettingsImpl implements OniGameSettings {
     private _settings: GameSettings | null = null;
 
     constructor(
-        @inject(TypeSerializer) private _typeSerializer: TypeSerializer,
+        @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
     ) {}
 
     get baseAlreadyCreated(): boolean {
@@ -59,9 +59,9 @@ export class OniGameSettingsImpl implements OniGameSettings {
     parse(reader: DataReader): void {
         const rootName = validateDotNetIdentifierName(reader.readKleiString());
         if (rootName !== GameSettings) {
-            throw new Error(`Expected to find "${GameSettings}", but got "${rootName}"`);
+            throw new Error(`Expected to find "${GameSettings}", but got "${rootName}".`);
         }
-        this._settings = this._typeSerializer.parseTemplatedType<GameSettings>(reader, GameSettings);
+        this._settings = this._templateSerializer.parseTemplatedType<GameSettings>(reader, GameSettings);
     }
 
     write(writer: DataWriter): void {
@@ -69,7 +69,7 @@ export class OniGameSettingsImpl implements OniGameSettings {
             throw new Error("Failed to write GameSettings: No game settings loaded.");
         }
         writer.writeKleiString(GameSettings);
-        this._typeSerializer.writeTemplatedType(writer, GameSettings, this._settings);
+        this._templateSerializer.writeTemplatedType(writer, GameSettings, this._settings);
     }
 
     toJSON() {

@@ -1,5 +1,5 @@
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeSerializer } from "../type-serializer";
+import { TypeTemplateSerializer } from "../type-serializer";
 import { OniSaveRoot } from "./services";
 /**
  * ONI assembly object.
@@ -13,9 +13,9 @@ export interface SaveFileRoot {
 }
 export declare const SaveFileRoot = "Klei.SaveFileRoot";
 export declare class OniSaveRootImpl implements OniSaveRoot {
-    private _typeSerializer;
+    private _templateSerializer;
     private _saveFileRoot;
-    constructor(_typeSerializer: TypeSerializer);
+    constructor(_templateSerializer: TypeTemplateSerializer);
     readonly widthInCells: number;
     readonly heightInCells: number;
     readonly streamed: ReadonlyMap<string, ArrayBufferView>;

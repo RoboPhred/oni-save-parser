@@ -45,10 +45,14 @@ export const TypeDescriptorSerializer: Identifier<TypeDescriptorSerializer> = Sy
 export interface TypeSerializer {
     parseType<T = any>(reader: DataReader, descriptor: TypeDescriptor<T>): T;
     writeType<T = any>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void;
+}
+export const TypeSerializer: Identifier<TypeSerializer> = Symbol("TypeSerializer");
 
-    hasTemplatedType(templateName: string): boolean;
+
+export interface TypeTemplateSerializer {
+    has(templateName: string): boolean;
 
     parseTemplatedType<T extends object = any>(reader: DataReader, templateName: string): T;
     writeTemplatedType<T extends object = any>(writer: DataWriter, templateName: string, value: T): void;
 }
-export const TypeSerializer: Identifier<TypeSerializer> = Symbol("TypeSerializer");
+export const TypeTemplateSerializer: Identifier<TypeTemplateSerializer> = Symbol("TypeTemplateSerializer");
