@@ -17,3 +17,7 @@
     - Somehow get compression / child writers more structured, to support ```DiagnosticDataWriter```.  Support "when in scope" bindings in microinject?
 - Expose props as getters, and throw if accessed before they are parsed.
  
+
+ ### On moving services into versioned folders...
+ Object of service name keys to module values.  Factory function takes optional object of overrides.
+ Find a way to let the next version be implemented as "Use 7_3 services, but replace service X with implementation Y".
