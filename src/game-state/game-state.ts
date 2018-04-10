@@ -2,7 +2,8 @@
 import {
     inject,
     injectable,
-    inScope
+    inScope,
+    optional
 } from "microinject";
 
 import {
@@ -51,16 +52,28 @@ export class OniGameStateManagerImpl implements OniGameState {
 
     private _versionMinor: number | null = null;
 
+    private _logWarn: Logger["warn"];
+    private _logTrace: Logger["trace"];
+
     constructor(
         @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
-        @inject(Logger) private _logger: Logger
-    ) {}
+        @inject(Logger) @optional() logger?: Logger
+    ) {
+        if (logger) {
+            this._logWarn = logger.warn.bind(logger)
+            this._logTrace = logger.trace.bind(logger)
+        }
+        else {
+            this._logWarn = () => {};
+            this._logTrace = () => {};
+        }
+    }
 
     parse(reader: DataReader): void {
         const expectedHeader = OniGameStateManagerImpl.SAVE_HEADER;
         const header = reader.readChars(expectedHeader.length);
         if (header !== expectedHeader) {
-            throw new Error(`Game state header mismatch.  Expected "${expectedHeader}" but got "${header}" (${Array.from(header).map(x => x.charCodeAt(0))})`);
+            throw new Error(`Failed to parse GameState: Expected "${expectedHeader}" but got "${header}" (${Array.from(header).map(x => x.charCodeAt(0))})`);
         }
 
         const expectedMajor = OniGameStateManagerImpl.CURRENT_VERSION_MAJOR;
@@ -70,14 +83,14 @@ export class OniGameStateManagerImpl implements OniGameState {
         const versionMinor = reader.readInt32();
 
         if (versionMajor !== expectedMajor) {
-            throw new Error(`Game state version mismatch.  Expected major version ${expectedMajor} but got ${versionMajor}.`);
+            throw new Error(`Failed to parse GameState: Version mismatch: Expected major version ${expectedMajor} but got ${versionMajor}.`);
         }
 
         if (versionMinor > expectedMinor) {
             // If they stick to semver, then minor changes should in theory be backwards compatible with older versions.
             //  This means its likely we can parse this correctly, but not guarenteed.
             // It's worth noting that the ONI itself will refuse to load a minor version higher than it understands.
-            this._logger.warn(`Game state version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
+            this._logWarn(`Game state version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
         }
 
         this._versionMinor = versionMinor;
@@ -110,20 +123,20 @@ export class OniGameStateManagerImpl implements OniGameState {
     }
 
     private _parsePrefabs(reader: DataReader): void {
-        this._logger.trace("Parsing prefabs.");
+        this._logTrace("Parsing prefabs.");
 
         const prefabCount = reader.readInt32();
         for(let i = 0; i < prefabCount; i++) {
             const prefabName = validatePrefabName(reader.readKleiString());
             this._gameObjectOrdering.push(prefabName);
-            this._logger.trace(`Parsing prefab "${prefabName}"`);
+            this._logTrace(`Parsing prefab "${prefabName}"`);
 
             const prefabSet = this._parsePrefabSet(reader, prefabName);
 
             this.gameObjects.set(prefabName, prefabSet);
         }
 
-        this._logger.trace("Prefab parsing complete.");        
+        this._logTrace("Prefab parsing complete.");        
     }
 
     private _writePrefabs(writer: DataWriter): void {
@@ -140,7 +153,7 @@ export class OniGameStateManagerImpl implements OniGameState {
         const dataLength = reader.readInt32();
         const preParsePosition = reader.position;
 
-        this._logger.trace(`Prefab has ${instanceCount} objects across ${dataLength} bytes.`);
+        this._logTrace(`Prefab has ${instanceCount} objects across ${dataLength} bytes.`);
         
         const prefabObjects: GameObject[] = new Array(instanceCount);
         for(let i = 0; i < instanceCount; i++) {
@@ -184,11 +197,11 @@ export class OniGameStateManagerImpl implements OniGameState {
         const folder = reader.readByte();
 
        
-        this._logger.trace(`Parsing game object at (${position.x, position.y, position.z}) in folder ${folder}.`);
+        this._logTrace(`Parsing game object at (${position.x, position.y, position.z}) in folder ${folder}.`);
 
         const behaviorCount = reader.readInt32();
 
-        this._logger.trace(`Parsing ${behaviorCount} game object behaviors.`);
+        this._logTrace(`Parsing ${behaviorCount} game object behaviors.`);
 
         const behaviors: GameObjectBehavior[] = [];
 
@@ -196,7 +209,7 @@ export class OniGameStateManagerImpl implements OniGameState {
             behaviors[i] = this._parseGameObjectBehavior(reader);
         }
 
-        this._logger.trace("Game object parsing complete.");
+        this._logTrace("Game object parsing complete.");
 
         return {
             position,
@@ -230,13 +243,13 @@ export class OniGameStateManagerImpl implements OniGameState {
 
     private _parseGameObjectBehavior(reader: DataReader): GameObjectBehavior {
         const name = validateBehaviorName(reader.readKleiString());
-        this._logger.trace(`Parsing game object behavior "${name}".`);
+        this._logTrace(`Parsing game object behavior "${name}".`);
 
         const dataLength = reader.readInt32();
         const preParsePosition = reader.position;
 
         if (!this._templateSerializer.has(name)) {
-            this._logger.warn(`GameObjectBehavior "${name} could not be found in the type directory.  Storing remaining data as extraData.`);
+            this._logWarn(`GameObjectBehavior "${name} could not be found in the type directory.  Storing remaining data as extraData.`);
             return {
                 name,
                 hasParseData: false,
@@ -255,7 +268,7 @@ export class OniGameStateManagerImpl implements OniGameState {
         else if (dataRemaining > 0) {
             // We know these exists, but for now we don't know what to do with them.
             //  TODO: Implement extra data parsing for specific behaviors that implement ISaveLoadableDetails.
-            this._logger.warn(`GameObjectBehavior "${name}" has extra data.  This object should be inspected for a ISaveLoadableDetails implementation.`);
+            this._logWarn(`GameObjectBehavior "${name}" has extra data.  This object should be inspected for a ISaveLoadableDetails implementation.`);
             extraData = reader.readBytes(dataRemaining);
         }
 

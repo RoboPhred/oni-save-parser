@@ -4,13 +4,6 @@ import {
 } from "microinject";
 
 
-// TODO: Export a set of prebuild composed modules
-//  for different breaking-change save file versions.
-
-import {
-    createModule as createLoggingModule
-} from "../../logging/module";
-
 import {
     createModule as createSaveModule
 } from "../../oni-save/module";
@@ -45,10 +38,6 @@ import {
 
 
 export default composeModules(
-    createLoggingModule({
-        trace: false,
-        warn: false
-    }),
     createSaveModule(),
     createSaveHeaderModule(),
     createTypesModule(),

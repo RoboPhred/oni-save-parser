@@ -5,14 +5,15 @@ import { OniGameState } from "./services";
 import { GameObject } from "./interfaces";
 export declare class OniGameStateManagerImpl implements OniGameState {
     private _templateSerializer;
-    private _logger;
     static readonly SAVE_HEADER: string;
     static readonly CURRENT_VERSION_MAJOR: number;
     static readonly CURRENT_VERSION_MINOR: number;
     gameObjects: Map<string, GameObject[]>;
     private _gameObjectOrdering;
     private _versionMinor;
-    constructor(_templateSerializer: TypeTemplateSerializer, _logger: Logger);
+    private _logWarn;
+    private _logTrace;
+    constructor(_templateSerializer: TypeTemplateSerializer, logger?: Logger);
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
     toJSON(): {
