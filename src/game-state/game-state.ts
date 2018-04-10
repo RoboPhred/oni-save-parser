@@ -24,9 +24,8 @@ import {
 } from "../oni-save";
 
 import {
-    TypeReader,
-    TypeWriter
-} from "../type-templates";
+    TypeSerializer
+} from "../type-serializer";
 
 import {
     OniGameState
@@ -53,8 +52,7 @@ export class OniGameStateManagerImpl implements OniGameState {
     private _versionMinor: number | null = null;
 
     constructor(
-        @inject(TypeReader) private _typeReader: TypeReader,
-        @inject(TypeWriter) private _typeWriter: TypeWriter,
+        @inject(TypeSerializer) private _typeSerializer: TypeSerializer,
         @inject(Logger) private _logger: Logger
     ) {}
 
@@ -237,7 +235,7 @@ export class OniGameStateManagerImpl implements OniGameState {
         const dataLength = reader.readInt32();
         const preParsePosition = reader.position;
 
-        if (!this._typeReader.hasType(name)) {
+        if (!this._typeSerializer.hasTemplatedType(name)) {
             this._logger.warn(`GameObjectBehavior "${name} could not be found in the type directory.  Storing remaining data as extraData.`);
             return {
                 name,
@@ -247,7 +245,7 @@ export class OniGameStateManagerImpl implements OniGameState {
             };
         }
 
-        const parsedData = this._typeReader.deserializeRawType(reader, name);
+        const parsedData = this._typeSerializer.parseTemplatedType(reader, name);
         let extraData = null;
 
         const dataRemaining = dataLength - (reader.position - preParsePosition);
@@ -282,7 +280,7 @@ export class OniGameStateManagerImpl implements OniGameState {
         var dataWriter = new ArrayDataWriter();
 
         if (hasParseData) {
-            this._typeWriter.serializeRawType(dataWriter, name, parsedData);
+            this._typeSerializer.writeTemplatedType(dataWriter, name, parsedData);
         }
 
         if (extraData) {

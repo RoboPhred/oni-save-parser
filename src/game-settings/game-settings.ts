@@ -6,7 +6,8 @@ import {
 } from "microinject";
 
 import {
-    ensureNotNull
+    ensureNotNull,
+    validateDotNetIdentifierName
 } from "../utils";
 
 import {
@@ -15,9 +16,8 @@ import {
 } from "../binary-serializer";
 
 import {
-    TypeReader,
-    TypeWriter
-} from "../type-templates";
+    TypeSerializer
+} from "../type-serializer";
 
 import {
     OniSave
@@ -38,8 +38,7 @@ export class OniGameSettingsImpl implements OniGameSettings {
     private _settings: GameSettings | null = null;
 
     constructor(
-        @inject(TypeReader) private _typeReader: TypeReader,
-        @inject(TypeWriter) private _typeWriter: TypeWriter
+        @inject(TypeSerializer) private _typeSerializer: TypeSerializer,
     ) {}
 
     get baseAlreadyCreated(): boolean {
@@ -55,11 +54,19 @@ export class OniGameSettingsImpl implements OniGameSettings {
     }
 
     parse(reader: DataReader): void {
-        this._settings = this._typeReader.deserialize(reader, GameSettings);
+        const rootName = validateDotNetIdentifierName(reader.readKleiString());
+        if (rootName !== GameSettings) {
+            throw new Error(`Expected to find "${GameSettings}", but got "${rootName}"`);
+        }
+        this._settings = this._typeSerializer.parseTemplatedType(reader, GameSettings) as GameSettings;
     }
 
     write(writer: DataWriter): void {
-        this._typeWriter.serialize(writer, GameSettings, this._settings);
+        if (!this._settings) {
+            throw new Error("Failed to write GameSettings: No game settings loaded.");
+        }
+        writer.writeKleiString(GameSettings);
+        this._typeSerializer.writeTemplatedType(writer, GameSettings, this._settings);
     }
 
     toJSON() {

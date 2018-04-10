@@ -1,11 +1,10 @@
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeReader, TypeWriter } from "../type-templates";
+import { TypeSerializer } from "../type-serializer";
 import { OniGameData } from "./services";
 export declare class OniGameDataImpl implements OniGameData {
-    private _typeReader;
-    private _typeWriter;
+    private _typeSerializer;
     private _data;
-    constructor(_typeReader: TypeReader, _typeWriter: TypeWriter);
+    constructor(_typeSerializer: TypeSerializer);
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
     toJSON(): {};

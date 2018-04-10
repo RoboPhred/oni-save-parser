@@ -20,8 +20,8 @@ import {
 } from "../../save-header/module";
 
 import {
-    createModule as createTypeTemplateModule
-} from "../../type-templates/module";
+    createModule as createTypesModule
+} from "../../type-serializer/module";
 
 import {
     createModule as createSaveBodyModule
@@ -51,7 +51,7 @@ export default composeModules(
     }),
     createSaveModule(),
     createSaveHeaderModule(),
-    createTypeTemplateModule(),
+    createTypesModule(),
     createSaveBodyModule(),
     createSaveRootModule(),
     createGameSettingsModule(),

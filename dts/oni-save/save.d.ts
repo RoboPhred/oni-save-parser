@@ -1,5 +1,5 @@
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeTemplateRegistry } from "../type-templates";
+import { TypeTemplateRegistry } from "../type-serializer";
 import { OniSaveHeader } from "../save-header";
 import { OniSaveBody } from "../save-body";
 import { OniSave } from "./services";

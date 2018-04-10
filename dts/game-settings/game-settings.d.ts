@@ -1,11 +1,10 @@
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeReader, TypeWriter } from "../type-templates";
+import { TypeSerializer } from "../type-serializer";
 import { OniGameSettings } from "./services";
 export declare class OniGameSettingsImpl implements OniGameSettings {
-    private _typeReader;
-    private _typeWriter;
+    private _typeSerializer;
     private _settings;
-    constructor(_typeReader: TypeReader, _typeWriter: TypeWriter);
+    constructor(_typeSerializer: TypeSerializer);
     readonly baseAlreadyCreated: boolean;
     readonly nextUniqueID: number;
     readonly gameID: number;

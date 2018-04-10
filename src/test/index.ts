@@ -9,7 +9,7 @@ import {
     writeOniSave
 } from "../index";
 
-const fileName = "TheLoneSurvivor";
+const fileName = "Rancher-Test-writeback";
 const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
 console.log("Loading save");
@@ -54,3 +54,4 @@ function testDumpJson() {
 }
 
 testDumpJson();
+// testWriteback();

@@ -6,7 +6,8 @@ import {
 } from "microinject";
 
 import {
-    ensureNotNull
+    ensureNotNull,
+    validateDotNetIdentifierName
 } from "../utils"
 
 import {
@@ -19,9 +20,8 @@ import {
 } from "../oni-save";
 
 import {
-    TypeReader,
-    TypeWriter
-} from "../type-templates";
+    TypeSerializer
+} from "../type-serializer";
 
 import {
     SaveFileRoot
@@ -38,8 +38,7 @@ export class OniSaveRootImpl implements OniSaveRoot {
     private _saveFileRoot: SaveFileRoot | null = null;
 
     constructor(
-        @inject(TypeReader) private _typeReader: TypeReader,
-        @inject(TypeWriter) private _typeWriter: TypeWriter
+        @inject(TypeSerializer) private _typeSerializer: TypeSerializer,
     ) {}
 
     get widthInCells(): number {
@@ -55,11 +54,19 @@ export class OniSaveRootImpl implements OniSaveRoot {
     }
 
     parse(reader: DataReader) {
-        this._saveFileRoot = this._typeReader.deserialize(reader, SaveFileRoot);
+        const rootName = validateDotNetIdentifierName(reader.readKleiString());
+        if (rootName !== SaveFileRoot) {
+            throw new Error(`Expected to find "${SaveFileRoot}", but got "${rootName}"`);
+        }
+        this._saveFileRoot = this._typeSerializer.parseTemplatedType(reader, SaveFileRoot) as SaveFileRoot;
     }
 
     write(writer: DataWriter) {
-        this._typeWriter.serialize(writer, SaveFileRoot, this._saveFileRoot);
+        if (!this._saveFileRoot) {
+            throw new Error("Failed to write SaveFileRoot: No root loaded.");
+        }
+        writer.writeKleiString(SaveFileRoot);
+        this._typeSerializer.writeTemplatedType(writer, SaveFileRoot, this._saveFileRoot);
     }
 
     toJSON() {
