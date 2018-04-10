@@ -6,7 +6,7 @@ import {
 } from "microinject";
 
 import {
-    ensureNotNull
+    validateDotNetIdentifierName
 } from "../utils";
 
 import {
@@ -15,9 +15,8 @@ import {
 } from "../binary-serializer";
 
 import {
-    TypeReader,
-    TypeWriter
-} from "../type-templates";
+    TypeSerializer
+} from "../type-serializer";
 
 import {
     OniSave
@@ -27,6 +26,7 @@ import {
     OniGameData
 } from "./services";
 
+const GameStateData = "Game+GameSaveData";
 
 @injectable(OniGameData)
 @inScope(OniSave)
@@ -34,16 +34,23 @@ export class OniGameDataImpl implements OniGameData {
     private _data: object | null = null;
 
     constructor(
-        @inject(TypeReader) private _typeReader: TypeReader,
-        @inject(TypeWriter) private _typeWriter: TypeWriter
-    ) {}
+        @inject(TypeSerializer) private _typeSerializer: TypeSerializer
+    ) { }
 
     parse(reader: DataReader): void {
-        this._data = this._typeReader.deserialize(reader, "Game+GameSaveData");
+        const rootName = validateDotNetIdentifierName(reader.readKleiString());
+        if (rootName !== GameStateData) {
+            throw new Error(`Expected to find "${GameStateData}", but got "${rootName}"`);
+        }
+        this._data = this._typeSerializer.parseTemplatedType(reader, GameStateData);
     }
 
     write(writer: DataWriter): void {
-        this._typeWriter.serialize(writer, "Game+GameSaveData", this._data);
+        if (!this._data) {
+            throw new Error("Failed to write GameStateData: No data loaded.");
+        }
+        writer.writeKleiString(GameStateData);
+        this._typeSerializer.writeTemplatedType(writer, GameStateData, this._data);
     }
 
     toJSON() {

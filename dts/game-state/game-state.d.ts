@@ -1,11 +1,10 @@
 import { Logger } from "../logging";
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeReader, TypeWriter } from "../type-templates";
+import { TypeSerializer } from "../type-serializer";
 import { OniGameState } from "./services";
 import { GameObject } from "./interfaces";
 export declare class OniGameStateManagerImpl implements OniGameState {
-    private _typeReader;
-    private _typeWriter;
+    private _typeSerializer;
     private _logger;
     static readonly SAVE_HEADER: string;
     static readonly CURRENT_VERSION_MAJOR: number;
@@ -13,7 +12,7 @@ export declare class OniGameStateManagerImpl implements OniGameState {
     gameObjects: Map<string, GameObject[]>;
     private _gameObjectOrdering;
     private _versionMinor;
-    constructor(_typeReader: TypeReader, _typeWriter: TypeWriter, _logger: Logger);
+    constructor(_typeSerializer: TypeSerializer, _logger: Logger);
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
     toJSON(): {

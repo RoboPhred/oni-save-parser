@@ -16,7 +16,7 @@ import {
 
 import {
     TypeTemplateRegistry
-} from "../type-templates";
+} from "../type-serializer";
 
 import {
     OniSaveHeader

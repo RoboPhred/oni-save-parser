@@ -1,11 +1,10 @@
 import { DataReader, DataWriter } from "../binary-serializer";
-import { TypeReader, TypeWriter } from "../type-templates";
+import { TypeSerializer } from "../type-serializer";
 import { OniSaveRoot } from "./services";
 export declare class OniSaveRootImpl implements OniSaveRoot {
-    private _typeReader;
-    private _typeWriter;
+    private _typeSerializer;
     private _saveFileRoot;
-    constructor(_typeReader: TypeReader, _typeWriter: TypeWriter);
+    constructor(_typeSerializer: TypeSerializer);
     readonly widthInCells: number;
     readonly heightInCells: number;
     readonly streamed: ReadonlyMap<string, ArrayBufferView>;
