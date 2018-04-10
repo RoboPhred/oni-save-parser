@@ -19,4 +19,18 @@ export declare class GameSaveDataInstanceImpl implements GameSaveDataInstance {
     readonly advancedPersonalPriorities: boolean;
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
+    fromJSON(value: any): void;
+    toJSON(): {
+        gasConduitFlow: any;
+        liquidConduitFlow: any;
+        simActiveRegionMin: Vector2I;
+        simActiveRegionMax: Vector2I;
+        fallingWater: any;
+        unstableGround: any;
+        worldDetail: any;
+        customGameSettings: any;
+        debugWasUsed: boolean;
+        autoPrioritizeRoles: any;
+        advancedPersonalPriorities: boolean;
+    };
 }

@@ -31,7 +31,8 @@ import {
 
 import {
     GameObject,
-    GameObjectBehavior
+    GameObjectBehavior,
+    GameObjectPrefabs
 } from "../interfaces";
 
 
@@ -46,7 +47,7 @@ export class GameObjectManagerImpl implements GameObjectManager {
 
     private _versionMinor: number | null = null;
 
-    private _gameObjects = new Map<string, GameObject[]>();
+    private _gameObjects: GameObjectPrefabs = {};
     private _gameObjectOrdering: string[] = [];
 
     private _warnExtraniousDataTypes = new Set<string>();
@@ -68,7 +69,7 @@ export class GameObjectManagerImpl implements GameObjectManager {
         }
     }
 
-    get gameObjects(): Map<string, GameObject[]> {
+    get gameObjects(): GameObjectPrefabs {
         return this._gameObjects;
     }
 
@@ -114,6 +115,17 @@ export class GameObjectManagerImpl implements GameObjectManager {
         this._writePrefabs(writer);
     }
 
+    fromJSON(gameObjects: GameObjectPrefabs) {
+        this._gameObjects = gameObjects;
+        // TODO: Amend ordering based on new or removed keys rather than
+        //  loosing the order.
+        this._gameObjectOrdering = Object.keys(gameObjects);
+    }
+
+    toJSON(): GameObjectPrefabs {
+        return {...this._gameObjects};
+    }
+
     private _parsePrefabs(reader: DataReader): void {
         this._logTrace("Parsing prefabs.");
 
@@ -125,7 +137,7 @@ export class GameObjectManagerImpl implements GameObjectManager {
 
             const prefabSet = this._parsePrefabSet(reader, prefabName);
 
-            this.gameObjects.set(prefabName, prefabSet);
+            this.gameObjects[prefabName] = prefabSet;
         }
 
         this._logTrace("Prefab parsing complete.");        
@@ -135,7 +147,7 @@ export class GameObjectManagerImpl implements GameObjectManager {
         writer.writeInt32(this._gameObjectOrdering.length);
         for (let name of this._gameObjectOrdering) {
             writer.writeKleiString(name);
-            const prefab = this.gameObjects.get(name)!;
+            const prefab = this.gameObjects[name]!;
             this._writePrefabSet(writer, prefab);
         }
     }

@@ -101,9 +101,22 @@ export class GameSaveDataInstanceImpl implements GameSaveDataInstance {
 
     write(writer: DataWriter): void {
         if (!this._data) {
-            throw new TypeError("Failed to write GameStateData: Data has not been parsed.");
+            throw new TypeError("Failed to write GameSaveData: Data has not been parsed.");
         }
         writer.writeKleiString(AssemblyTypeName);
         this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._data);
+    }
+
+    fromJSON(value: any): void {
+        // TODO: validate json value
+        this._data = {...value};
+
+    }
+
+    toJSON() {
+        if (!this._data) {
+            throw new Error("Failed to serialize GameSaveData json: Data has not been set.");
+        }
+        return {...this._data};
     }
 }

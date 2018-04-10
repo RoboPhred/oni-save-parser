@@ -1,7 +1,7 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
 import { TypeTemplateRegistry } from "../type-serializer";
 import { SaveGameInstance, SaveGameHeaderInstance, SaveBodyInstance } from "../services";
-import { SaveGameHeader, SaveBody } from "../interfaces";
+import { SaveGameHeader, SaveBody, SaveGame } from "../interfaces";
 export declare class SaveGameInstanceImpl implements SaveGameInstance {
     private _header;
     private _templates;
@@ -11,4 +11,6 @@ export declare class SaveGameInstanceImpl implements SaveGameInstance {
     readonly body: SaveBody;
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
+    fromJSON(value: SaveGame): void;
+    toJSON(): SaveGame;
 }

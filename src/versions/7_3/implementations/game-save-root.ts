@@ -23,6 +23,7 @@ import {
     GameSaveRootInstance,
     SaveGameScope
 } from "../services";
+import { GameSaveRoot } from "..";
 
 
 const AssemblyTypeName = "Klei.SaveFileRoot";
@@ -50,8 +51,14 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
         return ensureNotNull(this._data).HeightInCells;
     }
 
-    get streamed(): Map<string, Uint8Array> {
-        return ensureNotNull(this._data).streamed;
+    get streamed(): { [key: string]: Uint8Array } {
+        const streamed = ensureNotNull(this._data).streamed;
+        const obj: { [key: string]: Uint8Array } = {};
+        for(let pair of streamed) {
+            obj[pair[0]] = pair[1];
+        }
+
+        return obj;
     }
 
     parse(reader: DataReader) {
@@ -68,5 +75,27 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
         }
         writer.writeKleiString(AssemblyTypeName);
         this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._data);
+    }
+
+    fromJSON(value: GameSaveRoot): void {
+        // TODO: validate json value
+        const streamed = new Map<string, Uint8Array>();
+        for (let key of Object.keys(value.streamed)) {
+            streamed.set(key, value.streamed[key]);
+        }
+
+        this._data = {
+            WidthInCells: value.widthInCells,
+            HeightInCells: value.heightInCells,
+            streamed
+        };
+    }
+
+    toJSON(): GameSaveRoot {
+        return {
+            widthInCells: this.widthInCells,
+            heightInCells: this.heightInCells,
+            streamed: this.streamed
+        };
     }
 }

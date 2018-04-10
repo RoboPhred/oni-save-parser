@@ -25,7 +25,7 @@ import {
 } from "../services";
 
 import {
-    SaveGameInfo
+    SaveGameInfo, SaveGameHeader
 } from "../interfaces";
 
 
@@ -83,12 +83,19 @@ export class SaveGameHeaderInstanceImpl implements SaveGameHeaderInstance {
         writer.writeBytes(headerBytes.buffer);
     }
 
+    fromJSON(value: SaveGameHeader) {
+        this._buildVersion = value.buildVersion;
+        this._headerVersion = value.headerVersion;
+        this._isCompressed = value.isCompressed;
+        this._gameInfo = value.gameInfo;
+    }
+
     toJSON() {
         return {
             buildVersion: this.buildVersion,
             headerVersion: this.headerVersion,
             isCompressed: this.isCompressed,
-            gameData: this.gameInfo
+            gameInfo: this.gameInfo
         };
     }
 }

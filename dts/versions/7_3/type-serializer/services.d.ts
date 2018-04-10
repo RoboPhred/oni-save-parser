@@ -1,5 +1,6 @@
 import { Identifier } from "microinject";
 import { BinarySerializable, DataReader, DataWriter } from "../../../binary-serializer";
+import { JsonSerializable } from "../../../json-serializer";
 import { TypeDescriptor, TypeTemplate, TypeID } from "./interfaces";
 export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDescriptor<TType> = TypeDescriptor<TType>> {
     id: TypeID;
@@ -10,7 +11,7 @@ export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDesc
     writeType(writer: DataWriter, descriptor: TDescriptor, value: TType): void;
 }
 export declare const TypeSerializationInfo: Identifier<TypeSerializationInfo>;
-export interface TypeTemplateRegistry extends BinarySerializable {
+export interface TypeTemplateRegistry extends BinarySerializable, JsonSerializable {
     has(templateName: string): boolean;
     get(templateName: string): TypeTemplate | undefined;
 }
