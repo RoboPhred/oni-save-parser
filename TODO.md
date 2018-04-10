@@ -8,6 +8,8 @@
 - DiagnosticDataWriter(...): take an ArrayBuffer and ensure each write operation is equal to the existing ArrayBuffer.  For testing.
 
 ## Refactor
+- Simplify type-serializer.
+    Refactor is too verbose.  Don't really have a use for typed / discriminated explicit TypeDefinition interfaces outside of their serialization info.
 - Move all service implementations into a flat folder of versions/7_3.
     These are all implementations for this specific version.  Move them all into there and bind them (auto-discover with webpack require.context).
 - Once save component services are all under versions, try to simplify the save interface structure.  Ideally, same interfaces used in toJSON()
