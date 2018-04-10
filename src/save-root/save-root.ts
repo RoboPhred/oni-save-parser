@@ -20,7 +20,7 @@ import {
 } from "../oni-save";
 
 import {
-    TypeSerializer
+    TypeTemplateSerializer
 } from "../type-serializer";
 
 import {
@@ -47,7 +47,7 @@ export class OniSaveRootImpl implements OniSaveRoot {
     private _saveFileRoot: SaveFileRoot | null = null;
 
     constructor(
-        @inject(TypeSerializer) private _typeSerializer: TypeSerializer,
+        @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
     ) {}
 
     get widthInCells(): number {
@@ -67,7 +67,7 @@ export class OniSaveRootImpl implements OniSaveRoot {
         if (rootName !== SaveFileRoot) {
             throw new Error(`Expected to find "${SaveFileRoot}", but got "${rootName}"`);
         }
-        this._saveFileRoot = this._typeSerializer.parseTemplatedType<SaveFileRoot>(reader, SaveFileRoot);
+        this._saveFileRoot = this._templateSerializer.parseTemplatedType<SaveFileRoot>(reader, SaveFileRoot);
     }
 
     write(writer: DataWriter) {
@@ -75,7 +75,7 @@ export class OniSaveRootImpl implements OniSaveRoot {
             throw new Error("Failed to write SaveFileRoot: No root loaded.");
         }
         writer.writeKleiString(SaveFileRoot);
-        this._typeSerializer.writeTemplatedType(writer, SaveFileRoot, this._saveFileRoot);
+        this._templateSerializer.writeTemplatedType(writer, SaveFileRoot, this._saveFileRoot);
     }
 
     toJSON() {

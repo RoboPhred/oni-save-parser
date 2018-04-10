@@ -15,7 +15,7 @@ import {
 } from "../binary-serializer";
 
 import {
-    TypeSerializer
+    TypeTemplateSerializer
 } from "../type-serializer";
 
 import {
@@ -34,15 +34,15 @@ export class OniGameDataImpl implements OniGameData {
     private _data: object | null = null;
 
     constructor(
-        @inject(TypeSerializer) private _typeSerializer: TypeSerializer
+        @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer
     ) { }
 
     parse(reader: DataReader): void {
         const rootName = validateDotNetIdentifierName(reader.readKleiString());
         if (rootName !== GameStateData) {
-            throw new Error(`Expected to find "${GameStateData}", but got "${rootName}"`);
+            throw new Error(`Expected to find "${GameStateData}", but got "${rootName}".`);
         }
-        this._data = this._typeSerializer.parseTemplatedType(reader, GameStateData);
+        this._data = this._templateSerializer.parseTemplatedType(reader, GameStateData);
     }
 
     write(writer: DataWriter): void {
@@ -50,7 +50,7 @@ export class OniGameDataImpl implements OniGameData {
             throw new Error("Failed to write GameStateData: No data loaded.");
         }
         writer.writeKleiString(GameStateData);
-        this._typeSerializer.writeTemplatedType(writer, GameStateData, this._data);
+        this._templateSerializer.writeTemplatedType(writer, GameStateData, this._data);
     }
 
     toJSON() {

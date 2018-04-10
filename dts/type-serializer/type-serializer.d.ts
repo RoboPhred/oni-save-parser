@@ -11,8 +11,6 @@ export declare class TypeSerializerImpl implements TypeSerializer, TypeDescripto
     parseType<T>(reader: DataReader, descriptor: TypeDescriptor<T>): T;
     writeType<T>(writer: DataWriter, descriptor: TypeDescriptor<T>, value: T): void;
     hasTemplatedType(templateName: string): boolean;
-    parseTemplatedType<T extends object = any>(reader: DataReader, templateName: string): T;
-    writeTemplatedType<T extends object = any>(writer: DataWriter, templateName: string, value: T): void;
     private _getSerializationInfo(descriptor);
     private _buildCache();
 }

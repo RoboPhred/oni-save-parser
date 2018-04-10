@@ -2,7 +2,8 @@
 import {
     injectable,
     inject,
-    singleton
+    singleton,
+    provides
 } from "microinject";
 
 
@@ -22,18 +23,25 @@ import {
 
 import {
     TypeTemplateRegistry,
-    TypeDescriptorSerializer
+    TypeDescriptorSerializer,
+    TypeTemplateSerializer,
+    TypeSerializer
 } from "./services";
 
 
-@injectable(TypeTemplateRegistry)
+@injectable()
+@provides(TypeTemplateRegistry)
+@provides(TypeTemplateSerializer)
 @singleton()
-export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
+export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTemplateSerializer {
     private _templates = new Map<string, TypeTemplate>();
     private _templateNameOrderings: string[] = [];
 
     @inject(TypeDescriptorSerializer)
     private _typeDescriptorSerializer: TypeDescriptorSerializer | undefined;
+
+    @inject(TypeSerializer)
+    private _typeSerializer: TypeSerializer | undefined;
 
     has(templateName: string): boolean {
         return this._templates.has(templateName);
@@ -68,6 +76,68 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry {
 
             writer.writeKleiString(templateName);
             this._writeTemplate(writer, template);
+        }
+    }
+
+    parseTemplatedType<T extends object = any>(reader: DataReader, templateName: string): T {
+        const template = this.get(templateName);
+        if (!template) {
+            throw new Error(`Failed to parse object: Template name "${templateName}" is not in the template registry.`);
+        }
+
+        const obj: any = {};
+
+        // We parse fields, then properties, in order of appearance.
+
+        for (let field of template.fields) {
+            const {
+                name,
+                type
+            } = field;
+            
+            const data = this._typeSerializer!.parseType(reader, type);
+            obj[name] = data;
+        }
+
+        for (let property of template.properties) {
+            const {
+                name,
+                type
+            } = property;
+            
+            const data = this._typeSerializer!.parseType(reader, type);
+            obj[name] = data;
+        }
+
+        return obj;
+    }
+
+    writeTemplatedType<T extends object = any>(writer: DataWriter, templateName: string, value: T): void {
+        const template = this.get(templateName);
+        if (!template) {
+            throw new Error(`Failed to write object: Template name "${templateName}" is not in the template registry.`);
+        }
+
+        // We parse fields, then properties, in order of appearance.
+
+        for (let field of template.fields) {
+            const {
+                name,
+                type
+            } = field;
+            
+            const data = (value as any)[name];
+            this._typeSerializer!.writeType(writer, type, data);
+        }
+
+        for (let property of template.properties) {
+            const {
+                name,
+                type
+            } = property;
+            
+            const data = (value as any)[name];
+            this._typeSerializer!.writeType(writer, type, data);
         }
     }
 

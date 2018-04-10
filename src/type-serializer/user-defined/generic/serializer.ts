@@ -22,7 +22,7 @@ import {
 
 import {
     TypeSerializationInfo,
-    TypeSerializer,
+    TypeTemplateSerializer,
     TypeDescriptorSerializer,
     TypeTemplateRegistry
 } from "../../services";
@@ -40,7 +40,7 @@ export class UserDefinedGenericTypeSerializer implements TypeSerializationInfo<o
     constructor(
         @inject(TypeTemplateRegistry) private _templateRegistry: TypeTemplateRegistry,
         @inject(TypeDescriptorSerializer) private _descriptorSerializer: TypeDescriptorSerializer,
-        @inject(TypeSerializer) private _typeSerializer: TypeSerializer
+        @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer
     ) { }
 
     parseDescriptor(reader: DataReader): UserDefinedGenericTypeDescriptor<object> {
@@ -97,7 +97,7 @@ export class UserDefinedGenericTypeSerializer implements TypeSerializationInfo<o
 
         const parseStart = reader.position;
 
-        const obj = this._typeSerializer.parseTemplatedType(reader, templateName);
+        const obj = this._templateSerializer.parseTemplatedType(reader, templateName);
 
         const parseLength = reader.position - parseStart;
         if (parseLength !== dataLength) {
@@ -119,7 +119,7 @@ export class UserDefinedGenericTypeSerializer implements TypeSerializationInfo<o
         }
         else {
             const dataWriter = new ArrayDataWriter();
-            this._typeSerializer.writeTemplatedType(dataWriter, templateName, value);
+            this._templateSerializer.writeTemplatedType(dataWriter, templateName, value);
 
             writer.writeInt32(dataWriter.position);
             writer.writeBytes(dataWriter.getBytesView());
