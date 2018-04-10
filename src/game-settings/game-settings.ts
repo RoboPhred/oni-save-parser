@@ -27,10 +27,13 @@ import {
     OniGameSettings
 } from "./services";
 
-import {
-    GameSettings
-} from "../assembly-types";
 
+interface GameSettings {
+    baseAlreadyCreated: boolean;
+    nextUniqueID: number;
+    gameID: number;
+}
+const GameSettings = "Game+Settings";
 
 @injectable(OniGameSettings)
 @inScope(OniSave)
@@ -58,7 +61,7 @@ export class OniGameSettingsImpl implements OniGameSettings {
         if (rootName !== GameSettings) {
             throw new Error(`Expected to find "${GameSettings}", but got "${rootName}"`);
         }
-        this._settings = this._typeSerializer.parseTemplatedType(reader, GameSettings) as GameSettings;
+        this._settings = this._typeSerializer.parseTemplatedType<GameSettings>(reader, GameSettings);
     }
 
     write(writer: DataWriter): void {
