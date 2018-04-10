@@ -24,12 +24,21 @@ import {
 } from "../type-serializer";
 
 import {
-    SaveFileRoot
-} from "../assembly-types";
-
-import {
     OniSaveRoot
 } from "./services";
+
+
+/**
+ * ONI assembly object.
+ * Namespace: ```Klei```
+ * Class: ```SaveFileRoot```
+ */
+export interface SaveFileRoot {
+    WidthInCells: number;
+    HeightInCells: number;
+    streamed: Map<string, ArrayBufferView>;
+}
+export const SaveFileRoot = "Klei.SaveFileRoot";
 
 
 @injectable(OniSaveRoot)
@@ -58,7 +67,7 @@ export class OniSaveRootImpl implements OniSaveRoot {
         if (rootName !== SaveFileRoot) {
             throw new Error(`Expected to find "${SaveFileRoot}", but got "${rootName}"`);
         }
-        this._saveFileRoot = this._typeSerializer.parseTemplatedType(reader, SaveFileRoot) as SaveFileRoot;
+        this._saveFileRoot = this._typeSerializer.parseTemplatedType<SaveFileRoot>(reader, SaveFileRoot);
     }
 
     write(writer: DataWriter) {
