@@ -1,22 +1,23 @@
 import { Identifier } from "microinject";
 import { BinarySerializable } from "../../../binary-serializer";
-import { SaveGame, SaveGameHeader, SaveGameInfo, SaveBody, GameSaveRoot, GameSettings, GameObject, GameSaveData } from "../interfaces";
-export interface SaveGameInstance extends SaveGame, BinarySerializable {
+import { JsonSerializable } from "../../../json-serializer";
+import { SaveGame, SaveGameHeader, SaveGameInfo, SaveBody, GameSaveRoot, GameSettings, GameObjectPrefabs, GameSaveData } from "../interfaces";
+export interface SaveGameInstance extends SaveGame, BinarySerializable, JsonSerializable<SaveGame> {
 }
 export declare const SaveGameInstance: Identifier<SaveGameInstance>;
-export interface SaveGameHeaderInstance extends SaveGameHeader, BinarySerializable {
+export interface SaveGameHeaderInstance extends SaveGameHeader, BinarySerializable, JsonSerializable<SaveGameHeader> {
 }
 export declare const SaveGameHeaderInstance: Identifier<SaveGameHeaderInstance>;
-export interface SaveGameInfoInstance extends SaveGameInfo, BinarySerializable {
+export interface SaveGameInfoInstance extends SaveGameInfo, BinarySerializable, JsonSerializable<SaveGameInfo> {
 }
 export declare const SaveGameInfoInstance: Identifier<SaveGameInfoInstance>;
-export interface SaveBodyInstance extends SaveBody, BinarySerializable {
+export interface SaveBodyInstance extends SaveBody, BinarySerializable, JsonSerializable<SaveBody> {
 }
 export declare const SaveBodyInstance: Identifier<SaveBodyInstance>;
-export interface GameSaveRootInstance extends GameSaveRoot, BinarySerializable {
+export interface GameSaveRootInstance extends GameSaveRoot, BinarySerializable, JsonSerializable<GameSaveRoot> {
 }
 export declare const GameSaveRootInstance: Identifier<GameSaveRootInstance>;
-export interface GameSettingsInstance extends GameSettings, BinarySerializable {
+export interface GameSettingsInstance extends GameSettings, BinarySerializable, JsonSerializable<GameSettings> {
 }
 export declare const GameSettingsInstance: Identifier<GameSettingsInstance>;
 /**
@@ -28,9 +29,11 @@ export declare const GameSettingsInstance: Identifier<GameSettingsInstance>;
  * game objects.
  */
 export interface GameObjectManager extends BinarySerializable {
-    readonly gameObjects: Map<string, GameObject[]>;
+    readonly gameObjects: GameObjectPrefabs;
+    fromJSON(gameObjects: GameObjectPrefabs): void;
+    toJSON(): GameObjectPrefabs;
 }
 export declare const GameObjectManager: Identifier<GameObjectManager>;
-export interface GameSaveDataInstance extends GameSaveData, BinarySerializable {
+export interface GameSaveDataInstance extends GameSaveData, BinarySerializable, JsonSerializable<GameSaveData> {
 }
 export declare const GameSaveDataInstance: Identifier<GameSaveDataInstance>;

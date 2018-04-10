@@ -82,8 +82,15 @@ export interface SaveGameInfo {
 export interface SaveBody {
     saveRoot: GameSaveRoot;
     gameSettings: GameSettings;
-    gameObjects: Map<string, GameObject[]>;
+    gameObjects: GameObjectPrefabs;
     gameData: GameSaveData;
+}
+/**
+ * An object containing arrays of game objects keyed
+ * by their prefab assembly types.
+ */
+export interface GameObjectPrefabs {
+    [key: string]: GameObject[];
 }
 /**
  * Namespace: "Klei"
@@ -107,7 +114,9 @@ export interface GameSaveRoot {
      *
      * Class Property: "streamed"
      */
-    streamed: Map<string, Uint8Array>;
+    streamed: {
+        [key: string]: Uint8Array;
+    };
 }
 export interface GameSettings {
     baseAlreadyCreated: boolean;
@@ -145,7 +154,7 @@ export interface GameObjectBehavior {
      * The parsed template data, if templateRecognized is true.
      * A null value may indicate a correctly parsed null instance.
      */
-    parsedData?: AnyObject | null;
+    parsedData?: any | null;
     /**
      * If templateRecognized is true, this may contain all extranious
      * data remaining after parsing the template.  This usually occurs
@@ -157,9 +166,6 @@ export interface GameObjectBehavior {
      */
     extraData?: ArrayBuffer | null;
 }
-export declare type AnyObject = {
-    [key: string]: any;
-};
 /**
  * Class: "Game+GameSaveData"
  */

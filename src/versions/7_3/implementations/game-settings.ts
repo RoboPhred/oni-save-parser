@@ -23,6 +23,7 @@ import {
     GameSettingsInstance,
     SaveGameScope
 } from "../services";
+import { GameSettings } from "..";
 
 
 interface GameSettingsTemplate {
@@ -35,22 +36,22 @@ const AssemblyTypeName = "Game+Settings";
 @injectable(GameSettingsInstance)
 @inScope(SaveGameScope)
 export class GameSettingsInstanceImpl implements GameSettingsInstance {
-    private _settings: GameSettingsTemplate | null = null;
+    private _data: GameSettingsTemplate | null = null;
 
     constructor(
         @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
     ) {}
 
     get baseAlreadyCreated(): boolean {
-        return ensureNotNull(this._settings, "The value has not yet been parsed.").baseAlreadyCreated;
+        return ensureNotNull(this._data, "The value has not yet been parsed.").baseAlreadyCreated;
     }
 
     get nextUniqueID(): number {
-        return ensureNotNull(this._settings, "The value has not yet been parsed.").nextUniqueID;
+        return ensureNotNull(this._data, "The value has not yet been parsed.").nextUniqueID;
     }
 
     get gameID(): number {
-        return ensureNotNull(this._settings, "The value has not yet been parsed.").gameID;
+        return ensureNotNull(this._data, "The value has not yet been parsed.").gameID;
     }
 
     parse(reader: DataReader): void {
@@ -58,14 +59,27 @@ export class GameSettingsInstanceImpl implements GameSettingsInstance {
         if (rootName !== AssemblyTypeName) {
             throw new Error(`Failed to parse GameSettings: Expected to find "${AssemblyTypeName}", but got "${rootName}".`);
         }
-        this._settings = this._templateSerializer.parseTemplatedType<GameSettingsTemplate>(reader, AssemblyTypeName);
+        this._data = this._templateSerializer.parseTemplatedType<GameSettingsTemplate>(reader, AssemblyTypeName);
     }
 
     write(writer: DataWriter): void {
-        if (!this._settings) {
-            throw new Error("Failed to write GameSettings: Data has not been parsed.");
+        if (!this._data) {
+            throw new Error("Failed to write GameSettings: Data has not been set.");
         }
         writer.writeKleiString(AssemblyTypeName);
-        this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._settings);
+        this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._data);
+    }
+
+    fromJSON(value: any): void {
+        // TODO: validate json value
+        this._data = {...value};
+
+    }
+
+    toJSON(): GameSettings {
+        if (!this._data) {
+            throw new Error("Failed to serialize GameSettings json: Data has not been set.");
+        }
+        return {...this._data};
     }
 }

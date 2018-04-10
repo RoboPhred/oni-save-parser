@@ -1,6 +1,6 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
 import { SaveGameHeaderInstance } from "../services";
-import { SaveGameInfo } from "../interfaces";
+import { SaveGameInfo, SaveGameHeader } from "../interfaces";
 export declare class SaveGameHeaderInstanceImpl implements SaveGameHeaderInstance {
     private _buildVersion;
     private _headerVersion;
@@ -12,10 +12,11 @@ export declare class SaveGameHeaderInstanceImpl implements SaveGameHeaderInstanc
     readonly gameInfo: SaveGameInfo;
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
+    fromJSON(value: SaveGameHeader): void;
     toJSON(): {
         buildVersion: number;
         headerVersion: number;
         isCompressed: boolean;
-        gameData: SaveGameInfo;
+        gameInfo: SaveGameInfo;
     };
 }

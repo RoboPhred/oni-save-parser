@@ -2,7 +2,7 @@ import { Logger } from "../../../logging";
 import { DataReader, DataWriter } from "../../../binary-serializer";
 import { TypeTemplateSerializer } from "../type-serializer";
 import { GameObjectManager } from "../services";
-import { GameObject } from "../interfaces";
+import { GameObjectPrefabs } from "../interfaces";
 export declare class GameObjectManagerImpl implements GameObjectManager {
     private _templateSerializer;
     static readonly SAVE_HEADER: string;
@@ -15,9 +15,11 @@ export declare class GameObjectManagerImpl implements GameObjectManager {
     private _logWarn;
     private _logTrace;
     constructor(_templateSerializer: TypeTemplateSerializer, logger?: Logger);
-    readonly gameObjects: Map<string, GameObject[]>;
+    readonly gameObjects: GameObjectPrefabs;
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
+    fromJSON(gameObjects: GameObjectPrefabs): void;
+    toJSON(): GameObjectPrefabs;
     private _parsePrefabs(reader);
     private _writePrefabs(writer);
     private _parsePrefabSet(reader, prefabName);

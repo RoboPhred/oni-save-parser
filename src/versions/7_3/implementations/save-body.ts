@@ -32,8 +32,10 @@ import {
 import {
     GameSaveRoot,
     GameSettings,
+    GameObjectPrefabs,
     GameObject,
-    GameSaveData
+    GameSaveData,
+    SaveBody
 } from "../interfaces";
 
 
@@ -57,7 +59,7 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
         return ensureNotNull(this._gameSettings);
     }
 
-    get gameObjects(): Map<string, GameObject[]> {
+    get gameObjects(): GameObjectPrefabs {
         return ensureNotNull(this._gameObjectManager).gameObjects;
     }
 
@@ -110,5 +112,22 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
         this._gameSettings.write(writer);
         this._gameObjectManager.write(writer);
         this._gameData.write(writer);
+    }
+
+    fromJSON(value: SaveBody): void {
+        // TODO: validate json value
+        this._saveRoot.fromJSON(value.saveRoot);
+        this._gameSettings.fromJSON(value.gameSettings);
+        this._gameObjectManager.fromJSON(value.gameObjects);
+        this._gameData.fromJSON(value.gameData);
+    }
+
+    toJSON(): SaveBody {
+        return {
+            saveRoot: this._saveRoot.toJSON(),
+            gameSettings: this._gameSettings.toJSON(),
+            gameObjects: this._gameObjectManager.toJSON(),
+            gameData: this._gameData.toJSON()
+        };
     }
 }

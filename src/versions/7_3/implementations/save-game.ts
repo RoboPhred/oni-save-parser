@@ -27,7 +27,8 @@ import {
 
 import {
     SaveGameHeader,
-    SaveBody
+    SaveBody,
+    SaveGame
 } from "../interfaces";
 
 
@@ -59,5 +60,17 @@ export class SaveGameInstanceImpl implements SaveGameInstance {
         this._header.write(writer);
         this._templates.write(writer);
         this._body.write(writer);
+    }
+
+    fromJSON(value: SaveGame) {
+        this._header.fromJSON(value.header),
+        this._body.fromJSON(value.body);
+    }
+
+    toJSON(): SaveGame {
+        return {
+            header: this._header.toJSON(),
+            body: this._body.toJSON()
+        };
     }
 }

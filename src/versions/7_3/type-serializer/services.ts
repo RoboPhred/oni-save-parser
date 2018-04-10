@@ -10,10 +10,15 @@ import {
 } from "../../../binary-serializer";
 
 import {
+    JsonSerializable
+} from "../../../json-serializer";
+
+import {
     TypeDescriptor,
     TypeTemplate,
     TypeID
 } from "./interfaces";
+
 
 export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDescriptor<TType> = TypeDescriptor<TType>> {
     id: TypeID;
@@ -28,7 +33,7 @@ export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDesc
 export const TypeSerializationInfo: Identifier<TypeSerializationInfo> = Symbol("TypeSerializationInfo");
 
 
-export interface TypeTemplateRegistry extends BinarySerializable {
+export interface TypeTemplateRegistry extends BinarySerializable, JsonSerializable {
     has(templateName: string): boolean;
     get(templateName: string): TypeTemplate | undefined;
 }
