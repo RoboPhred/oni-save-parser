@@ -5,10 +5,6 @@ import { GameObjectManager } from "../services";
 import { GameObjectPrefabs } from "../interfaces";
 export declare class GameObjectManagerImpl implements GameObjectManager {
     private _templateSerializer;
-    static readonly SAVE_HEADER: string;
-    static readonly CURRENT_VERSION_MAJOR: number;
-    static readonly CURRENT_VERSION_MINOR: number;
-    private _versionMinor;
     private _gameObjects;
     private _gameObjectOrdering;
     private _warnExtraniousDataTypes;
@@ -20,8 +16,6 @@ export declare class GameObjectManagerImpl implements GameObjectManager {
     write(writer: DataWriter): void;
     fromJSON(gameObjects: GameObjectPrefabs): void;
     toJSON(): GameObjectPrefabs;
-    private _parsePrefabs(reader);
-    private _writePrefabs(writer);
     private _parsePrefabSet(reader, prefabName);
     private _writePrefabSet(writer, prefabObjects);
     private _parseGameObject(reader);

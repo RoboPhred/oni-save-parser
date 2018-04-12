@@ -46,6 +46,10 @@ export class SaveGameInstanceImpl implements SaveGameInstance {
         return this._header;
     }
 
+    get templates(): TypeTemplate[] {
+        return this._templates.toJSON();
+    }
+
     get body(): SaveBody {
         return this._body;
     }
@@ -64,12 +68,14 @@ export class SaveGameInstanceImpl implements SaveGameInstance {
 
     fromJSON(value: SaveGame) {
         this._header.fromJSON(value.header),
+        this._templates.fromJSON(value.templates);
         this._body.fromJSON(value.body);
     }
 
     toJSON(): SaveGame {
         return {
             header: this._header.toJSON(),
+            templates: this._templates.toJSON(),
             body: this._body.toJSON()
         };
     }

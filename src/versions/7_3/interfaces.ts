@@ -56,7 +56,7 @@ export interface SaveGame {
     // Disabled for now.
     // It might be the case that unused template data is left out, so we might
     //  need the ability to add to these later.
-    // templates: TypeTemplate[];
+    templates: TypeTemplate[];
 
     /**
      * The body content of the save file.
@@ -105,6 +105,8 @@ export interface SaveGameInfo {
 export interface SaveBody {
     saveRoot: GameSaveRoot;
     gameSettings: GameSettings;
+    versionMajor: number;
+    versionMinor: number;
     gameObjects: GameObjectPrefabs;
     gameData: GameSaveData;
 }

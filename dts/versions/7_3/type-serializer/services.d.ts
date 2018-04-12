@@ -11,7 +11,7 @@ export interface TypeSerializationInfo<TType = any, TDescriptor extends TypeDesc
     writeType(writer: DataWriter, descriptor: TDescriptor, value: TType): void;
 }
 export declare const TypeSerializationInfo: Identifier<TypeSerializationInfo>;
-export interface TypeTemplateRegistry extends BinarySerializable, JsonSerializable {
+export interface TypeTemplateRegistry extends BinarySerializable, JsonSerializable<TypeTemplate[]> {
     has(templateName: string): boolean;
     get(templateName: string): TypeTemplate | undefined;
 }

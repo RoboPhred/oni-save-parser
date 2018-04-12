@@ -54,7 +54,7 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
             //  ends up getting written out.
             throw new Error("Dictionary types require 2 sub-types.");
         }
-        
+
         return {
             name: this.name,
             keyType: this._descriptorSerializer.parseDescriptor(reader),
@@ -83,16 +83,30 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
             let pairs: [any, any][] = new Array(count);
 
             // Values are parsed first
-            for(let i = 0; i < count; i++) {
+            for (let i = 0; i < count; i++) {
                 pairs[i] = new Array(2) as [any, any];
                 pairs[i][1] = this._typeSerializer.parseType(reader, valueType);
             }
 
-            for(let i = 0; i < count; i++) {
+            for (let i = 0; i < count; i++) {
                 pairs[i][0] = this._typeSerializer.parseType(reader, keyType);
             }
 
-            return new Map(pairs);
+            const map = new Map(pairs);
+            // HACK: temp for json dumping.
+            (map as any).toJSON = () => {
+                const obj: any = {};
+                for (let pair of map) {
+                    let key = pair[0];
+                    let keyType = typeof key;
+                    if (keyType && keyType === "object") {
+                        key = JSON.stringify(key);
+                    }
+                    obj[key] = pair[1];
+                }
+                return obj;
+            }
+            return map;
         }
         else {
             return null;
@@ -119,10 +133,10 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
             const dataWriter = new ArrayDataWriter();
 
             // Values come first.
-            for(let element of value) {
+            for (let element of value) {
                 this._typeSerializer.writeType(dataWriter, valueType, element[1]);
             }
-            for(let element of value) {
+            for (let element of value) {
                 this._typeSerializer.writeType(dataWriter, keyType, element[0]);
             }
 

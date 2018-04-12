@@ -10,8 +10,8 @@ export declare class TypeTemplateRegistryImpl implements TypeTemplateRegistry, T
     get(templateName: string): TypeTemplate | undefined;
     parse(reader: DataReader): void;
     write(writer: DataWriter): void;
-    fromJSON(value: any): void;
-    toJSON(): any;
+    fromJSON(value: TypeTemplate[]): void;
+    toJSON(): TypeTemplate[];
     parseTemplatedType<T extends object = any>(reader: DataReader, templateName: string): T;
     writeTemplatedType<T extends object = any>(writer: DataWriter, templateName: string, value: T): void;
     private _parseTemplate(name, reader);

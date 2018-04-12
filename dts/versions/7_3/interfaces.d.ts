@@ -1,4 +1,5 @@
 import { Vector2I, Vector3, Quaternion } from "../../interfaces";
+import { TypeTemplate } from "./type-serializer";
 /**
  * Holds all data that makes up an Oxygen Not Included save game.
  *
@@ -40,6 +41,7 @@ export interface SaveGame {
      * Parser Class: "Manager"
      * Parser Function: "DeserializeDirectory(IReader reader)"
      */
+    templates: TypeTemplate[];
     /**
      * The body content of the save file.
      *
@@ -82,6 +84,8 @@ export interface SaveGameInfo {
 export interface SaveBody {
     saveRoot: GameSaveRoot;
     gameSettings: GameSettings;
+    versionMajor: number;
+    versionMinor: number;
     gameObjects: GameObjectPrefabs;
     gameData: GameSaveData;
 }
