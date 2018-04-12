@@ -40,13 +40,6 @@ import {
 @injectable(GameObjectManager)
 @inScope(SaveGameScope)
 export class GameObjectManagerImpl implements GameObjectManager {
-    static readonly SAVE_HEADER = "KSAV";
-
-    static readonly CURRENT_VERSION_MAJOR = 7;
-    static readonly CURRENT_VERSION_MINOR = 3;
-
-    private _versionMinor: number | null = null;
-
     private _gameObjects: GameObjectPrefabs = {};
     private _gameObjectOrdering: string[] = [];
 
@@ -74,59 +67,6 @@ export class GameObjectManagerImpl implements GameObjectManager {
     }
 
     parse(reader: DataReader): void {
-        const expectedHeader = GameObjectManagerImpl.SAVE_HEADER;
-        const header = reader.readChars(expectedHeader.length);
-        if (header !== expectedHeader) {
-            throw new Error(`Failed to parse GameState: Expected "${expectedHeader}" but got "${header}" (${Array.from(header).map(x => x.charCodeAt(0))})`);
-        }
-
-        const expectedMajor = GameObjectManagerImpl.CURRENT_VERSION_MAJOR;
-        const expectedMinor = GameObjectManagerImpl.CURRENT_VERSION_MINOR;
-
-        const versionMajor = reader.readInt32();
-        const versionMinor = reader.readInt32();
-
-        if (versionMajor !== expectedMajor) {
-            throw new Error(`Failed to parse GameState: Version mismatch: Expected major version ${expectedMajor} but got ${versionMajor}.`);
-        }
-
-        if (versionMinor > expectedMinor) {
-            // If they stick to semver, then minor changes should in theory be backwards compatible with older versions.
-            //  This means its likely we can parse this correctly, but not guarenteed.
-            // It's worth noting that the ONI itself will refuse to load a minor version higher than it understands.
-            this._logWarn(`Game state version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
-        }
-
-        this._versionMinor = versionMinor;
-
-        this._parsePrefabs(reader);
-    }
-
-    write(writer: DataWriter): void {
-        if (this._versionMinor == null) {
-            throw new Error("Game state has not been parsed.");
-        }
-
-        writer.writeChars(GameObjectManagerImpl.SAVE_HEADER);
-
-        writer.writeInt32(GameObjectManagerImpl.CURRENT_VERSION_MAJOR);
-        writer.writeInt32(this._versionMinor);
-
-        this._writePrefabs(writer);
-    }
-
-    fromJSON(gameObjects: GameObjectPrefabs) {
-        this._gameObjects = gameObjects;
-        // TODO: Amend ordering based on new or removed keys rather than
-        //  loosing the order.
-        this._gameObjectOrdering = Object.keys(gameObjects);
-    }
-
-    toJSON(): GameObjectPrefabs {
-        return {...this._gameObjects};
-    }
-
-    private _parsePrefabs(reader: DataReader): void {
         this._logTrace("Parsing prefabs.");
 
         const prefabCount = reader.readInt32();
@@ -140,16 +80,27 @@ export class GameObjectManagerImpl implements GameObjectManager {
             this.gameObjects[prefabName] = prefabSet;
         }
 
-        this._logTrace("Prefab parsing complete.");        
+        this._logTrace("Prefab parsing complete.");       
     }
 
-    private _writePrefabs(writer: DataWriter): void {
+    write(writer: DataWriter): void {
         writer.writeInt32(this._gameObjectOrdering.length);
         for (let name of this._gameObjectOrdering) {
             writer.writeKleiString(name);
             const prefab = this.gameObjects[name]!;
             this._writePrefabSet(writer, prefab);
         }
+    }
+
+    fromJSON(gameObjects: GameObjectPrefabs) {
+        this._gameObjects = gameObjects;
+        // TODO: Amend ordering based on new or removed keys rather than
+        //  loosing the order.
+        this._gameObjectOrdering = Object.keys(gameObjects);
+    }
+
+    toJSON(): GameObjectPrefabs {
+        return {...this._gameObjects};
     }
 
     private _parsePrefabSet(reader: DataReader, prefabName: string): GameObject[] {

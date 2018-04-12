@@ -83,20 +83,18 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
         }
     }
 
-    fromJSON(value: any) {
-        const templates = new Map<string, TypeTemplate>();
-        for(let key of Object.keys(value)) {
-            templates.set(key, value[key]);
+    fromJSON(value: TypeTemplate[]) {
+        this._templates = new Map<string, TypeTemplate>();
+        this._templateNameOrderings = new Array(value.length);
+        for(let i = 0; i < value.length; i++) {
+            const template = value[i];
+            this._templateNameOrderings[i] = template.name;
+            this._templates.set(template.name, template);
         }
     }
 
-    toJSON(): any {
-        const templates: {[key: string]: TypeTemplate} = {};
-        for(let pair of this._templates) {
-            templates[pair[0]] = pair[1];
-        }
-
-        return templates;
+    toJSON(): TypeTemplate[] {
+        return this._templateNameOrderings.map(x => this._templates.get(x)!);
     }
 
     parseTemplatedType<T extends object = any>(reader: DataReader, templateName: string): T {
