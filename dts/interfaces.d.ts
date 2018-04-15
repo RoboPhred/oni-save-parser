@@ -20,9 +20,6 @@ export interface Quaternion {
     z: number;
     w: number;
 }
-/**
- * With a 'u', because thats how Klei does it, and Precedent is Important.
- */
 export interface Colour {
     r: number;
     g: number;
