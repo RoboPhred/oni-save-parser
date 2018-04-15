@@ -14,7 +14,7 @@ export interface EffectInstance {
 }
 
 // TODO: move to oni-save-parser
-export const AI_EFFECT_NAMES: string[] = [
+export const AI_EFFECT_IDS: string[] = [
     "UncomfortableSleep",
     "Sleep",
     "NarcolepticSleep",

@@ -16,11 +16,11 @@ export interface Accessory {
         Guid: string;
     };
 }
-export declare const EYES: string[];
-export declare const HEADS: string[];
-export declare const MOUTHS: string[];
-export declare const HAIRS: string[];
-export declare const BODIES: string[];
+export declare const ACCESSORIZER_EYE_GUIDS: string[];
+export declare const ACCESSORIZER_HEAD_GUIDS: string[];
+export declare const ACCESSORIZER_MOUTH_GUIDS: string[];
+export declare const ACCESSORIZER_HAIR_GUIDS: string[];
+export declare const ACCESSORIZER_BODY_GUIDS: string[];
 export declare function getIndexOfAccessoryType(accessories: Accessory[], type: string): number;
 export declare function getAccessoryType(accessoryID: string): string | null;
 export declare function getAccessoryOrdinal(accessoryID: string): number | null;

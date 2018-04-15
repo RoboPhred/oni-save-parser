@@ -6,6 +6,8 @@ export const KPrefabIDBehavior: BehaviorName<KPrefabIDBehavior> = "KPrefabID";
 export interface KPrefabIDBehavior extends GameObjectBehavior {
     name: "KPrefabID";
     parsedData: {
-        InstanceID: number;
+        InstanceID: KPrefabID;
     };
 }
+
+export type KPrefabID = number;

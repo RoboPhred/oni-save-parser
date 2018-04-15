@@ -50,13 +50,13 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
     };
 }
 
-export type MINION_IDENTITY_GENDERS = [
+export const MINION_IDENTITY_GENDERS: string[] = [
     "MALE",
     "FEMALE",
     "NB"
 ];
 
-export type MINION_IDENTITY_VOICES = [
+export const MINION_IDENTITY_VOICES: number[] = [
     0,
     1,
     2,

@@ -9,7 +9,7 @@ export interface AITraitsBehavior extends GameObjectBehavior {
     };
 }
 
-export const AI_TRAITS: string[] = [
+export const AI_TRAIT_IDS: string[] = [
     "None",
     "Stinky",
     "Ellie",

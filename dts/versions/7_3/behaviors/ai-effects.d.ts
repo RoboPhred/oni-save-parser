@@ -11,4 +11,4 @@ export interface EffectInstance {
     id: string;
     timeRemaining: number;
 }
-export declare const AI_EFFECT_NAMES: string[];
+export declare const AI_EFFECT_IDS: string[];

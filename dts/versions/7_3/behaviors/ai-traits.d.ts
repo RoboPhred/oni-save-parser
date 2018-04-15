@@ -7,4 +7,4 @@ export interface AITraitsBehavior extends GameObjectBehavior {
         TraitIds: string[];
     };
 }
-export declare const AI_TRAITS: string[];
+export declare const AI_TRAIT_IDS: string[];
