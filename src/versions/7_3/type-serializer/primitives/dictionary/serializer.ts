@@ -96,13 +96,12 @@ export class DictionaryTypeSerializer implements TypeSerializationInfo<Dictionar
             // HACK: temp for json dumping.
             (map as any).toJSON = () => {
                 const obj: any = {};
-                for (let pair of map) {
-                    let key = pair[0];
+                for (let [key, value] of map) {
                     let keyType = typeof key;
                     if (keyType && keyType === "object") {
                         key = JSON.stringify(key);
                     }
-                    obj[key] = pair[1];
+                    obj[key] = value;
                 }
                 return obj;
             }

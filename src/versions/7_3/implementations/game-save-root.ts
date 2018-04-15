@@ -54,8 +54,8 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
     get streamed(): { [key: string]: Uint8Array } {
         const streamed = ensureNotNull(this._data).streamed;
         const obj: { [key: string]: Uint8Array } = {};
-        for(let pair of streamed) {
-            obj[pair[0]] = pair[1];
+        for(let [key, value] of streamed) {
+            obj[key] = value;
         }
 
         return obj;
