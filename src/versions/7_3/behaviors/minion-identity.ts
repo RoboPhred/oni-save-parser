@@ -8,8 +8,8 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
         name: string;
         nameStringKey: string;
 
-        gender: "MALE" | "FEMALE" | "NB";
-        genderStringKey: "MALE" | "FEMALE" | "NB";
+        gender: MinionGender;
+        genderStringKey: MinionGender;
 
         arrivalTime: number;
 
@@ -50,7 +50,9 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
     };
 }
 
-export const MINION_IDENTITY_GENDERS: string[] = [
+export type MinionGender = "MALE" | "FEMALE" | "NB";
+
+export const MINION_IDENTITY_GENDERS: MinionGender[] = [
     "MALE",
     "FEMALE",
     "NB"

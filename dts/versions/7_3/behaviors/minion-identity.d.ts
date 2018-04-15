@@ -6,8 +6,8 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
     parsedData: {
         name: string;
         nameStringKey: string;
-        gender: "MALE" | "FEMALE" | "NB";
-        genderStringKey: "MALE" | "FEMALE" | "NB";
+        gender: MinionGender;
+        genderStringKey: MinionGender;
         arrivalTime: number;
         voiceIdx: number;
         bodyData: {
@@ -44,5 +44,6 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
         };
     };
 }
-export declare const MINION_IDENTITY_GENDERS: string[];
+export declare type MinionGender = "MALE" | "FEMALE" | "NB";
+export declare const MINION_IDENTITY_GENDERS: MinionGender[];
 export declare const MINION_IDENTITY_VOICES: number[];
