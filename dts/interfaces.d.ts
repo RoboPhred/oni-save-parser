@@ -20,9 +20,3 @@ export interface Quaternion {
     z: number;
     w: number;
 }
-export interface Colour {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-}
