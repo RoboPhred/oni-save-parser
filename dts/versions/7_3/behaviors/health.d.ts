@@ -9,3 +9,6 @@ export interface HealthBehavior extends GameObjectBehavior {
     };
 }
 export declare const HEALTH_STATE_NAMES: string[];
+export declare const HEALTH_STATE_MIN = 0;
+export declare const HEALTH_STATE_MAX: number;
+export declare function getHealthStateName(stateID: number): string | null;

@@ -22,7 +22,7 @@ export interface Accessory {
     }
 };
 
-export const EYES: string[] = [
+export const ACCESSORIZER_EYE_GUIDS: string[] = [
     1,
     2,
     3,
@@ -30,21 +30,21 @@ export const EYES: string[] = [
     5
 ].map(x =>  makeAccessoryID("eyes", x));
 
-export const HEADS: string[] = [
+export const ACCESSORIZER_HEAD_GUIDS: string[] = [
     1,
     2,
     3,
     4
 ].map(x => makeAccessoryID("headshape", x));
 
-export const MOUTHS: string[] = [
+export const ACCESSORIZER_MOUTH_GUIDS: string[] = [
     1,
     2,
     3,
     4
 ].map(x => makeAccessoryID("mouth", x));
 
-export const HAIRS: string[] = [
+export const ACCESSORIZER_HAIR_GUIDS: string[] = [
     1,
     2,
     3,
@@ -77,7 +77,7 @@ export const HAIRS: string[] = [
     33
 ].map(x => makeAccessoryID("hair", x));
 
-export const BODIES: string[] = [
+export const ACCESSORIZER_BODY_GUIDS: string[] = [
     1,
     2,
     3,
