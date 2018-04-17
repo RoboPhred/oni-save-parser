@@ -1,6 +1,3 @@
-export interface JsonObjectSerializable {
-    toJSON(): object;
-}
 export interface Vector2 {
     x: number;
     y: number;
