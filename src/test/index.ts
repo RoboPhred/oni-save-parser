@@ -9,31 +9,13 @@ import {
     writeSaveGame
 } from "../index";
 
-const fileName = "Rancher-Test"; //"TheLoneSurvivor";
+const fileName = "broken-before-writeback"; //"TheLoneSurvivor";
 const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
 console.log("Loading save");
 const saveData = parseSaveGame(fileData.buffer);
 
 function testWriteback() {
-    console.log("Modding minions for writeback");
-
-    // let logBehaviors = true;
-    const minions = saveData.body.gameObjects["Minion"] as any[];
-    writeFileSync(`./test-data/${fileName}-minions-behaviors.json`, JSON.stringify(minions, null, 2));
-    for(let minion of minions) {
-        // if (logBehaviors) {
-        //     logBehaviors = false;
-        //     writeFileSync(`./test-data/${fileName}-minion-behaviors.json`, JSON.stringify(minion["behaviors"], null, 2));
-        // }
-        minion["scale"]["x"] = 0.3;
-        minion["scale"]["y"] = 0.3;
-        minion["scale"]["z"] = 0.3;
-        const attrBehavior = (minion["behaviors"] as any[]).find(x => x["name"] === "Klei.AI.AttributeLevels");
-        const levels = attrBehavior["parsedData"].saveLoadLevels as any[];
-        levels.forEach(x => x["level"] = 100);
-    }
-
     console.log("Serializing");
     const writeData = writeSaveGame(saveData);
     console.log("Writing to file");

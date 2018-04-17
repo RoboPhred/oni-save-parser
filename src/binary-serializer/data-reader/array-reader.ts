@@ -126,8 +126,15 @@ export class ArrayDataReader implements DataReader {
     }
 
     readChars(length: number): string {
-        const bytes = this.readBytes(length);
-        return this._stringDecoder.decode(new DataView(bytes));
+        // Note: readChars deals with unencoded single-byte utf-8 chars.
+        //  This is not safe for multi-byte characters, and is only used for
+        //  places dealing with fixed length single-byte values.
+        const bytes = new Uint8Array(this.readBytes(length));
+        let str = "";
+        for(let i = 0; i < bytes.length; i++) {
+            str += String.fromCharCode(bytes[i]);
+        }
+        return str;
     }
 
     readKleiString(): string | null {
@@ -140,6 +147,7 @@ export class ArrayDataReader implements DataReader {
             return "";
         }
         if (count > 0) {
+            // Note: the length is the encoded length, not the character count.
             const bytes = this.readBytes(count);
             return this._stringDecoder.decode(new DataView(bytes));
         }
