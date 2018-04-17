@@ -115,10 +115,13 @@ export class ArrayDataWriter implements DataWriter {
     }
 
     writeChars(value: string): void {
-        const encoded = this._textEncoder.encode(value);
-        this._ensureCanWrite(encoded.byteLength);
-        this._buffer.set(encoded, this._byteOffset);
-        this._byteOffset += encoded.byteLength;
+        // Do not encode here, we want pure unicode values.
+        //  These values are not suitable for multi-byte characters.
+        this._ensureCanWrite(value.length);
+        for (let i = 0; i < value.length; i++) {
+            this._view.setUint8(this._byteOffset + i, value.charCodeAt(i));
+        }
+        this._byteOffset += value.length;
     }
 
     writeKleiString(value: string | null): void {
@@ -129,8 +132,11 @@ export class ArrayDataWriter implements DataWriter {
             this.writeInt32(0);
         }
         else {
-            this.writeInt32(value.length);
-            this.writeChars(value);
+            // We cannot use writeChars here, as
+            //  encodings can write multi-byte data.
+            const encoded = this._textEncoder.encode(value);
+            this.writeInt32(encoded.byteLength);
+            this.writeBytes(encoded);
         }
     }
 
