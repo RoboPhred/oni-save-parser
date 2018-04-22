@@ -41,3 +41,5 @@ export declare const GEYSER_TYPE_NAMES: ("steam" | "hot_steam" | "hot_water" | "
 export declare const GEYSER_TYPE_HASH_NAMES: {
     [key: number]: GeyserTypeName;
 };
+export declare function getGeyserTypeName(hash: number): string | undefined;
+export declare function getGeyserTypeHash(name: string): number | undefined;

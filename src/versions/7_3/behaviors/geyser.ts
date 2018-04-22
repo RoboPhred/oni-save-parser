@@ -62,14 +62,14 @@ for (let geyserType of GEYSER_TYPE_NAMES) {
     GEYSER_TYPE_HASH_NAMES[hash] = geyserType;
 }
 
-function getGeyserTypeName(hash: number): string | undefined {
+export function getGeyserTypeName(hash: number): string | undefined {
     if (!Object.prototype.hasOwnProperty.call(GEYSER_TYPE_HASH_NAMES, hash)) {
         return undefined;
     }
     return GEYSER_TYPE_HASH_NAMES[hash];
 }
 
-function getGeyserTypeHash(name: string): number | undefined {
+export function getGeyserTypeHash(name: string): number | undefined {
     if (!Object.prototype.hasOwnProperty.call(GEYSER_TYPE_HASHES, name)) {
         return undefined;
     }
