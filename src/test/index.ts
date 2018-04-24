@@ -9,7 +9,7 @@ import {
     writeSaveGame
 } from "../index";
 
-const fileName = "broken-before-writeback"; //"TheLoneSurvivor";
+const fileName = "Rancher-Test"; //"TheLoneSurvivor";
 const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
 console.log("Loading save");
@@ -51,9 +51,9 @@ function testDumpJson() {
     }
 
     // console.log("writing json");
-    // writeFileSync(`./test-data/${fileName}-gameObjects.json`, JSON.stringify(writeData, null, 2));
+    writeFileSync(`./test-data/${fileName}-gameObjects.json`, JSON.stringify(writeData, null, 2));
     console.log("json dump completed");
 }
 
-//testDumpJson();
-testWriteback();
+testDumpJson();
+//testWriteback();
