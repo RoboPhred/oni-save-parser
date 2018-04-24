@@ -1,5 +1,7 @@
 import { GameObjectBehavior } from "../interfaces";
 import { BehaviorName } from "./interfaces";
+export declare type AccessoryType = "eyes" | "hair" | "headshape" | "mouth" | "body";
+export declare const ACCESSORY_TYPES: AccessoryType[];
 export declare const AccessorizerBehavior: BehaviorName<AccessorizerBehavior>;
 export interface AccessorizerBehavior extends GameObjectBehavior {
     name: "Accessorizer";
@@ -21,8 +23,8 @@ export declare const ACCESSORIZER_HEAD_GUIDS: string[];
 export declare const ACCESSORIZER_MOUTH_GUIDS: string[];
 export declare const ACCESSORIZER_HAIR_GUIDS: string[];
 export declare const ACCESSORIZER_BODY_GUIDS: string[];
-export declare function getIndexOfAccessoryType(accessories: Accessory[], type: string): number;
-export declare function getAccessoryType(accessoryID: string): string | null;
+export declare function getIndexOfAccessoryType(accessories: Accessory[], type: AccessoryType): number;
+export declare function getAccessoryType(accessoryID: string): AccessoryType | null;
 export declare function getAccessoryOrdinal(accessoryID: string): number | null;
-export declare function makeAccessoryID(type: string, ordinal: number): string;
-export declare function getAccessoryOfType(accessories: Accessory[], type: string): Accessory | null;
+export declare function makeAccessoryID(type: AccessoryType, ordinal: number): string;
+export declare function getAccessoryOfType(accessories: Accessory[], type: AccessoryType): Accessory | null;

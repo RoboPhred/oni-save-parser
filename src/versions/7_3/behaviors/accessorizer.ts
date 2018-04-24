@@ -5,6 +5,9 @@ import { BehaviorName } from "./interfaces";
 const ACCESSORY_PREFIX = "Root.Accessories.";
 const TYPE_EXTRACTOR_REGEX = /^Root\.Accessories\.([a-zA-Z_]+)_(\d\d\d)$/;
 
+export type AccessoryType = "eyes" | "hair" | "headshape" | "mouth" | "body";
+export const ACCESSORY_TYPES: AccessoryType[] = ["eyes", "hair", "headshape", "mouth", "body"];
+
 export const AccessorizerBehavior: BehaviorName<AccessorizerBehavior> = "Accessorizer";
 export interface AccessorizerBehavior extends GameObjectBehavior {
     name: "Accessorizer",
@@ -87,7 +90,7 @@ export const ACCESSORIZER_BODY_GUIDS: string[] = [
 
 
 
-export function getIndexOfAccessoryType(accessories: Accessory[], type: string): number {
+export function getIndexOfAccessoryType(accessories: Accessory[], type: AccessoryType): number {
     return accessories.findIndex(acc => {
         const guid = acc.guid.Guid;
         const match = TYPE_EXTRACTOR_REGEX.exec(guid);
@@ -96,10 +99,10 @@ export function getIndexOfAccessoryType(accessories: Accessory[], type: string):
     });
 }
 
-export function getAccessoryType(accessoryID: string): string | null {
+export function getAccessoryType(accessoryID: string): AccessoryType | null {
     const match = TYPE_EXTRACTOR_REGEX.exec(accessoryID);
     if (!match) return null;
-    return match[1];
+    return match[1] as AccessoryType;
 }
 
 export function getAccessoryOrdinal(accessoryID: string): number | null {
@@ -110,11 +113,11 @@ export function getAccessoryOrdinal(accessoryID: string): number | null {
     return Number(match[2]) || null;
 }
 
-export function makeAccessoryID(type: string, ordinal: number): string {
+export function makeAccessoryID(type: AccessoryType, ordinal: number): string {
     return `${ACCESSORY_PREFIX}${type}_${leftPad(ordinal, "0", 3)}`
 }
 
-export function getAccessoryOfType(accessories: Accessory[], type: string): Accessory | null {
+export function getAccessoryOfType(accessories: Accessory[], type: AccessoryType): Accessory | null {
     const index = getIndexOfAccessoryType(accessories, type);
     if (index === -1) return null;
     return accessories[index];
