@@ -23,7 +23,7 @@ export interface GeyserBehavior extends GameObjectBehavior {
 
 // We want to export as number, but compute them by key.
 //  Could probably type this better by passing array to a builder func.
-export const GEYSER_TYPE_HASHES = {
+export const GEYSER_TYPE_NAME_HASHES = {
     "steam": (null as any) as number,
     "hot_steam": (null as any) as number,
     "hot_water": (null as any) as number,
@@ -52,13 +52,13 @@ export const GEYSER_TYPE_HASHES = {
     "oil_drip": (null as any) as number
 };
 
-export type GeyserTypeName = keyof typeof GEYSER_TYPE_HASHES;
-export const GEYSER_TYPE_NAMES = Object.keys(GEYSER_TYPE_HASHES) as (GeyserTypeName)[];
+export type GeyserTypeName = keyof typeof GEYSER_TYPE_NAME_HASHES;
+export const GEYSER_TYPE_NAMES = Object.keys(GEYSER_TYPE_NAME_HASHES) as GeyserTypeName[];
 export const GEYSER_TYPE_HASH_NAMES: {[key: number]: GeyserTypeName} = {};
 
 for (let geyserType of GEYSER_TYPE_NAMES) {
     const hash = getSDBMHash32(geyserType);
-    GEYSER_TYPE_HASHES[geyserType] = hash;
+    GEYSER_TYPE_NAME_HASHES[geyserType] = hash;
     GEYSER_TYPE_HASH_NAMES[hash] = geyserType;
 }
 
@@ -70,8 +70,8 @@ export function getGeyserTypeName(hash: number): string | undefined {
 }
 
 export function getGeyserTypeHash(name: string): number | undefined {
-    if (!Object.prototype.hasOwnProperty.call(GEYSER_TYPE_HASHES, name)) {
+    if (!Object.prototype.hasOwnProperty.call(GEYSER_TYPE_NAME_HASHES, name)) {
         return undefined;
     }
-    return GEYSER_TYPE_HASHES[name as GeyserTypeName];
+    return GEYSER_TYPE_NAME_HASHES[name as GeyserTypeName];
 }

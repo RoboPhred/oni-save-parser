@@ -16,7 +16,7 @@ export interface GeyserBehavior extends GameObjectBehavior {
         };
     };
 }
-export declare const GEYSER_TYPE_HASHES: {
+export declare const GEYSER_TYPE_NAME_HASHES: {
     "steam": number;
     "hot_steam": number;
     "hot_water": number;
@@ -36,7 +36,7 @@ export declare const GEYSER_TYPE_HASHES: {
     "molten_gold": number;
     "oil_drip": number;
 };
-export declare type GeyserTypeName = keyof typeof GEYSER_TYPE_HASHES;
+export declare type GeyserTypeName = keyof typeof GEYSER_TYPE_NAME_HASHES;
 export declare const GEYSER_TYPE_NAMES: ("steam" | "hot_steam" | "hot_water" | "slush_water" | "filthy_water" | "small_volcano" | "big_volcano" | "liquid_co2" | "hot_co2" | "hot_hydrogen" | "hot_po2" | "slimy_po2" | "chlorine_gas" | "methane" | "molten_copper" | "molten_iron" | "molten_gold" | "oil_drip")[];
 export declare const GEYSER_TYPE_HASH_NAMES: {
     [key: number]: GeyserTypeName;
