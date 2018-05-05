@@ -34,6 +34,9 @@ class ConsoleStepListener implements ParseStepListener {
         else {
             this._stack.push(`${e.name}`);
         }
+        if (this._sameLine) {
+            process.stdout.write("\n");
+        }
         process.stdout.write(this._stack.join(" > "));
         this._sameLine = true;
     }
@@ -59,7 +62,7 @@ class ConsoleStepListener implements ParseStepListener {
 }
 
 const injectModule = new ContainerModule(bind => {
-    bind(ConsoleStepListener)
+    // bind(ConsoleStepListener)
 });
 
 const fileName = process.argv.length > 2 ? process.argv[2] : "TestShennanigans";
