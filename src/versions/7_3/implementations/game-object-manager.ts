@@ -15,6 +15,10 @@ import {
 } from "../../../logging";
 
 import {
+    ParseStepExecutor
+} from "../../../parse-steps";
+
+import {
     ArrayDataWriter,
     DataReader,
     DataWriter
@@ -46,19 +50,17 @@ export class GameObjectManagerImpl implements GameObjectManager {
     private _warnExtraniousDataTypes = new Set<string>();
 
     private _logWarn: Logger["warn"];
-    private _logTrace: Logger["trace"];
 
     constructor(
         @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
+        @inject(ParseStepExecutor) private _stepExecutor: ParseStepExecutor,
         @inject(Logger) @optional() logger?: Logger
     ) {
         if (logger) {
             this._logWarn = logger.warn.bind(logger)
-            this._logTrace = logger.trace.bind(logger)
         }
         else {
-            this._logWarn = () => {};
-            this._logTrace = () => {};
+            this._logWarn = () => { };
         }
     }
 
@@ -67,29 +69,11 @@ export class GameObjectManagerImpl implements GameObjectManager {
     }
 
     parse(reader: DataReader): void {
-        this._logTrace("Parsing prefabs.");
-
-        const prefabCount = reader.readInt32();
-        for(let i = 0; i < prefabCount; i++) {
-            const prefabName = validatePrefabName(reader.readKleiString());
-            this._gameObjectOrdering.push(prefabName);
-            this._logTrace(`Parsing prefab "${prefabName}"`);
-
-            const prefabSet = this._parsePrefabSet(reader, prefabName);
-
-            this.gameObjects[prefabName] = prefabSet;
-        }
-
-        this._logTrace("Prefab parsing complete.");       
+        this._parsePrefabs(reader)
     }
 
     write(writer: DataWriter): void {
-        writer.writeInt32(this._gameObjectOrdering.length);
-        for (let name of this._gameObjectOrdering) {
-            writer.writeKleiString(name);
-            const prefab = this.gameObjects[name]!;
-            this._writePrefabSet(writer, prefab);
-        }
+        this._writePrefabs(writer);
     }
 
     fromJSON(gameObjects: GameObjectPrefabs) {
@@ -100,7 +84,36 @@ export class GameObjectManagerImpl implements GameObjectManager {
     }
 
     toJSON(): GameObjectPrefabs {
-        return {...this._gameObjects};
+        return { ...this._gameObjects };
+    }
+
+    private _parsePrefabs(reader: DataReader) {
+        const prefabCount = reader.readInt32();
+        this._stepExecutor.for(
+            "prefabs",
+            prefabCount,
+            () => {
+                const prefabName = validatePrefabName(reader.readKleiString());
+                this._gameObjectOrdering.push(prefabName);
+
+                const prefabSet = this._parsePrefabSet(reader, prefabName);
+
+                this.gameObjects[prefabName] = prefabSet;
+            }
+        );
+    }
+
+    private _writePrefabs(writer: DataWriter) {
+        writer.writeInt32(this._gameObjectOrdering.length);
+        this._stepExecutor.forEach(
+            "prefabs",
+            this._gameObjectOrdering,
+            name => {
+                writer.writeKleiString(name);
+                const prefab = this.gameObjects[name]!;
+                this._writePrefabSet(writer, name, prefab);
+            }
+        );
     }
 
     private _parsePrefabSet(reader: DataReader, prefabName: string): GameObject[] {
@@ -108,12 +121,11 @@ export class GameObjectManagerImpl implements GameObjectManager {
         const dataLength = reader.readInt32();
         const preParsePosition = reader.position;
 
-        this._logTrace(`Prefab has ${instanceCount} objects across ${dataLength} bytes.`);
-        
-        const prefabObjects: GameObject[] = new Array(instanceCount);
-        for(let i = 0; i < instanceCount; i++) {
-            prefabObjects[i] = this._parseGameObject(reader);
-        }
+        const prefabObjects = this._stepExecutor.for(
+            prefabName,
+            instanceCount,
+            () => this._parseGameObject(reader)
+        );
 
         const bytesRemaining = dataLength - (reader.position - preParsePosition);
         if (bytesRemaining < 0) {
@@ -129,15 +141,17 @@ export class GameObjectManagerImpl implements GameObjectManager {
         return prefabObjects;
     }
 
-    private _writePrefabSet(writer: DataWriter, prefabObjects: GameObject[]) {
-
+    private _writePrefabSet(writer: DataWriter, prefabName: string, prefabObjects: GameObject[]) {
         // We need to know the data length.
         //  Write the data to another buffer, so we can
         //  figure out its length and write its data out.
         const setWriter = new ArrayDataWriter();
-        for (let gameObject of prefabObjects) {
-            this._writeGameObject(setWriter, gameObject);
-        }
+        this._stepExecutor.forEach(
+            prefabName,
+            prefabObjects,
+            gameObject => this._writeGameObject(setWriter, gameObject)
+        );
+
         const gameObjectData = setWriter.getBytesView();
 
         writer.writeInt32(prefabObjects.length);
@@ -151,20 +165,14 @@ export class GameObjectManagerImpl implements GameObjectManager {
         const scale = reader.readVector3();
         const folder = reader.readByte();
 
-       
-        this._logTrace(`Parsing game object at (${position.x, position.y, position.z}) in folder ${folder}.`);
 
         const behaviorCount = reader.readInt32();
 
-        this._logTrace(`Parsing ${behaviorCount} game object behaviors.`);
-
-        const behaviors: GameObjectBehavior[] = [];
-
-        for(let i = 0; i < behaviorCount; i++) {
-            behaviors[i] = this._parseGameObjectBehavior(reader);
-        }
-
-        this._logTrace("Game object parsing complete.");
+        const behaviors = this._stepExecutor.for(
+            "behaviors",
+            behaviorCount,
+            () => this._parseGameObjectBehavior(reader)
+        );
 
         return {
             position,
@@ -190,16 +198,24 @@ export class GameObjectManagerImpl implements GameObjectManager {
         writer.writeByte(folder);
 
         writer.writeInt32(behaviors.length);
-        for (let behavior of behaviors) {
-            this._writeGameObjectBehavior(writer, behavior);
-        }
+        this._stepExecutor.forEach(
+            "behaviors",
+            behaviors,
+            behavior => this._writeGameObjectBehavior(writer, behavior)
+        );
     }
 
     private _parseGameObjectBehavior(reader: DataReader): GameObjectBehavior {
         const name = validateBehaviorName(reader.readKleiString());
-        this._logTrace(`Parsing game object behavior "${name}".`);
-
         const dataLength = reader.readInt32();
+
+        return this._stepExecutor.do(
+            name,
+            () => this._deserializeGameObjectBehavior(reader, name, dataLength)
+        );
+    }
+
+    private _deserializeGameObjectBehavior(reader: DataReader, name: string, dataLength: number): GameObjectBehavior {
         const preParsePosition = reader.position;
 
         if (!this._templateSerializer.has(name)) {
@@ -220,7 +236,7 @@ export class GameObjectManagerImpl implements GameObjectManager {
         }
         else if (dataRemaining > 0) {
             //  TODO: Implement extra data parsing for specific behaviors that implement ISaveLoadableDetails.
-            
+
             if (!this._warnExtraniousDataTypes.has(name)) {
                 this._warnExtraniousDataTypes.add(name);
                 this._logWarn(`GameObjectBehavior "${name}" has extra data.  This object should be inspected for a ISaveLoadableDetails implementation.`);
@@ -246,18 +262,23 @@ export class GameObjectManagerImpl implements GameObjectManager {
 
         writer.writeKleiString(name);
 
-        var dataWriter = new ArrayDataWriter();
+        this._stepExecutor.do(
+            name,
+            () => {
+                var dataWriter = new ArrayDataWriter();
 
-        if (parsedData != null) {
-            this._templateSerializer.writeTemplatedType(dataWriter, name, parsedData);
-        }
+                if (parsedData != null) {
+                    this._templateSerializer.writeTemplatedType(dataWriter, name, parsedData);
+                }
 
-        if (extraData) {
-            dataWriter.writeBytes(extraData);
-        }
+                if (extraData) {
+                    dataWriter.writeBytes(extraData);
+                }
 
-        writer.writeInt32(dataWriter.position);
-        writer.writeBytes(dataWriter.getBytesView());
+                writer.writeInt32(dataWriter.position);
+                writer.writeBytes(dataWriter.getBytesView());
+            }
+        );
     }
 }
 

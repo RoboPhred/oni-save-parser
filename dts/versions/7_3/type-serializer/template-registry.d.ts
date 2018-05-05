@@ -1,9 +1,12 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
+import { ParseStepExecutor } from "../../../parse-steps";
 import { TypeTemplate } from "./interfaces";
 import { TypeTemplateRegistry, TypeTemplateSerializer } from "./services";
 export declare class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTemplateSerializer {
+    private _stepExecutor;
     private _templates;
     private _templateNameOrderings;
+    constructor(_stepExecutor: ParseStepExecutor);
     private _typeDescriptorSerializer;
     private _typeSerializer;
     has(templateName: string): boolean;

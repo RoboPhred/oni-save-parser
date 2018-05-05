@@ -18,6 +18,10 @@ import {
 import { Logger } from "../../../logging";
 
 import {
+    ParseStepExecutor
+} from "../../../parse-steps";
+
+import {
     ensureNotNull
 } from "../../../utils";
 
@@ -58,8 +62,10 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
         @inject(GameSettingsInstance) private _gameSettings: GameSettingsInstance,
         @inject(GameObjectManager) private _gameObjectManager: GameObjectManager,
         @inject(GameSaveDataInstance) private _gameData: GameSaveDataInstance,
+        @inject(ParseStepExecutor) private _stepExecutor: ParseStepExecutor,
         @inject(Logger) @optional() private _logger?: Logger
-    ) { }
+    ) {
+    }
 
     get saveRoot(): GameSaveRoot {
         return ensureNotNull(this._saveRoot);
@@ -87,7 +93,10 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
 
     parse(reader: DataReader): void {
         if (this._header.isCompressed) {
-            const deflatedReader = new ZlibDataReader(reader.viewAllBytes());
+            const deflatedReader = this._stepExecutor.do(
+                "decompressing",
+                () => new ZlibDataReader(reader.viewAllBytes())
+            );
             this._parseState(deflatedReader);
         }
         else {
@@ -97,9 +106,17 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
 
     write(writer: DataWriter): void {
         if (this._header.isCompressed) {
-            const deflateWriter = new ZlibDataWriter();
-            this._writeState(deflateWriter);
-            writer.writeBytes(deflateWriter.getBytesView());
+            const rawWriter = new ArrayDataWriter();
+            this._writeState(rawWriter);
+            const compressedBytes = this._stepExecutor.do(
+                "compressing",
+                () => {
+                    const deflateWriter = new ZlibDataWriter();
+                    deflateWriter.writeBytes(rawWriter.getBytesView());
+                    return deflateWriter.getBytesView();
+                }
+            );
+            writer.writeBytes(compressedBytes);
         }
         else {
             this._writeState(writer);
@@ -121,30 +138,35 @@ export class SaveBodyInstanceImpl implements SaveBodyInstance {
         this._gameSettings.parse(reader);
 
 
-        const expectedHeader = SaveBodyInstanceImpl.SAVE_HEADER;
-        const header = reader.readChars(expectedHeader.length);
-        if (header !== expectedHeader) {
-            throw new Error(`Failed to parse SaveBody: Expected "${expectedHeader}" but got "${header}" (${Array.from(header).map(x => x.charCodeAt(0))})`);
-        }
-
-        const expectedMajor = SaveBodyInstanceImpl.CURRENT_VERSION_MAJOR;
-        const expectedMinor = SaveBodyInstanceImpl.CURRENT_VERSION_MINOR;
-
-        const versionMajor = reader.readInt32();
-        const versionMinor = reader.readInt32();
-
-        if (versionMajor !== expectedMajor) {
-            throw new Error(`Failed to parse SaveBody: Version mismatch: Expected major version ${expectedMajor} but got ${versionMajor}.`);
-        }
-
-        if (versionMinor > expectedMinor) {
-            // If they stick to semver, then minor changes should in theory be backwards compatible with older versions.
-            //  This means its likely we can parse this correctly, but not guarenteed.
-            // It's worth noting that the ONI itself will refuse to load a minor version higher than it understands.
-            if (this._logger) this._logger.warn(`SaveBody version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
-        }
-
-        this._versionMinor = versionMinor;
+        this._stepExecutor.do(
+            "header",
+            () => {
+                const expectedHeader = SaveBodyInstanceImpl.SAVE_HEADER;
+                const header = reader.readChars(expectedHeader.length);
+                if (header !== expectedHeader) {
+                    throw new Error(`Failed to parse SaveBody: Expected "${expectedHeader}" but got "${header}" (${Array.from(header).map(x => x.charCodeAt(0))})`);
+                }
+        
+                const expectedMajor = SaveBodyInstanceImpl.CURRENT_VERSION_MAJOR;
+                const expectedMinor = SaveBodyInstanceImpl.CURRENT_VERSION_MINOR;
+        
+                const versionMajor = reader.readInt32();
+                const versionMinor = reader.readInt32();
+        
+                if (versionMajor !== expectedMajor) {
+                    throw new Error(`Failed to parse SaveBody: Version mismatch: Expected major version ${expectedMajor} but got ${versionMajor}.`);
+                }
+        
+                if (versionMinor > expectedMinor) {
+                    // If they stick to semver, then minor changes should in theory be backwards compatible with older versions.
+                    //  This means its likely we can parse this correctly, but not guarenteed.
+                    // It's worth noting that the ONI itself will refuse to load a minor version higher than it understands.
+                    if (this._logger) this._logger.warn(`SaveBody version ${versionMajor}.${versionMinor} has a higher minor version than expected ${expectedMajor}.${expectedMinor}.  Problems may occur with parsing.`);
+                }
+        
+                this._versionMinor = versionMinor;
+            }
+        );
 
         this._gameObjectManager.parse(reader);
         this._gameData.parse(reader);

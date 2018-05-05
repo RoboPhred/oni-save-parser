@@ -7,8 +7,26 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Rancher-Test",
             "program": "${workspaceFolder}/src/test/index.ts",
+            "args": [
+                "Rancher-Test"
+            ],
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/lib/**/*.js"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "TheLoneSurvivor",
+            "program": "${workspaceFolder}/src/test/index.ts",
+            "args": [
+                "TheLoneSurvivor"
+            ],
+            "console": "integratedTerminal",
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"
             ],

@@ -5,6 +5,11 @@ import {
 } from "fs";
 
 import {
+    ContainerModule,
+    injectable
+} from "microinject";
+
+import {
     parseSaveGame,
     writeSaveGame,
     GameObject,
@@ -13,15 +18,62 @@ import {
     GameObjectBehavior
 } from "../index";
 
-const fileName = "TestShennanigans"; //"TheLoneSurvivor";
+import {
+    ParseStepListener,
+    ParseStepEventArgs
+} from "../parse-steps";
+
+@injectable(ParseStepListener)
+class ConsoleStepListener implements ParseStepListener {
+    private _sameLine: boolean = false;
+    private _stack: string[] = [];
+    onStart(e: ParseStepEventArgs) {
+        if (e.max != null) {
+            this._stack.push(`${e.name} (${e.current} of ${e.max})`);
+        }
+        else {
+            this._stack.push(`${e.name}`);
+        }
+        if (this._sameLine) {
+            process.stdout.write("\n");
+        }
+        process.stdout.write(this._stack.join(" > "));
+        this._sameLine = true;
+    }
+
+    onProgress(e: ParseStepEventArgs) {
+        this._stack.pop();
+        this._stack.push(`${e.name} (${e.current} of ${e.max})`);
+        process.stdout.write("\r" + this._stack.join(" > "));
+        this._sameLine = true;
+    }
+
+    onEnd(e: ParseStepEventArgs) {
+        if (this._sameLine) {
+            this._sameLine = false;
+            this._stack.pop();
+            process.stdout.write(" done\n");
+        }
+        else {
+            process.stdout.write(this._stack.join(" > ") + " done\n");
+            this._stack.pop();
+        }
+    }
+}
+
+const injectModule = new ContainerModule(bind => {
+    // bind(ConsoleStepListener)
+});
+
+const fileName = process.argv.length > 2 ? process.argv[2] : "TestShennanigans";
 const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
 console.log("Loading save");
-const saveData = parseSaveGame(fileData.buffer);
+const saveData = parseSaveGame(fileData.buffer, injectModule);
 
 function testWriteback() {
-    console.log("Serializing");
-    const writeData = writeSaveGame(saveData);
+    console.log("\n\n\nSerializing");
+    const writeData = writeSaveGame(saveData, injectModule);
     console.log("Writing to file");
     writeFileSync(`./test-data/${fileName}-writeback.sav`, new Uint8Array(writeData));
     console.log("writeback completed");
@@ -123,7 +175,7 @@ function testDumpJson() {
 //     writeFileSync(`${fileName}-normalized.json`, JSON.stringify(data, null, 2));
 // }
 
-testDumpJson();
-//testWriteback();
+//testDumpJson();
+testWriteback();
 
 // testNormalize();

@@ -1,5 +1,6 @@
 import { DataReader, DataWriter } from "../../../binary-serializer";
 import { Logger } from "../../../logging";
+import { ParseStepExecutor } from "../../../parse-steps";
 import { SaveBodyInstance, SaveGameHeaderInstance, GameSaveRootInstance, GameSettingsInstance, GameObjectManager, GameSaveDataInstance } from "../services";
 import { GameSaveRoot, GameSettings, GameObjectPrefabs, GameSaveData, SaveBody } from "../interfaces";
 export declare class SaveBodyInstanceImpl implements SaveBodyInstance {
@@ -8,12 +9,13 @@ export declare class SaveBodyInstanceImpl implements SaveBodyInstance {
     private _gameSettings;
     private _gameObjectManager;
     private _gameData;
+    private _stepExecutor;
     private _logger;
     static readonly SAVE_HEADER: string;
     static readonly CURRENT_VERSION_MAJOR: number;
     static readonly CURRENT_VERSION_MINOR: number;
     private _versionMinor;
-    constructor(_header: SaveGameHeaderInstance, _saveRoot: GameSaveRootInstance, _gameSettings: GameSettingsInstance, _gameObjectManager: GameObjectManager, _gameData: GameSaveDataInstance, _logger?: Logger | undefined);
+    constructor(_header: SaveGameHeaderInstance, _saveRoot: GameSaveRootInstance, _gameSettings: GameSettingsInstance, _gameObjectManager: GameObjectManager, _gameData: GameSaveDataInstance, _stepExecutor: ParseStepExecutor, _logger?: Logger | undefined);
     readonly saveRoot: GameSaveRoot;
     readonly gameSettings: GameSettings;
     readonly versionMajor: number;
