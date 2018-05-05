@@ -4,11 +4,11 @@ import {
     composeModules
 } from "microinject";
 
+import { createModule as createParseStepModule } from "../../parse-steps/module";
 
 import {
     createModule as createTypesModule
 } from "./type-serializer/module";
-
 
 import { GameObjectManagerImpl } from "./implementations/game-object-manager";
 import { GameSaveDataInstanceImpl } from "./implementations/game-save-data";
@@ -21,6 +21,7 @@ import { SaveGameInstanceImpl } from "./implementations/save-game";
 
 export function createModule() {
     return composeModules(
+        createParseStepModule(),
         createTypesModule(),
         new ContainerModule(bind => {
             bind(GameObjectManagerImpl);
@@ -32,4 +33,4 @@ export function createModule() {
             bind(SaveGameInstanceImpl);
         })
     );
-} 
+}

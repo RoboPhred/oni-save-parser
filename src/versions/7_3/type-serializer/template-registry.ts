@@ -12,6 +12,8 @@ import {
     DataWriter
 } from "../../../binary-serializer";
 
+import { ParseStepExecutor } from "../../../parse-steps";
+
 import {
     validateDotNetIdentifierName
 } from "../../../utils";
@@ -41,6 +43,10 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
     private _templates = new Map<string, TypeTemplate>();
     private _templateNameOrderings: string[] = [];
 
+    constructor(
+        @inject(ParseStepExecutor) private _stepExecutor: ParseStepExecutor
+    ) { }
+
     @inject(TypeDescriptorSerializer)
     private _typeDescriptorSerializer: TypeDescriptorSerializer | undefined;
 
@@ -58,35 +64,43 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
     parse(reader: DataReader): void {
         const templateCount = reader.readInt32();
         this._templateNameOrderings = new Array(templateCount);
-        for(let i = 0; i < templateCount; i++) {
-            const name = validateDotNetIdentifierName(reader.readKleiString());
-            if (this._templates.has(name)) {
-                throw new Error(`Failed to parse type template: A template named "${name}" already exists.`);
-            }
+        this._stepExecutor.for(
+            "type-templates",
+            templateCount,
+            index => {
+                const name = validateDotNetIdentifierName(reader.readKleiString());
+                if (this._templates.has(name)) {
+                    throw new Error(`Failed to parse type template: A template named "${name}" already exists.`);
+                }
 
-            const template = this._parseTemplate(name, reader);
-            this._templates.set(name, template);
-            this._templateNameOrderings[i] = name;
-        }
+                const template = this._parseTemplate(name, reader);
+                this._templates.set(name, template);
+                this._templateNameOrderings[index] = name;
+            }
+        );
     }
 
     write(writer: DataWriter): void {
         writer.writeInt32(this._templateNameOrderings.length);
-        for (let templateName of this._templateNameOrderings) {
-            const template = this._templates.get(templateName);
-            if (!template) {
-                throw new Error(`Failed to write type template: A template in templateNameOrderings was not in the template map.`);
-            }
+        this._stepExecutor.forEach(
+            "type-templates",
+            this._templateNameOrderings,
+            templateName => {
+                const template = this._templates.get(templateName);
+                if (!template) {
+                    throw new Error(`Failed to write type template: A template in templateNameOrderings was not in the template map.`);
+                }
 
-            writer.writeKleiString(templateName);
-            this._writeTemplate(writer, template);
-        }
+                writer.writeKleiString(templateName);
+                this._writeTemplate(writer, template);
+            }
+        );
     }
 
     fromJSON(value: TypeTemplate[]) {
         this._templates = new Map<string, TypeTemplate>();
         this._templateNameOrderings = new Array(value.length);
-        for(let i = 0; i < value.length; i++) {
+        for (let i = 0; i < value.length; i++) {
             const template = value[i];
             this._templateNameOrderings[i] = template.name;
             this._templates.set(template.name, template);
@@ -112,7 +126,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
                 name,
                 type
             } = field;
-            
+
             const data = this._typeSerializer!.parseType(reader, type);
             obj[name] = data;
         }
@@ -122,7 +136,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
                 name,
                 type
             } = property;
-            
+
             const data = this._typeSerializer!.parseType(reader, type);
             obj[name] = data;
         }
@@ -143,7 +157,7 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
                 name,
                 type
             } = field;
-            
+
             const data = (value as any)[name];
             this._typeSerializer!.writeType(writer, type, data);
         }
@@ -153,68 +167,78 @@ export class TypeTemplateRegistryImpl implements TypeTemplateRegistry, TypeTempl
                 name,
                 type
             } = property;
-            
+
             const data = (value as any)[name];
             this._typeSerializer!.writeType(writer, type, data);
         }
     }
 
     private _parseTemplate(name: string, reader: DataReader): TypeTemplate {
-        const fieldCount = reader.readInt32();
-        const propCount = reader.readInt32();
-
-        const fields: TypeTemplateMember[] = new Array(fieldCount);
-        for(let i = 0; i < fieldCount; i++) {
-            const name = validateDotNetIdentifierName(reader.readKleiString());
-            const type = this._typeDescriptorSerializer!.parseDescriptor(reader);
-            fields[i] = {
-                name,
-                type
-            };
-        }
-
-        const properties: TypeTemplateMember[] = new Array(propCount);
-        for(let i = 0; i < propCount; i++) {
-            const name = validateDotNetIdentifierName(reader.readKleiString());
-            const type = this._typeDescriptorSerializer!.parseDescriptor(reader);
-            properties[i] = {
-                name,
-                type
-            };
-        }
-
-        return {
+        return this._stepExecutor.do(
             name,
-            fields,
-            properties
-        };
+            () => {
+                const fieldCount = reader.readInt32();
+                const propCount = reader.readInt32();
+
+                const fields: TypeTemplateMember[] = new Array(fieldCount);
+                for (let i = 0; i < fieldCount; i++) {
+                    const name = validateDotNetIdentifierName(reader.readKleiString());
+                    const type = this._typeDescriptorSerializer!.parseDescriptor(reader);
+                    fields[i] = {
+                        name,
+                        type
+                    };
+                }
+
+                const properties: TypeTemplateMember[] = new Array(propCount);
+                for (let i = 0; i < propCount; i++) {
+                    const name = validateDotNetIdentifierName(reader.readKleiString());
+                    const type = this._typeDescriptorSerializer!.parseDescriptor(reader);
+                    properties[i] = {
+                        name,
+                        type
+                    };
+                }
+
+                return {
+                    name,
+                    fields,
+                    properties
+                };
+            }
+        );
     }
 
     private _writeTemplate(writer: DataWriter, template: TypeTemplate) {
-        const {
-            fields,
-            properties
-        } = template;
+        this._stepExecutor.do(
+            template.name,
+            () => {
+                const {
+                    fields,
+                    properties
+                } = template;
 
-        writer.writeInt32(fields.length);
-        writer.writeInt32(properties.length);
+                writer.writeInt32(fields.length);
+                writer.writeInt32(properties.length);
 
-        for(let field of fields) {
-            const {
-                name,
-                type
-            } = field;
-            writer.writeKleiString(name);
-            this._typeDescriptorSerializer!.writeDescriptor(writer, type);
-        }
+                for (let field of fields) {
+                    const {
+                        name,
+                        type
+                    } = field;
+                    writer.writeKleiString(name);
+                    this._typeDescriptorSerializer!.writeDescriptor(writer, type);
+                }
 
-        for(let property of properties) {
-            const {
-                name,
-                type
-            } = property;
-            writer.writeKleiString(name);
-            this._typeDescriptorSerializer!.writeDescriptor(writer, type);
-        }
+                for (let property of properties) {
+                    const {
+                        name,
+                        type
+                    } = property;
+                    writer.writeKleiString(name);
+                    this._typeDescriptorSerializer!.writeDescriptor(writer, type);
+                }
+            }
+        );
     }
 }

@@ -16,6 +16,10 @@ import {
 } from "../../../binary-serializer";
 
 import {
+    ParseStepExecutor
+} from "../../../parse-steps";
+
+import {
     TypeTemplateSerializer
 } from "../type-serializer";
 
@@ -23,7 +27,8 @@ import {
     GameSaveRootInstance,
     SaveGameScope
 } from "../services";
-import { GameSaveRoot } from "..";
+
+import { GameSaveRoot } from "../interfaces";
 
 
 const AssemblyTypeName = "Klei.SaveFileRoot";
@@ -41,6 +46,7 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
 
     constructor(
         @inject(TypeTemplateSerializer) private _templateSerializer: TypeTemplateSerializer,
+        @inject(ParseStepExecutor) private _stepExecutor: ParseStepExecutor
     ) {}
 
     get widthInCells(): number {
@@ -66,7 +72,11 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
         if (rootName !== AssemblyTypeName) {
             throw new Error(`Failed to parse GameSaveRoot: Expected to find "${AssemblyTypeName}", but got "${rootName}"`);
         }
-        this._data = this._templateSerializer.parseTemplatedType<GameSaveRootTemplate>(reader, AssemblyTypeName);
+
+        this._data = this._stepExecutor.do(
+            "save-file-root",
+            () => this._templateSerializer.parseTemplatedType<GameSaveRootTemplate>(reader, AssemblyTypeName)
+        );
     }
 
     write(writer: DataWriter) {
@@ -74,7 +84,11 @@ export class GameSaveRootInstanceImpl implements GameSaveRootInstance {
             throw new Error("Failed to write SaveFileRoot: Data has not been parsed.");
         }
         writer.writeKleiString(AssemblyTypeName);
-        this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._data);
+
+        this._stepExecutor.do(
+            "save-file-root",
+            () => this._templateSerializer.writeTemplatedType(writer, AssemblyTypeName, this._data!)
+        );
     }
 
     fromJSON(value: GameSaveRoot): void {

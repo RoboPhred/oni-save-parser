@@ -1,4 +1,8 @@
 
+type Mutable<T> = {
+    -readonly [P in keyof T]: T[P]
+}
+
 // Typedefs for this is broken
 declare module "text-encoding" {
     export class TextDecoder {
