@@ -1,7 +1,5 @@
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface Int32TypeDescriptor extends TypeDescriptor<number>{
-    name: "int-32";
+export interface Int32TypeDescriptor extends TypeDescriptor<number> {
+  name: "int-32";
 }

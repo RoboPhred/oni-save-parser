@@ -1,12 +1,7 @@
+import { TypeDescriptor } from "../../interfaces";
 
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { Colour } from "./interfaces";
 
-import {
-    Colour
-} from "./interfaces";
-
-export interface ColourTypeDescriptor extends TypeDescriptor<Colour>{
-    name: "colour";
+export interface ColourTypeDescriptor extends TypeDescriptor<Colour> {
+  name: "colour";
 }

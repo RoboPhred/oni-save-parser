@@ -8,7 +8,8 @@
     "clean": "rimraf lib dts",
     "prebuild": "npm run clean",
     "build": "tsc -p src",
-    "watch": "tsc -p src -w"
+    "watch": "tsc -p src -w",
+    "format": "prettier --write ./src/**/*.ts"
   },
   "keywords": [
     "ONI",
@@ -25,6 +26,7 @@
     "@types/long": "^3.0.32",
     "@types/node": "^8.10.2",
     "@types/pako": "^1.0.0",
+    "prettier": "^1.13.4",
     "rimraf": "^2.6.2",
     "typescript": "^2.8.3"
   },

@@ -1,7 +1,5 @@
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface ByteTypeDescriptor extends TypeDescriptor<number>{
-    name: "byte";
+export interface ByteTypeDescriptor extends TypeDescriptor<number> {
+  name: "byte";
 }

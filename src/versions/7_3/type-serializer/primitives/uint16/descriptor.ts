@@ -1,7 +1,5 @@
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface UInt16TypeDescriptor extends TypeDescriptor<number>{
-    name: "int-16-unsigned";
+export interface UInt16TypeDescriptor extends TypeDescriptor<number> {
+  name: "int-16-unsigned";
 }
