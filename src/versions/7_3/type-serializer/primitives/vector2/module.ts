@@ -1,14 +1,9 @@
+import { ContainerModule } from "microinject";
 
-import {
-    ContainerModule
-} from "microinject";
-
-import {
-    Vector2TypeSerializer
-} from "./serializer";
+import { Vector2TypeSerializer } from "./serializer";
 
 export function createModule() {
-    return new ContainerModule(bind => {
-        bind(Vector2TypeSerializer)
-    });
+  return new ContainerModule(bind => {
+    bind(Vector2TypeSerializer);
+  });
 }

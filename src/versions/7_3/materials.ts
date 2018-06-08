@@ -1,4 +1,3 @@
-
 /**
  * Precomputed SDBM hashes used to identify materials.
  * In general, these are equal to getSDBMHash32(key.toLowerCase()),
@@ -104,5 +103,5 @@ export const MATERIAL_HASHES = {
   CarbonDioxide: 1960575215, // 0x74DC00EF
   CopperGas: 1966552544, // 0x753735E0
   FoolsGold: 2059777261, // 0x7AC5B4ED
-  MoltenCopper: 2128494380, // 0x7EDE3F2C
+  MoltenCopper: 2128494380 // 0x7EDE3F2C
 };

@@ -1,8 +1,4 @@
-
-import {
-    ContainerModule,
-    composeModules
-} from "microinject";
+import { ContainerModule, composeModules } from "microinject";
 
 // TODO: use webpack require.context()
 
@@ -30,28 +26,28 @@ import { createModule as createVector2IModule } from "./vector2I/module";
 import { createModule as createVector3Module } from "./vector3/module";
 
 export function createModule() {
-    return composeModules(
-        createArrayModule(),
-        createBooleanModule(),
-        createByteModule(),
-        createColourModule(),
-        createDictionaryModule(),
-        createDoubleModule(),
-        createEnumerationModule(),
-        createHashsetModule(),
-        createInt16Module(),
-        createInt32Module(),
-        createInt64Module(),
-        createListModule(),
-        createPairModule(),
-        createSByteModule(),
-        createSingleModule(),
-        createStringModule(),
-        createUint16Module(),
-        createUint32Module(),
-        createUint64Module(),
-        createVector2Module(),
-        createVector2IModule(),
-        createVector3Module()
-    );
+  return composeModules(
+    createArrayModule(),
+    createBooleanModule(),
+    createByteModule(),
+    createColourModule(),
+    createDictionaryModule(),
+    createDoubleModule(),
+    createEnumerationModule(),
+    createHashsetModule(),
+    createInt16Module(),
+    createInt32Module(),
+    createInt64Module(),
+    createListModule(),
+    createPairModule(),
+    createSByteModule(),
+    createSingleModule(),
+    createStringModule(),
+    createUint16Module(),
+    createUint32Module(),
+    createUint64Module(),
+    createVector2Module(),
+    createVector2IModule(),
+    createVector3Module()
+  );
 }

@@ -1,14 +1,9 @@
+import { ContainerModule } from "microinject";
 
-import {
-    ContainerModule
-} from "microinject";
-
-import {
-    ListTypeSerializer
-} from "./serializer";
+import { ListTypeSerializer } from "./serializer";
 
 export function createModule() {
-    return new ContainerModule(bind => {
-        bind(ListTypeSerializer)
-    });
+  return new ContainerModule(bind => {
+    bind(ListTypeSerializer);
+  });
 }

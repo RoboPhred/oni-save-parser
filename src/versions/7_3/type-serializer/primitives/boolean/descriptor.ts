@@ -1,7 +1,5 @@
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface BooleanTypeDescriptor extends TypeDescriptor<boolean>{
-    name: "boolean";
+export interface BooleanTypeDescriptor extends TypeDescriptor<boolean> {
+  name: "boolean";
 }

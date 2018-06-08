@@ -1,6 +1,3 @@
-
-import {
-    Scope
-} from "microinject";
+import { Scope } from "microinject";
 
 export const SaveGameScope: Scope = Symbol("SaveGameScope");

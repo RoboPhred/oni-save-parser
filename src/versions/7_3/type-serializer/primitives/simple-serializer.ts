@@ -1,63 +1,53 @@
+import { Newable, injectable, singleton } from "microinject";
 
-import {
-    Newable,
-    injectable,
-    singleton
-} from "microinject";
+import { DataReader, DataWriter } from "../../../../binary-serializer";
 
-import {
-    DataReader,
-    DataWriter
-} from "../../../../binary-serializer";
+import { TypeSerializationInfo } from "../services";
 
-
-import {
-    TypeSerializationInfo
-} from "../services";
-
-import {
-    TypeID, TypeDescriptor
-} from "../interfaces";
-
+import { TypeID, TypeDescriptor } from "../interfaces";
 
 export type TypeSerializationInfoClass = {
-    new(...args: any[]): TypeSerializationInfo
-}
+  new (...args: any[]): TypeSerializationInfo;
+};
 
-export function createSimpleSerializationInfo<T, TDescriptor extends TypeDescriptor<T>>(
-    id: TypeID,
-    name: TDescriptor["name"],
-    parse: ((reader: DataReader) => T),
-    write: ((writer: DataWriter, value: T) => void),
+export function createSimpleSerializationInfo<
+  T,
+  TDescriptor extends TypeDescriptor<T>
+>(
+  id: TypeID,
+  name: TDescriptor["name"],
+  parse: ((reader: DataReader) => T),
+  write: ((writer: DataWriter, value: T) => void)
 ): TypeSerializationInfoClass {
-    const simpleClassCtor = class implements TypeSerializationInfo<T, TDescriptor> {
-        readonly id = id;
-        readonly name: TDescriptor["name"] = name;
-        
-        parseDescriptor(reader: DataReader): TDescriptor {
-            return {
-                name
-            } as TDescriptor;
-        }
+  const simpleClassCtor = class
+    implements TypeSerializationInfo<T, TDescriptor> {
+    readonly id = id;
+    readonly name: TDescriptor["name"] = name;
 
-        writeDescriptor(writer: DataWriter, descriptor: TDescriptor): void {
-            // No additional data.
-        }
-
-        parseType(reader: DataReader, descriptor: TDescriptor): T {
-            return parse(reader);
-        }
-
-        writeType(writer: DataWriter, descriptor: TDescriptor, value: T): void {
-            write(writer, value);
-        }
+    parseDescriptor(reader: DataReader): TDescriptor {
+      return {
+        name
+      } as TDescriptor;
     }
 
-    injectable(TypeSerializationInfo)(simpleClassCtor);
+    writeDescriptor(writer: DataWriter, descriptor: TDescriptor): void {
+      // No additional data.
+    }
 
-    // Make simple serializers singletons, since they do not rely
-    //  on template data from the save.
-    singleton()(simpleClassCtor);
+    parseType(reader: DataReader, descriptor: TDescriptor): T {
+      return parse(reader);
+    }
 
-    return simpleClassCtor;
+    writeType(writer: DataWriter, descriptor: TDescriptor, value: T): void {
+      write(writer, value);
+    }
+  };
+
+  injectable(TypeSerializationInfo)(simpleClassCtor);
+
+  // Make simple serializers singletons, since they do not rely
+  //  on template data from the save.
+  singleton()(simpleClassCtor);
+
+  return simpleClassCtor;
 }

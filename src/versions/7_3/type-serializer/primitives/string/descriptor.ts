@@ -1,7 +1,5 @@
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface StringTypeDescriptor extends TypeDescriptor<string>{
-    name: "string";
+export interface StringTypeDescriptor extends TypeDescriptor<string> {
+  name: "string";
 }

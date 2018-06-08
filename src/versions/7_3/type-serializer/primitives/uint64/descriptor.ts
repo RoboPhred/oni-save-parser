@@ -1,10 +1,7 @@
-
 import Long from "long";
 
-import {
-    TypeDescriptor
-} from "../../interfaces";
+import { TypeDescriptor } from "../../interfaces";
 
-export interface UInt64TypeDescriptor extends TypeDescriptor<Long>{
-    name: "int-64-unsigned";
+export interface UInt64TypeDescriptor extends TypeDescriptor<Long> {
+  name: "int-64-unsigned";
 }
