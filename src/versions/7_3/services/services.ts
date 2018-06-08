@@ -17,7 +17,7 @@ import {
 } from "../interfaces";
 
 function getSymbol(name: string): symbol {
-  return Symbol(`${name}::v7_3`);
+  return Symbol(`${name}`);
 }
 
 // We treat parsed objects as services to allow them to reference each other.
@@ -76,8 +76,7 @@ export const GameSettingsInstance: Identifier<GameSettingsInstance> = getSymbol(
  * However, we name it for what it does, because we already
  * have enough things called "save".
  * Everything else called "save" deals with the save file
- * structure, while this explicitly deals with instantiating
- * game objects.
+ * structure, while this explicitly deals with game object data.
  */
 export interface GameObjectManager extends BinarySerializable {
   readonly gameObjects: GameObjectPrefabs;
