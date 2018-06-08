@@ -25,8 +25,7 @@ export declare const GameSettingsInstance: Identifier<GameSettingsInstance>;
  * However, we name it for what it does, because we already
  * have enough things called "save".
  * Everything else called "save" deals with the save file
- * structure, while this explicitly deals with instantiating
- * game objects.
+ * structure, while this explicitly deals with game object data.
  */
 export interface GameObjectManager extends BinarySerializable {
     readonly gameObjects: GameObjectPrefabs;
