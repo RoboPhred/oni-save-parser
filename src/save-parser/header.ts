@@ -2,7 +2,7 @@ import { TextDecoder, TextEncoder } from "text-encoding";
 
 import { Schema, validate } from "jsonschema";
 
-import { readBytes, readUInt32 } from "../parser";
+import { ParseIterator, readBytes, readUInt32 } from "../parser";
 
 import { DataWriter } from "../binary-serializer";
 
@@ -27,7 +27,7 @@ export const headerSchema: Schema = {
   additionalProperties: false
 };
 
-export function* parseHeader() {
+export function* parseHeader(): ParseIterator<SaveGameHeader> {
   const buildVersion = yield readUInt32();
   const headerSize = yield readUInt32();
   const headerVersion = yield readUInt32();

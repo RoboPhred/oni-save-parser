@@ -4,13 +4,21 @@ import {
   TypeTemplateMember,
   TypeInfo,
   SerializationTypeInfo,
-  GENERIC_TYPES
-} from "../save-structure/type-templates";
+  GENERIC_TYPES,
+  getTypeCode,
+  SerializationTypeCode
+} from "../../save-structure/type-templates";
 
-import { validateDotNetIdentifierName } from "../utils";
-import { readInt32, readKleiString, readByte } from "../parser";
+import { validateDotNetIdentifierName } from "../../utils";
 
-export function* parseTemplates(): IterableIterator<any> {
+import {
+  ParseIterator,
+  readInt32,
+  readKleiString,
+  readByte
+} from "../../parser";
+
+export function* parseTemplates(): ParseIterator<TypeTemplates> {
   const templateCount = yield readInt32();
   const templates: TypeTemplates = new Array(templateCount);
   for (let i = 0; i < templateCount; i++) {
@@ -20,7 +28,7 @@ export function* parseTemplates(): IterableIterator<any> {
   return templates;
 }
 
-function* parseTemplate(): IterableIterator<any> {
+function* parseTemplate(): ParseIterator<TypeTemplate> {
   const name = validateDotNetIdentifierName(yield readKleiString());
 
   const fieldCount = yield readInt32();
@@ -54,16 +62,16 @@ function* parseTemplate(): IterableIterator<any> {
   return template;
 }
 
-function* parseTypeInfo(): IterableIterator<any> {
+function* parseTypeInfo(): ParseIterator<TypeInfo> {
   const info: SerializationTypeInfo = yield readByte();
-  const type = info & SerializationTypeInfo.VALUE_MASK;
+  const type = getTypeCode(info);
 
   let typeName: string | undefined;
   let subTypes: TypeInfo[] | undefined;
 
   if (
-    type === SerializationTypeInfo.UserDefined ||
-    type === SerializationTypeInfo.Enumeration
+    type === SerializationTypeCode.UserDefined ||
+    type === SerializationTypeCode.Enumeration
   ) {
     const userTypeName = yield readKleiString();
     if (userTypeName === null) {
@@ -85,7 +93,7 @@ function* parseTypeInfo(): IterableIterator<any> {
     for (let i = 0; i < subTypeCount; i++) {
       subTypes[i] = yield* parseTypeInfo();
     }
-  } else if (type === SerializationTypeInfo.Array) {
+  } else if (type === SerializationTypeCode.Array) {
     const subType = yield* parseTypeInfo();
     subTypes = [subType];
   }

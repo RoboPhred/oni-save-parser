@@ -18,7 +18,8 @@ const readParsers: ReadParsers = {
   double: r => r.readDouble(),
   chars: (r, i) => r.readChars(instLength(i)),
   "klei-string": r => r.readKleiString(),
-  "skip-bytes": (r, i) => r.skipBytes(instLength(i))
+  "skip-bytes": (r, i) => r.skipBytes(instLength(i)),
+  "reader-position": r => r.position
 };
 export default readParsers;
 
