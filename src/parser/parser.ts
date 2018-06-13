@@ -3,7 +3,10 @@ import { DataReader } from "../binary-serializer";
 import { ReadInstruction, isReadInstruction } from "./read-instructions";
 import readParsers from "./read-parsers";
 
-export type ParseIterator<T> = IterableIterator<ReadInstruction | T>;
+// Typescript currently does not support specifying the return value of an iterator.
+//  We could use IterableIterator<ReadInstructions | T>, but that throws errors
+//  when the parser delegates to sub-generators.
+export type ParseIterator<T> = IterableIterator<any>;
 
 export function parse<T>(reader: DataReader, parser: ParseIterator<T>): T {
   let nextValue: any = undefined;

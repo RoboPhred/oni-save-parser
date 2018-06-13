@@ -4,7 +4,7 @@ import { Schema, validate } from "jsonschema";
 
 import { readBytes, readUInt32 } from "../parser";
 
-import { DataReader, DataWriter } from "../binary-serializer";
+import { DataWriter } from "../binary-serializer";
 
 import { SaveGameHeader } from "../save-structure";
 
@@ -37,12 +37,13 @@ export function* parseHeader() {
   const infoStr = new TextDecoder("utf-8").decode(infoBytes);
   const gameInfo = JSON.parse(infoStr);
 
-  return {
+  const header: SaveGameHeader = {
     buildVersion,
     headerVersion,
     isCompressed,
     gameInfo
   };
+  return header;
 }
 
 export function writeHeader(writer: DataWriter, header: SaveGameHeader) {
