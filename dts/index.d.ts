@@ -1,5 +1,3 @@
-export * from "./interfaces";
-export * from "./logging";
-export { createModule as createLogModule } from "./logging/module";
-export * from "./parse-steps";
-export * from "./versions/7_3";
+import { SaveGame } from "./save-structure";
+export declare function parseSaveGame(data: ArrayBuffer): SaveGame;
+export declare function writeSaveGame(save: SaveGame): ArrayBuffer;

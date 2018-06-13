@@ -1,9 +1,26 @@
-export * from "./interfaces";
+import { ArrayDataReader, ArrayDataWriter } from "./binary-serializer";
 
-export * from "./logging";
-export { createModule as createLogModule } from "./logging/module";
+import { SaveGame } from "./save-structure";
 
-export * from "./parse-steps";
+import { parseHeader, writeHeader } from "./save-parser/header";
+import { parseTemplates } from "./save-parser/templates";
 
-// Export current version as top level.
-export * from "./versions/7_3";
+export function parseSaveGame(data: ArrayBuffer): SaveGame {
+  const reader = new ArrayDataReader(data);
+
+  const header = parseHeader(reader);
+  const templates = parseTemplates(reader);
+
+  return {
+    header,
+    templates
+  };
+}
+
+export function writeSaveGame(save: SaveGame): ArrayBuffer {
+  const writer = new ArrayDataWriter();
+
+  writeHeader(writer, save.header);
+
+  return writer.getBytes();
+}
