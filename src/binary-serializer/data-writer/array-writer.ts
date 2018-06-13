@@ -1,6 +1,6 @@
 import { TextEncoder } from "text-encoding";
 
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 
 import { DataWriter } from "./interfaces";
 

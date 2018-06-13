@@ -4,18 +4,6 @@
 // "WorkChore`1+StatesInstance[[Clinic, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"
 const REGEX_IDENTIFIER = /^[a-zA-Z0-9\_\+\.]+(\`\d+)?(\+[a-zA-Z0-9\_\+\.]+)?(\[\[.+\]\])?$/;
 
-export function ensureNotNull<T>(
-  value: T | null | undefined,
-  message?: string
-): T {
-  if (value == null) {
-    if (message) throw new Error(message);
-    else throw new TypeError("Value cannot be null or undefined.");
-  }
-
-  return value;
-}
-
 /**
  * Check if we parsed a meaningful .NET identifier name.
  * If the name looks valid, the name is returned.

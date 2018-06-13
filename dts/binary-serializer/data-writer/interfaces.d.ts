@@ -1,6 +1,5 @@
-/// <reference types="long" />
 import Long from "long";
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 /**
  * A little-endian streaming data writer.
  */
