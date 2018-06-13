@@ -1,13 +1,13 @@
+import { SaveGameSettings } from "../save-structure/save-settings";
+import { ParseIterator, readKleiString } from "../parser";
 import { TemplateParser } from "./templates/type-parser";
-import { readKleiString, ParseIterator } from "../parser";
-import { SaveGameWorld } from "../save-structure/world";
 import { validateDotNetIdentifierName } from "../utils";
 
-const AssemblyTypeName = "Klei.SaveFileRoot";
+const AssemblyTypeName = "Game+Settings";
 
-export function* parseWorld({
+export function* parseSaveSettings({
   parseByTemplate
-}: TemplateParser): ParseIterator<SaveGameWorld> {
+}: TemplateParser): ParseIterator<SaveGameSettings> {
   const typeName = yield readKleiString();
   validateDotNetIdentifierName(typeName);
   if (typeName !== AssemblyTypeName) {
@@ -16,6 +16,5 @@ export function* parseWorld({
     );
   }
 
-  const world = yield* parseByTemplate<SaveGameWorld>(AssemblyTypeName);
-  return world;
+  return yield* parseByTemplate(AssemblyTypeName);
 }

@@ -15,6 +15,13 @@ import { parseByTemplate } from "./save-parser/templates/type-parser";
 import { SaveGameWorld } from "./save-structure/world";
 import { parseWorld } from "./save-parser/world";
 import { ParseContext } from "./parse-context";
+import { SaveGameSettings } from "./save-structure/save-settings";
+import { parseSaveSettings } from "./save-parser/save-settings";
+
+const SAVE_HEADER = "KSAV";
+
+const CURRENT_VERSION_MAJOR = 7;
+const CURRENT_VERSION_MINOR = 3;
 
 export function parseSaveGame(data: ArrayBuffer): SaveGame {
   let reader = new ArrayDataReader(data);
@@ -34,11 +41,27 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
   }
 
   const world = parse<SaveGameWorld>(reader, parseWorld(context));
+  const settings = parse<SaveGameSettings>(reader, parseSaveSettings(context));
+
+  const ksav = reader.readChars(SAVE_HEADER.length);
+  if (ksav !== SAVE_HEADER) {
+    throw new Error(
+      `Failed to parse SaveBody: Expected "${SAVE_HEADER}" but got "${ksav}" (${Array.from(
+        ksav
+      ).map(x => x.charCodeAt(0))})`
+    );
+  }
+
+  const versionMajor = reader.readInt32();
+  const versionMinor = reader.readInt32();
 
   return {
     header,
     templates,
-    world
+    world,
+    settings,
+    versionMajor,
+    versionMinor
   };
 }
 
