@@ -1,3 +1,5 @@
+import { Z_DEFAULT_STRATEGY } from "zlib";
+
 export interface BasicReadInstruction {
   type: "read";
   dataType: string;
@@ -149,6 +151,16 @@ export function skipBytes(length: number): SkipBytesInstruction {
   };
 }
 
+export interface GetReaderPosition extends BasicReadInstruction {
+  dataType: "reader-position";
+}
+export function getReaderPosition(): GetReaderPosition {
+  return {
+    type: "read",
+    dataType: "reader-position"
+  };
+}
+
 export type ReadInstruction =
   | ReadByteInstruction
   | ReadSByteInstruction
@@ -163,7 +175,8 @@ export type ReadInstruction =
   | ReadDoubleInstruction
   | ReadCharsInstruction
   | ReadKleiStringInstruction
-  | SkipBytesInstruction;
+  | SkipBytesInstruction
+  | GetReaderPosition;
 
 export type ReadDataTypes = ReadInstruction["dataType"];
 

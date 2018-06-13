@@ -1,25 +1,54 @@
-import { ArrayDataReader, ArrayDataWriter } from "./binary-serializer";
+import {
+  ArrayDataReader,
+  ArrayDataWriter,
+  ZlibDataReader
+} from "./binary-serializer";
 
 import { SaveGame, SaveGameHeader } from "./save-structure";
 
-import { parse, ParseIterator } from "./parser";
+import { parse } from "./parser";
 
 import { parseHeader, writeHeader } from "./save-parser/header";
-import { parseTemplates } from "./save-parser/templates";
+import { parseTemplates } from "./save-parser/templates/index";
 import { TypeTemplates } from "./save-structure/type-templates";
+import { parseByTemplate } from "./save-parser/templates/type-parser";
+import { SaveGameWorld } from "./save-structure/world";
+import { parseWorld } from "./save-parser/world";
+import { ParseContext } from "./parse-context";
 
 export function parseSaveGame(data: ArrayBuffer): SaveGame {
-  const reader = new ArrayDataReader(data);
-  function parseNext<T>(parser: ParseIterator<T>): T {
-    return parse<T>(reader, parser);
+  let reader = new ArrayDataReader(data);
+
+  const header = parse<SaveGameHeader>(reader, parseHeader());
+  const templates = parse<TypeTemplates>(reader, parseTemplates());
+
+  if (header.isCompressed) {
+    reader = new ZlibDataReader(reader.viewAllBytes());
   }
 
-  const header = parseNext<SaveGameHeader>(parseHeader());
-  const templates = parseNext<TypeTemplates>(parseTemplates());
+  const context = makeSaveParserContext(header, templates);
+
+  const worldMarker = reader.readKleiString();
+  if (worldMarker !== "world") {
+    throw new Error(`Expected "world" string.`);
+  }
+
+  const world = parse<SaveGameWorld>(reader, parseWorld(context));
 
   return {
     header,
-    templates
+    templates,
+    world
+  };
+}
+
+function makeSaveParserContext(
+  header: SaveGameHeader,
+  templates: TypeTemplates
+): ParseContext {
+  return {
+    ...header,
+    parseByTemplate: parseByTemplate.bind(null, templates)
   };
 }
 
