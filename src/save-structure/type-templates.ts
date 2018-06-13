@@ -1,6 +1,4 @@
-export interface TypeTemplateDictionary {
-  [key: string]: TypeTemplate;
-}
+export type TypeTemplates = TypeTemplate[];
 
 /**
  * A template describing how to

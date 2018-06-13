@@ -1,6 +1,6 @@
 import { DataReader } from "../binary-serializer";
 import {
-  TypeTemplateDictionary,
+  TypeTemplates,
   TypeTemplate,
   TypeTemplateMember,
   TypeInfo,
@@ -10,12 +10,12 @@ import {
 
 import { validateDotNetIdentifierName } from "../utils";
 
-export function parseTemplates(reader: DataReader): TypeTemplateDictionary {
+export function parseTemplates(reader: DataReader): TypeTemplates {
   const templateCount = reader.readInt32();
-  const templates: TypeTemplateDictionary = {};
+  const templates: TypeTemplates = new Array(templateCount);
   for (let i = 0; i < templateCount; i++) {
     const template = parseTemplate(reader);
-    templates[template.name] = template;
+    templates[i] = template;
   }
   return templates;
 }
