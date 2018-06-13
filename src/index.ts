@@ -46,7 +46,7 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
   const ksav = reader.readChars(SAVE_HEADER.length);
   if (ksav !== SAVE_HEADER) {
     throw new Error(
-      `Failed to parse SaveBody: Expected "${SAVE_HEADER}" but got "${ksav}" (${Array.from(
+      `Failed to parse ksav header: Expected "${SAVE_HEADER}" but got "${ksav}" (${Array.from(
         ksav
       ).map(x => x.charCodeAt(0))})`
     );
