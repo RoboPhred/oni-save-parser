@@ -2,6 +2,8 @@ import { TextDecoder, TextEncoder } from "text-encoding";
 
 import { Schema, validate } from "jsonschema";
 
+import { readBytes, readUInt32 } from "../parser";
+
 import { DataReader, DataWriter } from "../binary-serializer";
 
 import { SaveGameHeader } from "../save-structure";
@@ -25,14 +27,13 @@ export const headerSchema: Schema = {
   additionalProperties: false
 };
 
-export function parseHeader(reader: DataReader): SaveGameHeader {
-  const buildVersion = reader.readUInt32();
-  const headerSize = reader.readUInt32();
-  const headerVersion = reader.readUInt32();
-  const isCompressed =
-    headerVersion >= 1 ? Boolean(reader.readUInt32()) : false;
+export function* parseHeader() {
+  const buildVersion = yield readUInt32();
+  const headerSize = yield readUInt32();
+  const headerVersion = yield readUInt32();
+  const isCompressed = headerVersion >= 1 ? Boolean(yield readUInt32()) : false;
 
-  const infoBytes = reader.readBytes(headerSize);
+  const infoBytes = yield readBytes(headerSize);
   const infoStr = new TextDecoder("utf-8").decode(infoBytes);
   const gameInfo = JSON.parse(infoStr);
 

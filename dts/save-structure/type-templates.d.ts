@@ -1,6 +1,4 @@
-export interface TypeTemplateDictionary {
-    [key: string]: TypeTemplate;
-}
+export declare type TypeTemplates = TypeTemplate[];
 /**
  * A template describing how to
  * serialize or deserializea .NET class.
