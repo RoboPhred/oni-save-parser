@@ -8,6 +8,8 @@ export interface SaveGame {
   templates: TypeTemplates;
   world: SaveGameWorld;
   settings: SaveGameSettings;
-  versionMajor: number;
-  versionMinor: number;
+  version: {
+    major: number;
+    minor: number;
+  };
 }
