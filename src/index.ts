@@ -60,8 +60,10 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
     templates,
     world,
     settings,
-    versionMajor,
-    versionMinor
+    version: {
+      major: versionMajor,
+      minor: versionMinor
+    }
   };
 }
 
