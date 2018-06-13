@@ -1,4 +1,3 @@
-import { DataReader } from "../binary-serializer";
 import {
   TypeTemplates,
   TypeTemplate,
@@ -9,27 +8,28 @@ import {
 } from "../save-structure/type-templates";
 
 import { validateDotNetIdentifierName } from "../utils";
+import { readInt32, readKleiString, readByte } from "../parser";
 
-export function parseTemplates(reader: DataReader): TypeTemplates {
-  const templateCount = reader.readInt32();
+export function* parseTemplates(): IterableIterator<any> {
+  const templateCount = yield readInt32();
   const templates: TypeTemplates = new Array(templateCount);
   for (let i = 0; i < templateCount; i++) {
-    const template = parseTemplate(reader);
+    const template = yield* parseTemplate();
     templates[i] = template;
   }
   return templates;
 }
 
-function parseTemplate(reader: DataReader): TypeTemplate {
-  const name = validateDotNetIdentifierName(reader.readKleiString());
+function* parseTemplate(): IterableIterator<any> {
+  const name = validateDotNetIdentifierName(yield readKleiString());
 
-  const fieldCount = reader.readInt32();
-  const propCount = reader.readInt32();
+  const fieldCount = yield readInt32();
+  const propCount = yield readInt32();
 
   const fields: TypeTemplateMember[] = new Array(fieldCount);
   for (let i = 0; i < fieldCount; i++) {
-    const name = validateDotNetIdentifierName(reader.readKleiString());
-    const type = parseTypeInfo(reader);
+    const name = validateDotNetIdentifierName(yield readKleiString());
+    const type = yield* parseTypeInfo();
     fields[i] = {
       name,
       type
@@ -38,23 +38,24 @@ function parseTemplate(reader: DataReader): TypeTemplate {
 
   const properties: TypeTemplateMember[] = new Array(propCount);
   for (let i = 0; i < propCount; i++) {
-    const name = validateDotNetIdentifierName(reader.readKleiString());
-    const type = parseTypeInfo(reader);
+    const name = validateDotNetIdentifierName(yield readKleiString());
+    const type = yield* parseTypeInfo();
     properties[i] = {
       name,
       type
     };
   }
 
-  return {
+  const template: TypeTemplate = {
     name,
     fields,
     properties
   };
+  return template;
 }
 
-function parseTypeInfo(reader: DataReader): TypeInfo {
-  const info: SerializationTypeInfo = reader.readByte();
+function* parseTypeInfo(): IterableIterator<any> {
+  const info: SerializationTypeInfo = yield readByte();
   const type = info & SerializationTypeInfo.VALUE_MASK;
 
   let typeName: string | undefined;
@@ -64,7 +65,7 @@ function parseTypeInfo(reader: DataReader): TypeInfo {
     type === SerializationTypeInfo.UserDefined ||
     type === SerializationTypeInfo.Enumeration
   ) {
-    const userTypeName = reader.readKleiString();
+    const userTypeName = yield readKleiString();
     if (userTypeName === null) {
       throw new Error(
         "Expected non-null type name for user-defined or enumeration type."
@@ -79,19 +80,20 @@ function parseTypeInfo(reader: DataReader): TypeInfo {
         `Unsupported non-generic type ${type} marked as generic.`
       );
     }
-    const subTypeCount = reader.readByte();
+    const subTypeCount = yield readByte();
     subTypes = new Array(subTypeCount);
     for (let i = 0; i < subTypeCount; i++) {
-      subTypes[i] = parseTypeInfo(reader);
+      subTypes[i] = yield* parseTypeInfo();
     }
   } else if (type === SerializationTypeInfo.Array) {
-    const subType = parseTypeInfo(reader);
+    const subType = yield* parseTypeInfo();
     subTypes = [subType];
   }
 
-  return {
+  const typeInfo: TypeInfo = {
     info,
     typeName,
     subTypes
   };
+  return typeInfo;
 }

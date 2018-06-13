@@ -2,16 +2,20 @@ import { ArrayDataReader, ArrayDataWriter } from "./binary-serializer";
 
 import { SaveGame, SaveGameHeader } from "./save-structure";
 
-import { parse } from "./parser";
+import { parse, ParseIterator } from "./parser";
 
 import { parseHeader, writeHeader } from "./save-parser/header";
 import { parseTemplates } from "./save-parser/templates";
+import { TypeTemplates } from "./save-structure/type-templates";
 
 export function parseSaveGame(data: ArrayBuffer): SaveGame {
   const reader = new ArrayDataReader(data);
+  function parseNext<T>(parser: ParseIterator<T>): T {
+    return parse<T>(reader, parser);
+  }
 
-  const header = parse<SaveGameHeader>(reader, parseHeader());
-  const templates = parseTemplates(reader);
+  const header = parseNext<SaveGameHeader>(parseHeader());
+  const templates = parseNext<TypeTemplates>(parseTemplates());
 
   return {
     header,
