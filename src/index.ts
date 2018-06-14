@@ -4,7 +4,12 @@ import {
   ZlibDataReader
 } from "./binary-serializer";
 
-import { SaveGame, SaveGameHeader, GameObjectGroup } from "./save-structure";
+import {
+  SaveGame,
+  SaveGameHeader,
+  GameObjectGroup,
+  SaveGameData
+} from "./save-structure";
 
 import { parse, write } from "./parser";
 
@@ -18,6 +23,7 @@ import { ParseContext } from "./parse-context";
 import { SaveGameSettings } from "./save-structure/save-settings";
 import { parseSaveSettings } from "./save-parser/save-settings";
 import { parseGameObjects } from "./save-parser/game-objects";
+import { parseGameData } from "./save-parser/save-game-data";
 
 const SAVE_HEADER = "KSAV";
 
@@ -70,6 +76,8 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
     parseGameObjects(context)
   );
 
+  const gameData = parse<SaveGameData>(reader, parseGameData(context));
+
   return {
     header,
     templates,
@@ -79,7 +87,8 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
       major: versionMajor,
       minor: versionMinor
     },
-    gameObjects
+    gameObjects,
+    gameData
   };
 }
 
