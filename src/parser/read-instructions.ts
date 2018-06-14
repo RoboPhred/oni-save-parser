@@ -1,5 +1,3 @@
-import { Z_DEFAULT_STRATEGY } from "zlib";
-
 export interface BasicReadInstruction {
   type: "read";
   dataType: string;

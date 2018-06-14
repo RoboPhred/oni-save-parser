@@ -2,9 +2,13 @@ import { TextDecoder, TextEncoder } from "text-encoding";
 
 import { Schema, validate } from "jsonschema";
 
-import { ParseIterator, readBytes, readUInt32 } from "../parser";
-
-import { DataWriter } from "../binary-serializer";
+import {
+  ParseIterator,
+  readBytes,
+  readUInt32,
+  writeUInt32,
+  writeBytes
+} from "../parser";
 
 import { SaveGameHeader } from "../save-structure";
 
@@ -46,7 +50,7 @@ export function* parseHeader(): ParseIterator<SaveGameHeader> {
   return header;
 }
 
-export function writeHeader(writer: DataWriter, header: SaveGameHeader) {
+export function* writeHeader(header: SaveGameHeader) {
   validate(header, headerSchema, { throwError: true });
 
   const { buildVersion, headerVersion, isCompressed, gameInfo } = header;
@@ -54,12 +58,12 @@ export function writeHeader(writer: DataWriter, header: SaveGameHeader) {
   const infoStr = JSON.stringify(gameInfo);
   const headerBytes = new TextEncoder("utf-8").encode(infoStr);
 
-  writer.writeUInt32(buildVersion);
-  writer.writeUInt32(headerBytes.byteLength);
-  writer.writeUInt32(headerVersion);
+  yield writeUInt32(buildVersion);
+  yield writeUInt32(headerBytes.byteLength);
+  yield writeUInt32(headerVersion);
   if (headerVersion >= 1) {
-    writer.writeUInt32(isCompressed ? 1 : 0);
+    yield writeUInt32(isCompressed ? 1 : 0);
   }
 
-  writer.writeBytes(headerBytes.buffer);
+  yield writeBytes(headerBytes.buffer);
 }

@@ -6,7 +6,7 @@ import {
 
 import { SaveGame, SaveGameHeader } from "./save-structure";
 
-import { parse } from "./parser";
+import { parse, write } from "./parser";
 
 import { parseHeader, writeHeader } from "./save-parser/header";
 import { parseTemplates } from "./save-parser/templates/index";
@@ -55,6 +55,15 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
   const versionMajor = reader.readInt32();
   const versionMinor = reader.readInt32();
 
+  if (
+    versionMajor !== CURRENT_VERSION_MAJOR ||
+    versionMinor !== CURRENT_VERSION_MINOR
+  ) {
+    throw new Error(
+      `Save version "${versionMajor}.${versionMinor} is not compatible with this parser.`
+    );
+  }
+
   return {
     header,
     templates,
@@ -80,7 +89,7 @@ function makeSaveParserContext(
 export function writeSaveGame(save: SaveGame): ArrayBuffer {
   const writer = new ArrayDataWriter();
 
-  writeHeader(writer, save.header);
+  write<SaveGameHeader>(writer, writeHeader(save.header));
 
   return writer.getBytes();
 }
