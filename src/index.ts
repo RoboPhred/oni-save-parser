@@ -1,7 +1,9 @@
 import {
   ArrayDataReader,
   ArrayDataWriter,
-  ZlibDataReader
+  ZlibDataReader,
+  DataWriter,
+  ZlibDataWriter
 } from "./binary-serializer";
 
 import {
@@ -14,12 +16,15 @@ import {
 import { parse, write } from "./parser";
 
 import { parseHeader, writeHeader } from "./save-parser/header";
-import { parseTemplates } from "./save-parser/templates/index";
+import { parseTemplates, writeTemplates } from "./save-parser/templates/index";
 import { TypeTemplates } from "./save-structure/type-templates";
-import { parseByTemplate } from "./save-parser/templates/type-parser";
+import {
+  parseByTemplate,
+  writeByTemplate
+} from "./save-parser/templates/type-parser";
 import { SaveGameWorld } from "./save-structure/world";
 import { parseWorld } from "./save-parser/world";
-import { ParseContext } from "./parse-context";
+import { ParseContext, WriteContext } from "./parse-context";
 import { SaveGameSettings } from "./save-structure/save-settings";
 import { parseSaveSettings } from "./save-parser/save-settings";
 import { parseGameObjects } from "./save-parser/game-objects";
@@ -92,6 +97,33 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
   };
 }
 
+export function writeSaveGame(save: SaveGame): ArrayBuffer {
+  const writer = new ArrayDataWriter();
+
+  write<SaveGameHeader>(writer, writeHeader(save.header));
+  write<TypeTemplates>(writer, writeTemplates(save.templates));
+
+  if (save.header.isCompressed) {
+    const deflateWriter = new ZlibDataWriter();
+    writeCompressedData(save, deflateWriter);
+    writer.writeBytes(deflateWriter.getBytesView());
+  } else {
+    writeCompressedData(save, writer);
+  }
+  return writer.getBytes();
+}
+
+function writeCompressedData(save: SaveGame, writer: DataWriter) {
+  const context = makeSaveParserContext(save.header, save.templates);
+
+  writer.writeKleiString("world");
+
+  // write<SaveGameWorld>(writer, writeWorld(save.world, context));
+  // write<SaveGameSettings>(writer, writeSaveSettings(save.settings context));
+
+  return writer.getBytes();
+}
+
 function makeSaveParserContext(
   header: SaveGameHeader,
   templates: TypeTemplates
@@ -102,10 +134,12 @@ function makeSaveParserContext(
   };
 }
 
-export function writeSaveGame(save: SaveGame): ArrayBuffer {
-  const writer = new ArrayDataWriter();
-
-  write<SaveGameHeader>(writer, writeHeader(save.header));
-
-  return writer.getBytes();
+function makeSaveWriterContext(
+  header: SaveGameHeader,
+  templates: TypeTemplates
+): WriteContext {
+  return {
+    ...header,
+    writeByTemplate: writeByTemplate.bind(null, templates)
+  };
 }

@@ -15,7 +15,11 @@ import {
   ParseIterator,
   readInt32,
   readKleiString,
-  readByte
+  readByte,
+  WriteIterator,
+  writeInt32,
+  writeKleiString,
+  writeByte
 } from "../../parser";
 
 export function* parseTemplates(): ParseIterator<TypeTemplates> {
@@ -26,6 +30,13 @@ export function* parseTemplates(): ParseIterator<TypeTemplates> {
     templates[i] = template;
   }
   return templates;
+}
+
+export function* writeTemplates(templates: TypeTemplates): WriteIterator {
+  yield writeInt32(templates.length);
+  for (const template of templates) {
+    yield* writeTemplate(template);
+  }
 }
 
 function* parseTemplate(): ParseIterator<TypeTemplate> {
@@ -60,6 +71,25 @@ function* parseTemplate(): ParseIterator<TypeTemplate> {
     properties
   };
   return template;
+}
+
+function* writeTemplate(template: TypeTemplate) {
+  yield writeKleiString(template.name);
+
+  yield writeInt32(template.fields.length);
+  yield writeInt32(template.properties.length);
+
+  for (const field of template.fields) {
+    const { name, type } = field;
+    yield writeKleiString(name);
+    yield* writeTypeInfo(type);
+  }
+
+  for (const prop of template.properties) {
+    const { name, type } = prop;
+    yield writeKleiString(name);
+    yield* writeTypeInfo(type);
+  }
 }
 
 function* parseTypeInfo(): ParseIterator<TypeInfo> {
@@ -104,4 +134,24 @@ function* parseTypeInfo(): ParseIterator<TypeInfo> {
     subTypes
   };
   return typeInfo;
+}
+
+function* writeTypeInfo(info: TypeInfo): WriteIterator {
+  yield writeByte(info.info);
+  const type = getTypeCode(info.info);
+  if (
+    type === SerializationTypeCode.UserDefined ||
+    type === SerializationTypeCode.Enumeration
+  ) {
+    yield writeKleiString(info.typeName!);
+  }
+
+  if (info.info & SerializationTypeInfo.IS_GENERIC_TYPE) {
+    yield writeByte(info.subTypes!.length);
+    for (const subType of info.subTypes!) {
+      yield* writeTypeInfo(subType);
+    }
+  } else if (type === SerializationTypeCode.Array) {
+    yield* writeTypeInfo(info.subTypes![0]);
+  }
 }

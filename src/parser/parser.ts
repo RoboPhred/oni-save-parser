@@ -10,7 +10,7 @@ import { executeWriteInstruction } from "./write-parsers";
 //  We could use IterableIterator<ReadInstructions | T>, but that throws errors
 //  when the parser delegates to sub-generators.
 export type ParseIterator<T> = IterableIterator<any>;
-export type WriteIterator<T> = IterableIterator<any>;
+export type WriteIterator = IterableIterator<any>;
 
 export function parse<T>(reader: DataReader, readParser: ParseIterator<T>): T {
   let nextValue: any = undefined;
