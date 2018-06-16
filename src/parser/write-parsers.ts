@@ -1,4 +1,8 @@
-import { WriteDataTypes, WriteInstruction } from "./write-instructions";
+import {
+  WriteDataTypes,
+  WriteInstruction,
+  DataLengthToken
+} from "./write-instructions";
 import { DataWriter } from "../binary-serializer";
 
 type TypedWriteInstruction<T extends WriteDataTypes> = Extract<
@@ -25,7 +29,20 @@ const writeParsers: WriteParsers = {
   double: (r, i) => r.writeDouble(i.value),
   chars: (r, i) => r.writeChars(i.value),
   "klei-string": (r, i) => r.writeKleiString(i.value),
-  "writer-position": r => r.position
+  "writer-position": r => r.position,
+  "data-length:begin": (r, i) => {
+    const token: DataLengthToken = {
+      writePosition: r.position,
+      startPosition: i.startPosition != null ? i.startPosition : r.position
+    };
+    r.writeInt32(0);
+    return token;
+  },
+  "data-length:end": (r, i) =>
+    r.replaceInt32(
+      r.position - (i.token.startPosition + 4),
+      i.token.writePosition
+    )
 };
 export default writeParsers;
 
