@@ -33,6 +33,8 @@ import {
 import { parseGameObjects, writeGameObjects } from "./save-parser/game-objects";
 import { parseGameData, writeGameData } from "./save-parser/save-game-data";
 
+export * from "./save-structure";
+
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
