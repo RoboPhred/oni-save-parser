@@ -6,12 +6,7 @@ This is a utility library for editing saves. If you are looking for a way to edi
 
 ## Game Compatibility
 
-This should work for all save files up to the Rancher Update (save file version 7.3).
-
-## Library Compatibility
-
-This project makes use of some newer constructs such as Set, Map, and Symbol. It should be supported
-when these constructs are present.
+As of version 2, this library only supports the cosmic update (save file version 7.4).
 
 ## Current Progress
 
@@ -37,30 +32,24 @@ const {
     writeOniSave
 } = require("oni-save-parser");
 
-const fileData = readFileSync("./test-data/Rancher-Test.sav");
-
-const saveData = parseOniSave(fileData.buffer);
-
-const minions = saveData.body.gameState.gameObjects.get("Minion");
-for(let minion of minions) {
-    // Change every minion to 1/3 the size.
-    minion["scale"]["x"] = 0.3;
-    minion["scale"]["y"] = 0.3;
-    minion["scale"]["z"] = 0.3;
-
-    // Set all attribute levels to 100.
-    const attrBehavior = minion["behaviors"].find(x => x["name"] === "Klei.AI.AttributeLevels");
-    const levels = attrBehavior["parsedData"].saveLoadLevels;
-    levels.forEach(x => x["level"] = 100);
+function loadFile(fileName) {
+  const fileData = readFileSync(`./test-data/${fileName}.sav`);
+  return parseSaveGame(fileData.buffer);
 }
 
-const writeData = writeOniSave(saveData);
-writeFileSync("./test-data/writeback.sav", new Uint8Array(writeData));
+function saveFile(fileName, save) {
+  const fileData = writeSaveGame(save);
+  writeFileSync(`./test-data/${fileName}.sav`, new Uint8Array(fileData));
+}
+
+const saveData = loadFile(fileName);
+
+// Make all dups half-sized
+const minions = saveData.gameObjects.find(x => x.name === "Minion")!;
+for (const minion of minions.gameObjects) {
+  minion.scale.x = 0.5;
+  minion.scale.y = 0.5;
+}
+
+saveFile(`${fileName}-tweaked`, saveData);
 ```
-
-## Design
-
-This library makes use of dependency injection. Mostly to provide an easy way to swap out save file
-components as new versions make breaking changes, but really because I wanted to test my IoC library.
-Objects dealing with save data are scoped under the root OniSaveData for the load, allowing
-easy access to things like the logger or type template deserializer wherever they may be needed.
