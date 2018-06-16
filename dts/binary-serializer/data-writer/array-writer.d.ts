@@ -1,5 +1,5 @@
 /// <reference types="long" />
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 import { DataWriter } from "./interfaces";
 export declare class ArrayDataWriter implements DataWriter {
     private _byteOffset;
@@ -15,6 +15,7 @@ export declare class ArrayDataWriter implements DataWriter {
     writeInt16(value: number): void;
     writeUInt32(value: number): void;
     writeInt32(value: number): void;
+    replaceInt32(value: number, position: number): void;
     writeUInt64(value: Long): void;
     writeInt64(value: Long): void;
     writeSingle(value: number): void;
@@ -30,6 +31,6 @@ export declare class ArrayDataWriter implements DataWriter {
      * the specified amount of bytes.
      * @param length The number of bytes intending to be written.
      */
-    private _ensureCanWrite(length);
-    private _increaseBuffer(size);
+    private _ensureCanWrite;
+    private _increaseBuffer;
 }

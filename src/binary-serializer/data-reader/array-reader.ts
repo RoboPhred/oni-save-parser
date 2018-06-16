@@ -2,7 +2,7 @@ import { TextDecoder } from "text-encoding";
 
 import Long from "long";
 
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 
 import { DataReader } from "./interfaces";
 

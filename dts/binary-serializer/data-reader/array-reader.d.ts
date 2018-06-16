@@ -1,6 +1,5 @@
-/// <reference types="long" />
 import Long from "long";
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 import { DataReader } from "./interfaces";
 export declare class ArrayDataReader implements DataReader {
     private _buffer;
@@ -28,5 +27,5 @@ export declare class ArrayDataReader implements DataReader {
     readVector3(): Vector3;
     readQuaternion(): Quaternion;
     skipBytes(length: number): void;
-    private _checkCanRead(length);
+    private _checkCanRead;
 }
