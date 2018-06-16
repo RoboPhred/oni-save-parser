@@ -3,7 +3,7 @@ import { BehaviorName } from "./interfaces";
 export declare const MinionIdentityBehavior: BehaviorName<MinionIdentityBehavior>;
 export interface MinionIdentityBehavior extends GameObjectBehavior {
     name: "MinionIdentity";
-    parsedData: {
+    templateData: {
         name: string;
         nameStringKey: string;
         gender: MinionGender;

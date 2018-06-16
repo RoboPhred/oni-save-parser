@@ -5,7 +5,7 @@ export declare const ACCESSORY_TYPES: AccessoryType[];
 export declare const AccessorizerBehavior: BehaviorName<AccessorizerBehavior>;
 export interface AccessorizerBehavior extends GameObjectBehavior {
     name: "Accessorizer";
-    parsedData: {
+    templateData: {
         accessories: Accessory[];
     };
 }

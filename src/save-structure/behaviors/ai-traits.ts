@@ -5,7 +5,7 @@ export const AITraitsBehavior: BehaviorName<AITraitsBehavior> =
   "Klei.AI.Traits";
 export interface AITraitsBehavior extends GameObjectBehavior {
   name: "Klei.AI.Traits";
-  parsedData: {
+  templateData: {
     TraitIds: string[];
   };
 }

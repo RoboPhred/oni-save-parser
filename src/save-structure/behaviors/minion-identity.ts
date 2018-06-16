@@ -5,7 +5,7 @@ export const MinionIdentityBehavior: BehaviorName<MinionIdentityBehavior> =
   "MinionIdentity";
 export interface MinionIdentityBehavior extends GameObjectBehavior {
   name: "MinionIdentity";
-  parsedData: {
+  templateData: {
     name: string;
     nameStringKey: string;
 

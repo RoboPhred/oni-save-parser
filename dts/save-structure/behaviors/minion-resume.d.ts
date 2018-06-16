@@ -3,7 +3,7 @@ import { BehaviorName } from "./interfaces";
 export declare const MinionResumeBehavior: BehaviorName<MinionResumeBehavior>;
 export interface MinionResumeBehavior extends GameObjectBehavior {
     name: "MinionResume";
-    parsedData: {
+    templateData: {
         ExperienceByRoleID?: Map<string, number>;
         MasteryByRoleID?: Map<string, boolean>;
         AptitudeByRoleGroup?: Map<{

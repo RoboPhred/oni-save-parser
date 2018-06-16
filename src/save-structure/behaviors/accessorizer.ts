@@ -17,7 +17,7 @@ export const AccessorizerBehavior: BehaviorName<AccessorizerBehavior> =
   "Accessorizer";
 export interface AccessorizerBehavior extends GameObjectBehavior {
   name: "Accessorizer";
-  parsedData: {
+  templateData: {
     accessories: Accessory[];
   };
 }

@@ -4,7 +4,7 @@ import { BehaviorName } from "./interfaces";
 export const HealthBehavior: BehaviorName<HealthBehavior> = "Health";
 export interface HealthBehavior extends GameObjectBehavior {
   name: "Health";
-  parsedData: {
+  templateData: {
     CanBeIncapacitated: boolean;
     State: number;
   };
