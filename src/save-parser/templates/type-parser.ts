@@ -26,7 +26,6 @@ import {
   writeUInt16,
   writeUInt32,
   writeUInt64,
-  write,
   writeDataLengthBegin,
   DataLengthToken,
   getWriterPosition,
@@ -36,7 +35,8 @@ import {
   TypeTemplates,
   TypeInfo,
   getTypeCode,
-  SerializationTypeCode
+  SerializationTypeCode,
+  isValueType
 } from "../../save-structure/type-templates";
 
 export interface TemplateParser {
@@ -114,9 +114,24 @@ function* sharedArrayParser(info: TypeInfo, templates: TypeTemplates) {
   if (length === -1) {
     return null;
   } else if (length >= 0) {
-    if (getTypeCode(elementType.info) === SerializationTypeCode.Byte) {
+    const typeCode = getTypeCode(elementType.info);
+    if (typeCode === SerializationTypeCode.Byte) {
       const data = yield readBytes(length);
       return new Uint8Array(data);
+    } else if (isValueType(elementType.info)) {
+      if (typeCode !== SerializationTypeCode.UserDefined) {
+        throw new Error(`Type ${typeCode} cannot be parsed as a value-type.`);
+      }
+      const typeName = elementType.templateName!;
+      // In the ONI code, this skips straight back to a SerializationMapping (parseByTemplate) and bypasses ReadValue (parseByType)
+      //  This effectively skips out writing the data length, probably because that is also used to indicate null values.
+      const elements = new Array(length);
+      for (let i = 0; i < length; i++) {
+        const element = yield* parseByTemplate(templates, typeName);
+        elements[i] = element;
+      }
+
+      return elements;
     } else {
       const elements = new Array(length);
       for (let i = 0; i < length; i++) {
@@ -132,13 +147,13 @@ function* sharedArrayParser(info: TypeInfo, templates: TypeTemplates) {
 }
 
 function* sharedArrayWriter(
-  value: any,
+  values: any,
   info: TypeInfo,
   templates: TypeTemplates
 ): WriteIterator {
   const [elementType] = info.subTypes!;
 
-  if (value == null) {
+  if (values == null) {
     // ONI inconsistancy: Element count is only included
     //  in the data-length when the array is null.
     yield writeInt32(4);
@@ -151,16 +166,23 @@ function* sharedArrayWriter(
 
     // Frustratingly, the element count is written after the length but not included
     //  in it.
-    yield writeInt32(value.length);
+    yield writeInt32(values.length);
     lengthToken.startPosition = yield getWriterPosition();
 
     if (getTypeCode(elementType.info) === SerializationTypeCode.Byte) {
-      if (!(value instanceof Uint8Array)) {
+      if (!(values instanceof Uint8Array)) {
         throw new Error("Expected byte array value to be Uint8Array.");
       }
-      yield writeBytes(value);
+      yield writeBytes(values);
+    } else if (isValueType(elementType.info)) {
+      // In the ONI code, this skips straight back to a SerializationMapping (parseByTemplate) and bypasses ReadValue (parseByType)
+      //  This effectively skips out writing the data length, probably because that is also used to indicate null values.
+      const templateName = elementType.templateName!;
+      for (let element of values) {
+        yield* writeByTemplate(templates, templateName, element);
+      }
     } else {
-      for (let element of value) {
+      for (let element of values) {
         yield* writeByType(element, elementType, templates);
       }
     }
@@ -411,7 +433,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
   },
   [SerializationTypeCode.UserDefined]: {
     read: function*(info, templates) {
-      const templateName = info.typeName!;
+      const templateName = info.templateName!;
 
       const dataLength = yield readInt32();
       if (dataLength < 0) {
@@ -434,7 +456,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
       return obj;
     },
     write: function*(value, info, templates) {
-      const templateName = info.typeName!;
+      const templateName = info.templateName!;
       if (value == null) {
         yield writeInt32(-1);
       } else {

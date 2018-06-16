@@ -74,7 +74,7 @@ export interface TypeTemplateMember {
  */
 export interface TypeInfo {
   info: SerializationTypeInfo;
-  typeName?: string;
+  templateName?: string;
   subTypes?: TypeInfo[];
 }
 
@@ -106,7 +106,8 @@ export enum SerializationTypeInfo {
   List = 20,
   HashSet = 21,
   Colour = 22,
-  VALUE_MASK = 127,
+  VALUE_MASK = 63,
+  IS_VALUE_TYPE = 64,
   IS_GENERIC_TYPE = 128
 }
 
@@ -141,6 +142,10 @@ export function getTypeCode(
   type: SerializationTypeInfo
 ): SerializationTypeCode {
   return type & SerializationTypeInfo.VALUE_MASK;
+}
+
+export function isValueType(type: SerializationTypeInfo): boolean {
+  return Boolean(type & SerializationTypeInfo.IS_VALUE_TYPE);
 }
 
 /**

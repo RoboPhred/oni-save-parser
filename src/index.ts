@@ -36,12 +36,23 @@ import { parseGameData, writeGameData } from "./save-parser/save-game-data";
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
-const CURRENT_VERSION_MINOR = 3;
+const CURRENT_VERSION_MINOR = 4;
 
 export function parseSaveGame(data: ArrayBuffer): SaveGame {
   let reader = new ArrayDataReader(data);
 
   const header = parse<SaveGameHeader>(reader, parseHeader());
+
+  const { saveMajorVersion, saveMinorVersion } = header.gameInfo;
+  if (
+    saveMajorVersion !== CURRENT_VERSION_MAJOR ||
+    saveMinorVersion !== CURRENT_VERSION_MINOR
+  ) {
+    throw new Error(
+      `Save version "${saveMajorVersion}.${saveMinorVersion}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
+    );
+  }
+
   const templates = parse<TypeTemplates>(reader, parseTemplates());
 
   if (header.isCompressed) {
@@ -75,7 +86,7 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
     versionMinor !== CURRENT_VERSION_MINOR
   ) {
     throw new Error(
-      `Save version "${versionMajor}.${versionMinor} is not compatible with this parser.`
+      `Save version "${versionMajor}.${versionMinor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
     );
   }
 

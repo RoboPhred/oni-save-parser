@@ -96,7 +96,7 @@ function* parseTypeInfo(): ParseIterator<TypeInfo> {
   const info: SerializationTypeInfo = yield readByte();
   const type = getTypeCode(info);
 
-  let typeName: string | undefined;
+  let templateName: string | undefined;
   let subTypes: TypeInfo[] | undefined;
 
   if (
@@ -109,7 +109,7 @@ function* parseTypeInfo(): ParseIterator<TypeInfo> {
         "Expected non-null type name for user-defined or enumeration type."
       );
     }
-    typeName = userTypeName;
+    templateName = userTypeName;
   }
 
   if (info & SerializationTypeInfo.IS_GENERIC_TYPE) {
@@ -130,7 +130,7 @@ function* parseTypeInfo(): ParseIterator<TypeInfo> {
 
   const typeInfo: TypeInfo = {
     info,
-    typeName,
+    templateName,
     subTypes
   };
   return typeInfo;
@@ -143,7 +143,7 @@ function* writeTypeInfo(info: TypeInfo): WriteIterator {
     type === SerializationTypeCode.UserDefined ||
     type === SerializationTypeCode.Enumeration
   ) {
-    yield writeKleiString(info.typeName!);
+    yield writeKleiString(info.templateName!);
   }
 
   if (info.info & SerializationTypeInfo.IS_GENERIC_TYPE) {
