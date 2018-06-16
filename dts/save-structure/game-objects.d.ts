@@ -44,10 +44,4 @@ export interface GameObjectBehavior {
      * property will be unset.
      */
     extraRaw?: ArrayBuffer;
-    /**
-     * If the parser could not parse the behavior, this contains
-     * the raw unparsed behavior data.  This may happen if
-     * the behavior name is not in the templates.
-     */
-    raw?: ArrayBuffer;
 }

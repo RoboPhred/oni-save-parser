@@ -23,12 +23,15 @@ import {
   writeByTemplate
 } from "./save-parser/templates/type-parser";
 import { SaveGameWorld } from "./save-structure/world";
-import { parseWorld } from "./save-parser/world";
+import { parseWorld, writeWorld } from "./save-parser/world";
 import { ParseContext, WriteContext } from "./parse-context";
 import { SaveGameSettings } from "./save-structure/save-settings";
-import { parseSaveSettings } from "./save-parser/save-settings";
-import { parseGameObjects } from "./save-parser/game-objects";
-import { parseGameData } from "./save-parser/save-game-data";
+import {
+  parseSaveSettings,
+  writeSaveSettings
+} from "./save-parser/save-settings";
+import { parseGameObjects, writeGameObjects } from "./save-parser/game-objects";
+import { parseGameData, writeGameData } from "./save-parser/save-game-data";
 
 const SAVE_HEADER = "KSAV";
 
@@ -114,14 +117,21 @@ export function writeSaveGame(save: SaveGame): ArrayBuffer {
 }
 
 function writeCompressedData(save: SaveGame, writer: DataWriter) {
-  const context = makeSaveParserContext(save.header, save.templates);
+  const context = makeSaveWriterContext(save.header, save.templates);
 
   writer.writeKleiString("world");
 
-  // write<SaveGameWorld>(writer, writeWorld(save.world, context));
-  // write<SaveGameSettings>(writer, writeSaveSettings(save.settings context));
+  write<SaveGameWorld>(writer, writeWorld(save.world, context));
+  write<SaveGameSettings>(writer, writeSaveSettings(save.settings, context));
 
-  return writer.getBytes();
+  writer.writeChars(SAVE_HEADER);
+
+  writer.writeInt32(save.version.major);
+  writer.writeInt32(save.version.minor);
+
+  write<GameObjectGroup[]>(writer, writeGameObjects(save.gameObjects, context));
+
+  write(writer, writeGameData(save.gameData, context));
 }
 
 function makeSaveParserContext(

@@ -12,6 +12,7 @@ export interface DataWriter {
     writeInt16(value: number): void;
     writeUInt32(value: number): void;
     writeInt32(value: number): void;
+    replaceInt32(value: number, position: number): void;
     writeUInt64(value: Long): void;
     writeInt64(value: Long): void;
     writeSingle(value: number): void;

@@ -104,7 +104,7 @@ function* parseTypeInfo(): ParseIterator<TypeInfo> {
     type === SerializationTypeCode.Enumeration
   ) {
     const userTypeName = yield readKleiString();
-    if (userTypeName === null) {
+    if (userTypeName == null) {
       throw new Error(
         "Expected non-null type name for user-defined or enumeration type."
       );

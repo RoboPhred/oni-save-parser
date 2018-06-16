@@ -85,13 +85,13 @@ export function* writeByTemplate<T>(
   for (let field of template.fields) {
     const { name, type } = field;
     const value = (obj as any)[name];
-    yield* writeByType(type, value, templates);
+    yield* writeByType(value, type, templates);
   }
 
   for (let prop of template.properties) {
     const { name, type } = prop;
     const value = (obj as any)[name];
-    yield* writeByType(type, value, templates);
+    yield* writeByType(value, type, templates);
   }
 }
 
@@ -504,8 +504,8 @@ export function* parseByType(
 }
 
 export function* writeByType(
-  info: TypeInfo,
   value: any,
+  info: TypeInfo,
   templates: TypeTemplates
 ): ParseIterator<any> {
   const type = getTypeCode(info.info);
@@ -513,7 +513,7 @@ export function* writeByType(
   if (!parser) {
     throw new Error(`Unknown type code "${type}" (typeinfo: "${info.info}").`);
   }
-  return yield* parser.write(info, value, templates);
+  return yield* parser.write(value, info, templates);
 }
 
 function fracToByte(num: number): number {

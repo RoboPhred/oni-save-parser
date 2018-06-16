@@ -32,7 +32,7 @@ export function parse<T>(reader: DataReader, readParser: ParseIterator<T>): T {
   return nextValue;
 }
 
-export function write<T>(writer: DataWriter, writeParser: WriteIterator<T>): T {
+export function write<T>(writer: DataWriter, writeParser: WriteIterator): T {
   let nextValue: any = undefined;
   while (true) {
     const { value, done } = writeParser.next(nextValue);

@@ -72,6 +72,20 @@ export interface GetWriterPosition extends BasicWriteInstruction {
     dataType: "writer-position";
 }
 export declare function getWriterPosition(): GetWriterPosition;
-export declare type WriteInstruction = WriteByteInstruction | WriteSByteInstruction | WriteBytesInstruction | WriteUInt16Instruction | WriteInt16Instruction | WriteUInt32Instruction | WriteInt32Instruction | WriteUInt64Instruction | WriteInt64Instruction | WriteSingleInstruction | WriteDoubleInstruction | WriteCharsInstruction | WriteKleiStringInstruction | GetWriterPosition;
+export interface DataLengthToken {
+    writePosition: number;
+    startPosition: number;
+}
+export interface WriteDataLengthBegin extends BasicWriteInstruction {
+    dataType: "data-length:begin";
+    startPosition?: number;
+}
+export declare function writeDataLengthBegin(startPosition?: number): WriteDataLengthBegin;
+export interface WriteDataLengthEnd extends BasicWriteInstruction {
+    dataType: "data-length:end";
+    token: DataLengthToken;
+}
+export declare function writeDataLengthEnd(token: DataLengthToken): WriteDataLengthEnd;
+export declare type WriteInstruction = WriteByteInstruction | WriteSByteInstruction | WriteBytesInstruction | WriteUInt16Instruction | WriteInt16Instruction | WriteUInt32Instruction | WriteInt32Instruction | WriteUInt64Instruction | WriteInt64Instruction | WriteSingleInstruction | WriteDoubleInstruction | WriteCharsInstruction | WriteKleiStringInstruction | GetWriterPosition | WriteDataLengthBegin | WriteDataLengthEnd;
 export declare type WriteDataTypes = WriteInstruction["dataType"];
 export declare function isWriteInstruction(value: any): value is WriteInstruction;
