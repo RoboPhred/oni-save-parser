@@ -1,16 +1,16 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "stripInternal": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "outDir": "../lib",
-        "declaration": true,
-        "declarationDir": "../dts",
-        "sourceMap": true
-    }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "stripInternal": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "../lib",
+    "declaration": true,
+    "declarationDir": "../dts",
+    "sourceMap": true
+  },
+  "exclude": ["./old/**/*"]
 }

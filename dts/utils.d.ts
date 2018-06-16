@@ -1,4 +1,3 @@
-export declare function ensureNotNull<T>(value: T | null | undefined, message?: string): T;
 /**
  * Check if we parsed a meaningful .NET identifier name.
  * If the name looks valid, the name is returned.
