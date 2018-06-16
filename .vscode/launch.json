@@ -17,9 +17,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "TestShennanigans",
+      "name": "CU-273742",
       "program": "${workspaceFolder}/src/test/index.ts",
-      "args": ["TestShennanigans"],
+      "args": ["CU-273742"],
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/lib/**/*.js"],
       "sourceMaps": true

@@ -68,7 +68,7 @@ export interface TypeTemplateMember {
  */
 export interface TypeInfo {
     info: SerializationTypeInfo;
-    typeName?: string;
+    templateName?: string;
     subTypes?: TypeInfo[];
 }
 /**
@@ -99,7 +99,8 @@ export declare enum SerializationTypeInfo {
     List = 20,
     HashSet = 21,
     Colour = 22,
-    VALUE_MASK = 127,
+    VALUE_MASK = 63,
+    IS_VALUE_TYPE = 64,
     IS_GENERIC_TYPE = 128
 }
 export declare enum SerializationTypeCode {
@@ -128,6 +129,7 @@ export declare enum SerializationTypeCode {
     Colour = 22
 }
 export declare function getTypeCode(type: SerializationTypeInfo): SerializationTypeCode;
+export declare function isValueType(type: SerializationTypeInfo): boolean;
 /**
  * An array of SerializationTypeInfo values that are
  * capable of being generic.
