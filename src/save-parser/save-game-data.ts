@@ -1,5 +1,10 @@
-import { TemplateParser } from "./templates/type-parser";
-import { ParseIterator, readKleiString } from "../parser";
+import { TemplateParser, TemplateWriter } from "./templates/type-parser";
+import {
+  ParseIterator,
+  readKleiString,
+  WriteIterator,
+  writeKleiString
+} from "../parser";
 import { validateDotNetIdentifierName } from "../utils";
 import { SaveGameData } from "../save-structure";
 
@@ -18,4 +23,12 @@ export function* parseGameData({
 
   const gameData = yield* parseByTemplate<SaveGameData>(AssemblyTypeName);
   return gameData;
+}
+
+export function* writeGameData(
+  gameData: SaveGameData,
+  { writeByTemplate }: TemplateWriter
+): WriteIterator {
+  yield writeKleiString(AssemblyTypeName);
+  yield* writeByTemplate(AssemblyTypeName, gameData);
 }

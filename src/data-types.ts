@@ -17,7 +17,7 @@ export function* parseVector2(): ParseIterator<Vector2> {
     y: yield readSingle()
   };
 }
-export function* writeVector2(value: Vector2): WriteIterator<Vector2> {
+export function* writeVector2(value: Vector2): WriteIterator {
   yield writeSingle(value.x);
   yield writeSingle(value.y);
 }
@@ -32,7 +32,7 @@ export function* parseVector2I(): ParseIterator<Vector2I> {
     y: yield readInt32()
   };
 }
-export function* writeVector2I(value: Vector2I): WriteIterator<Vector2I> {
+export function* writeVector2I(value: Vector2I): WriteIterator {
   yield writeInt32(value.x);
   yield writeInt32(value.y);
 }
@@ -49,7 +49,7 @@ export function* parseVector3(): ParseIterator<Vector3> {
     z: yield readSingle()
   };
 }
-export function* writeVector3(value: Vector3): WriteIterator<Vector3> {
+export function* writeVector3(value: Vector3): WriteIterator {
   yield writeSingle(value.x);
   yield writeSingle(value.y);
   yield writeSingle(value.z);
@@ -69,7 +69,7 @@ export function* parseQuaternion(): ParseIterator<Quaternion> {
     w: yield readSingle()
   };
 }
-export function* writeQuaternion(value: Quaternion): WriteIterator<Quaternion> {
+export function* writeQuaternion(value: Quaternion): WriteIterator {
   yield writeSingle(value.x);
   yield writeSingle(value.y);
   yield writeSingle(value.z);

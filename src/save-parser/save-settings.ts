@@ -1,6 +1,11 @@
 import { SaveGameSettings } from "../save-structure/save-settings";
-import { ParseIterator, readKleiString } from "../parser";
-import { TemplateParser } from "./templates/type-parser";
+import {
+  ParseIterator,
+  readKleiString,
+  WriteIterator,
+  writeKleiString
+} from "../parser";
+import { TemplateParser, TemplateWriter } from "./templates/type-parser";
 import { validateDotNetIdentifierName } from "../utils";
 
 const AssemblyTypeName = "Game+Settings";
@@ -17,4 +22,12 @@ export function* parseSaveSettings({
   }
 
   return yield* parseByTemplate(AssemblyTypeName);
+}
+
+export function* writeSaveSettings(
+  settings: SaveGameSettings,
+  { writeByTemplate }: TemplateWriter
+): WriteIterator {
+  yield writeKleiString(AssemblyTypeName);
+  yield* writeByTemplate(AssemblyTypeName, settings);
 }

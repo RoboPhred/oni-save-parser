@@ -79,6 +79,10 @@ export class ArrayDataWriter implements DataWriter {
     this._byteOffset += 4;
   }
 
+  replaceInt32(value: number, position: number): void {
+    this._view.setInt32(position, value, true);
+  }
+
   writeUInt64(value: Long): void {
     value = value.toUnsigned();
     // little-endian, lower comes first.

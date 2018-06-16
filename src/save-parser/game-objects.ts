@@ -4,7 +4,14 @@ import {
   readKleiString,
   getReaderPosition,
   readByte,
-  readBytes
+  readBytes,
+  writeInt32,
+  WriteIterator,
+  writeKleiString,
+  writeDataLengthBegin,
+  writeDataLengthEnd,
+  writeByte,
+  writeBytes
 } from "../parser";
 
 import {
@@ -14,8 +21,14 @@ import {
 } from "../save-structure";
 
 import { validateDotNetIdentifierName } from "../utils";
-import { TemplateParser } from "./templates/type-parser";
-import { parseVector3, parseQuaternion } from "../data-types";
+import { TemplateParser, TemplateWriter } from "./templates/type-parser";
+import {
+  parseVector3,
+  parseQuaternion,
+  writeVector3,
+  writeQuaternion
+} from "../data-types";
+import { ArrayDataWriter } from "../binary-serializer";
 
 export function* parseGameObjects(
   templateParser: TemplateParser
@@ -26,6 +39,16 @@ export function* parseGameObjects(
     groups[i] = yield* parseGameObjectPrefabSet(templateParser);
   }
   return groups;
+}
+
+export function* writeGameObjects(
+  groups: GameObjectGroup[],
+  templateWriter: TemplateWriter
+): WriteIterator {
+  yield writeInt32(groups.length);
+  for (const group of groups) {
+    yield* writeGameObjectPrefabSet(group, templateWriter);
+  }
 }
 
 function* parseGameObjectPrefabSet(
@@ -66,6 +89,22 @@ function* parseGameObjectPrefabSet(
   return group;
 }
 
+function* writeGameObjectPrefabSet(
+  group: GameObjectGroup,
+  templateWriter: TemplateWriter
+): WriteIterator {
+  const { name, gameObjects } = group;
+  yield writeKleiString(name);
+  yield writeInt32(gameObjects.length);
+
+  const lengthToken = yield writeDataLengthBegin();
+  for (const gameObject of gameObjects) {
+    yield* writeGameObject(gameObject, templateWriter);
+  }
+
+  yield writeDataLengthEnd(lengthToken);
+}
+
 function* parseGameObject(
   templateParser: TemplateParser
 ): ParseIterator<GameObject> {
@@ -92,6 +131,24 @@ function* parseGameObject(
   return gameObject;
 }
 
+function* writeGameObject(
+  gameObject: GameObject,
+  templateWriter: TemplateWriter
+): WriteIterator {
+  const { position, rotation, scale, folder, behaviors } = gameObject;
+
+  yield* writeVector3(position);
+  yield* writeQuaternion(rotation);
+  yield* writeVector3(scale);
+  yield writeByte(folder);
+
+  yield writeInt32(behaviors.length);
+
+  for (const behavior of behaviors) {
+    yield* writeGameObjectBehavior(behavior, templateWriter);
+  }
+}
+
 function* parseGameObjectBehavior({
   parseByTemplate
 }: TemplateParser): ParseIterator<GameObjectBehavior> {
@@ -99,13 +156,13 @@ function* parseGameObjectBehavior({
   validateDotNetIdentifierName(name);
 
   const dataLength = yield readInt32();
-  const preParsePosition = yield getReaderPosition();
 
+  const preParsePosition = yield getReaderPosition();
   const templateData = yield* parseByTemplate(name);
+  const postParsePosition = yield getReaderPosition();
 
   let extraRaw: ArrayBuffer | undefined = undefined;
 
-  const postParsePosition = yield getReaderPosition();
   const dataRemaining = dataLength - (postParsePosition - preParsePosition);
   if (dataRemaining < 0) {
     throw new Error(
@@ -122,4 +179,22 @@ function* parseGameObjectBehavior({
     extraRaw
   };
   return behavior;
+}
+
+function* writeGameObjectBehavior(
+  behavior: GameObjectBehavior,
+  { writeByTemplate }: TemplateWriter
+): WriteIterator {
+  const { name, templateData, extraRaw } = behavior;
+
+  yield writeKleiString(name);
+
+  const lengthToken = yield writeDataLengthBegin();
+
+  yield* writeByTemplate(name, templateData);
+  if (extraRaw) {
+    yield writeBytes(extraRaw);
+  }
+
+  yield writeDataLengthEnd(lengthToken);
 }
