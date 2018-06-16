@@ -1,6 +1,6 @@
 import Long from "long";
 
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 
 /**
  * A little-endian streaming data writer.
@@ -17,6 +17,7 @@ export interface DataWriter {
 
   writeUInt32(value: number): void;
   writeInt32(value: number): void;
+  replaceInt32(value: number, position: number): void;
 
   writeUInt64(value: Long): void;
   writeInt64(value: Long): void;

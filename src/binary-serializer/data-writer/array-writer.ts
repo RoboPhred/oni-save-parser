@@ -1,6 +1,6 @@
 import { TextEncoder } from "text-encoding";
 
-import { Vector3, Quaternion } from "../../interfaces";
+import { Vector3, Quaternion } from "../../data-types";
 
 import { DataWriter } from "./interfaces";
 
@@ -77,6 +77,10 @@ export class ArrayDataWriter implements DataWriter {
     this._ensureCanWrite(4);
     this._view.setUint32(this._byteOffset, value, true);
     this._byteOffset += 4;
+  }
+
+  replaceInt32(value: number, position: number): void {
+    this._view.setInt32(position, value, true);
   }
 
   writeUInt64(value: Long): void {
