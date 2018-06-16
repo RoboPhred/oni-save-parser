@@ -26,7 +26,11 @@ import {
   writeUInt16,
   writeUInt32,
   writeUInt64,
-  write
+  write,
+  writeDataLengthBegin,
+  DataLengthToken,
+  getWriterPosition,
+  writeDataLengthEnd
 } from "../../parser";
 import {
   TypeTemplates,
@@ -34,7 +38,6 @@ import {
   getTypeCode,
   SerializationTypeCode
 } from "../../save-structure/type-templates";
-import { ArrayDataWriter } from "../../binary-serializer";
 
 export interface TemplateParser {
   parseByTemplate<T>(templateName: string): ParseIterator<T>;
@@ -143,25 +146,26 @@ function* sharedArrayWriter(
   } else {
     // Despite ONI not making use of the data length, we still calculate it
     //  and store it against the day that it might be used.
-    // TODO: Write directly to writer with ability to
-    //  retroactively update data length.
-    const elementWriter = new ArrayDataWriter();
+
+    const lengthToken: DataLengthToken = yield writeDataLengthBegin();
+
+    // Frustratingly, the element count is written after the length but not included
+    //  in it.
+    yield writeInt32(value.length);
+    lengthToken.startPosition = yield getWriterPosition();
+
     if (getTypeCode(elementType.info) === SerializationTypeCode.Byte) {
       if (!(value instanceof Uint8Array)) {
         throw new Error("Expected byte array value to be Uint8Array.");
       }
-      elementWriter.writeBytes(value);
+      yield writeBytes(value);
     } else {
       for (let element of value) {
-        write(elementWriter, writeByType(element, elementType, templates));
+        yield* writeByType(element, elementType, templates);
       }
     }
 
-    // ONI inconsistancy: Element count is not included
-    //  in the data-length when the array is not null.
-    yield writeInt32(elementWriter.position);
-    yield writeInt32(value.length);
-    yield writeBytes(elementWriter.getBytesView());
+    yield writeDataLengthEnd(lengthToken);
   }
 }
 
@@ -234,7 +238,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         return null;
       }
     },
-    write: function*(value, info, templates) {
+    write: function*(value: [any, any][], info, templates) {
       if (value == null) {
         // ONI inconsistancy: Element count is only included
         //  in the data-length when the dictionary is null.
@@ -244,24 +248,23 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         const [keyType, valueType] = info.subTypes!;
         // Despite ONI not making use of the data length, we still calculate it
         //  and store it against the day that it might be used.
-        // TODO: Write directly to writer with ability to
-        //  retroactively update data length.
-        // TODO: Mantain element order for load/save cycle consistency.
-        const dataWriter = new ArrayDataWriter();
+
+        const lengthToken: DataLengthToken = yield writeDataLengthBegin();
+
+        // Frustratingly, the element count is written after the length but not included
+        //  in it.
+        yield writeInt32(value.length);
+        lengthToken.startPosition = yield getWriterPosition();
 
         // Values come first.
         for (let element of value) {
-          write(dataWriter, writeByType(element[1], valueType, templates));
+          yield* writeByType(element[1], valueType, templates);
         }
         for (let element of value) {
-          write(dataWriter, writeByType(element[0], keyType, templates));
+          yield* writeByType(element[0], keyType, templates);
         }
 
-        // ONI inconsistancy: Element count is not included
-        //  in the data-length when the array is not null.
-        yield writeInt32(dataWriter.position);
-        yield writeInt32(value.size);
-        yield writeBytes(dataWriter.getBytesView());
+        yield writeDataLengthEnd(lengthToken);
       }
     }
   },
@@ -322,7 +325,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
     //  into an incorrect state.
     // We reproduce the faulty behavior here to remain accurate to ONI.
     read: function*(info, templates) {
-      // Writer mirrors ONI code and writes unparsable data.
+      // Writer mirrors ONI code and writes unparsable data.  See ONI bug description above.
       const dataLength = yield readInt32();
       if (dataLength >= 0) {
         // Trying to parse a data length of 0 makes no sense,
@@ -348,14 +351,13 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
 
         // Despite ONI not making use of the data length, we still calculate it
         //  and store it against the day that it might be used.
-        // TODO: Write directly to writer with ability to
-        //  retroactively update data length.
-        const dataWriter = new ArrayDataWriter();
-        write(dataWriter, writeByType(value.key, keyType, templates));
-        write(dataWriter, writeByType(value.value, valueType, templates));
 
-        yield writeInt32(dataWriter.position);
-        yield writeBytes(dataWriter.getBytesView());
+        const lengthToken = yield writeDataLengthBegin();
+
+        yield* writeByType(value.key, keyType, templates);
+        yield* writeByType(value.value, valueType, templates);
+
+        yield writeDataLengthEnd(lengthToken);
       }
     }
   },
@@ -436,11 +438,9 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
       if (value == null) {
         yield writeInt32(-1);
       } else {
-        const dataWriter = new ArrayDataWriter();
-        write(dataWriter, writeByTemplate(templates, templateName, value));
-
-        yield writeInt32(dataWriter.position);
-        yield writeBytes(dataWriter.getBytesView());
+        const lengthToken = yield writeDataLengthBegin();
+        yield* writeByTemplate(templates, templateName, value);
+        yield writeDataLengthEnd(lengthToken);
       }
     }
   },

@@ -171,6 +171,37 @@ export function getWriterPosition(): GetWriterPosition {
   };
 }
 
+export interface DataLengthToken {
+  writePosition: number;
+  startPosition: number;
+}
+
+export interface WriteDataLengthBegin extends BasicWriteInstruction {
+  dataType: "data-length:begin";
+  startPosition?: number;
+}
+export function writeDataLengthBegin(
+  startPosition?: number
+): WriteDataLengthBegin {
+  return {
+    type: "write",
+    dataType: "data-length:begin",
+    startPosition
+  };
+}
+
+export interface WriteDataLengthEnd extends BasicWriteInstruction {
+  dataType: "data-length:end";
+  token: DataLengthToken;
+}
+export function writeDataLengthEnd(token: DataLengthToken): WriteDataLengthEnd {
+  return {
+    type: "write",
+    dataType: "data-length:end",
+    token
+  };
+}
+
 export type WriteInstruction =
   | WriteByteInstruction
   | WriteSByteInstruction
@@ -185,7 +216,9 @@ export type WriteInstruction =
   | WriteDoubleInstruction
   | WriteCharsInstruction
   | WriteKleiStringInstruction
-  | GetWriterPosition;
+  | GetWriterPosition
+  | WriteDataLengthBegin
+  | WriteDataLengthEnd;
 
 export type WriteDataTypes = WriteInstruction["dataType"];
 
