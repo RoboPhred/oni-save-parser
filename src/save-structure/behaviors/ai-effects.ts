@@ -5,7 +5,7 @@ export const AIEffectsBehavior: BehaviorName<AIEffectsBehavior> =
   "Klei.AI.Effects";
 export interface AIEffectsBehavior extends GameObjectBehavior {
   name: "Klei.AI.Effects";
-  parsedData: {
+  templateData: {
     saveLoadEffects: EffectInstance[];
   };
 }

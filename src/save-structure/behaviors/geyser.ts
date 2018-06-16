@@ -5,7 +5,7 @@ import { BehaviorName } from "./interfaces";
 export const GeyserBehavior: BehaviorName<GeyserBehavior> = "Geyser";
 export interface GeyserBehavior extends GameObjectBehavior {
   name: "Geyser";
-  parsedData: {
+  templateData: {
     configuration?: {
       typeId: {
         hash: number;

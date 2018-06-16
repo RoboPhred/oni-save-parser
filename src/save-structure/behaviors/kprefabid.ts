@@ -4,7 +4,7 @@ import { BehaviorName } from "./interfaces";
 export const KPrefabIDBehavior: BehaviorName<KPrefabIDBehavior> = "KPrefabID";
 export interface KPrefabIDBehavior extends GameObjectBehavior {
   name: "KPrefabID";
-  parsedData: {
+  templateData: {
     InstanceID: KPrefabID;
   };
 }
