@@ -7,9 +7,9 @@ export const MinionResumeBehavior: BehaviorName<MinionResumeBehavior> =
 export interface MinionResumeBehavior extends GameObjectBehavior {
   name: "MinionResume";
   templateData: {
-    ExperienceByRoleID?: Map<string, number>;
-    MasteryByRoleID?: Map<string, boolean>;
-    AptitudeByRoleGroup?: Map<{ hash: number }, number>;
+    ExperienceByRoleID?: [string, number][];
+    MasteryByRoleID?: [string, boolean][];
+    AptitudeByRoleGroup?: [{ hash: number }, number][];
 
     currentRole?: string;
     targetRole?: string;
