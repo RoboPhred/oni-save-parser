@@ -1,1 +1,2 @@
-export * from "./type-info";
+export * from "./template-parser";
+export * from "./template-data-parser";

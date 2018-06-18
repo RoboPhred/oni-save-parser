@@ -1,9 +1,33 @@
+import { DataWriter } from "../../binary-serializer";
+
 import {
+  isWriteInstruction,
   WriteDataTypes,
   WriteInstruction,
   DataLengthToken
 } from "./write-instructions";
-import { DataWriter } from "../binary-serializer";
+
+export type UnparseIterator = IterableIterator<any>;
+
+export function unparse<T>(writer: DataWriter, unparser: UnparseIterator): T {
+  let nextValue: any = undefined;
+  while (true) {
+    const { value, done } = unparser.next(nextValue);
+    if (isWriteInstruction(value)) {
+      nextValue = executeWriteInstruction(writer, value);
+    } else if (!done) {
+      throw new Error("Cannot yield a non-parse-instruction.");
+    } else {
+      nextValue = value;
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  return nextValue;
+}
 
 type TypedWriteInstruction<T extends WriteDataTypes> = Extract<
   WriteInstruction,
@@ -44,9 +68,8 @@ const writeParsers: WriteParsers = {
       i.token.writePosition
     )
 };
-export default writeParsers;
 
-export function executeWriteInstruction<T extends WriteDataTypes>(
+function executeWriteInstruction<T extends WriteDataTypes>(
   writer: DataWriter,
   inst: TypedWriteInstruction<T>
 ): any {

@@ -13,15 +13,15 @@ import {
   SaveGameData
 } from "./save-structure";
 
-import { parse, write } from "./parser";
+import { parse, unparse } from "./parser";
 
-import { parseHeader, writeHeader } from "./save-parser/header";
-import { parseTemplates, writeTemplates } from "./save-parser/templates/index";
-import { TypeTemplates } from "./save-structure/type-templates";
+import { parseHeader, unparseHeader } from "./save-parser/header";
 import {
-  parseByTemplate,
-  writeByTemplate
-} from "./save-parser/templates/type-parser";
+  parseTemplates,
+  unparseTemplates
+} from "./save-parser/templates/index";
+import { TypeTemplates } from "./save-structure/type-templates";
+import { parseByTemplate, unparseByTemplate } from "./save-parser/templates";
 import { SaveGameWorld } from "./save-structure/world";
 import { parseWorld, writeWorld } from "./save-parser/world";
 import { ParseContext, WriteContext } from "./parse-context";
@@ -30,7 +30,10 @@ import {
   parseSaveSettings,
   writeSaveSettings
 } from "./save-parser/save-settings";
-import { parseGameObjects, writeGameObjects } from "./save-parser/game-objects";
+import {
+  parseGameObjects,
+  unparseGameObjects
+} from "./save-parser/game-objects";
 import { parseGameData, writeGameData } from "./save-parser/save-game-data";
 
 export * from "./save-structure";
@@ -117,8 +120,8 @@ export function parseSaveGame(data: ArrayBuffer): SaveGame {
 export function writeSaveGame(save: SaveGame): ArrayBuffer {
   const writer = new ArrayDataWriter();
 
-  write<SaveGameHeader>(writer, writeHeader(save.header));
-  write<TypeTemplates>(writer, writeTemplates(save.templates));
+  unparse<SaveGameHeader>(writer, unparseHeader(save.header));
+  unparse<TypeTemplates>(writer, unparseTemplates(save.templates));
 
   if (save.header.isCompressed) {
     const deflateWriter = new ZlibDataWriter();
@@ -135,17 +138,20 @@ function writeCompressedData(save: SaveGame, writer: DataWriter) {
 
   writer.writeKleiString("world");
 
-  write<SaveGameWorld>(writer, writeWorld(save.world, context));
-  write<SaveGameSettings>(writer, writeSaveSettings(save.settings, context));
+  unparse<SaveGameWorld>(writer, writeWorld(save.world, context));
+  unparse<SaveGameSettings>(writer, writeSaveSettings(save.settings, context));
 
   writer.writeChars(SAVE_HEADER);
 
   writer.writeInt32(save.version.major);
   writer.writeInt32(save.version.minor);
 
-  write<GameObjectGroup[]>(writer, writeGameObjects(save.gameObjects, context));
+  unparse<GameObjectGroup[]>(
+    writer,
+    unparseGameObjects(save.gameObjects, context)
+  );
 
-  write(writer, writeGameData(save.gameData, context));
+  unparse(writer, writeGameData(save.gameData, context));
 }
 
 function makeSaveParserContext(
@@ -164,6 +170,6 @@ function makeSaveWriterContext(
 ): WriteContext {
   return {
     ...header,
-    writeByTemplate: writeByTemplate.bind(null, templates)
+    unparseByTemplate: unparseByTemplate.bind(null, templates)
   };
 }

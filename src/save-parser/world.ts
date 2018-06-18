@@ -1,8 +1,8 @@
-import { TemplateParser, TemplateWriter } from "./templates/type-parser";
+import { TemplateParser, TemplateUnparser } from "./templates";
 import {
-  readKleiString,
   ParseIterator,
-  WriteIterator,
+  UnparseIterator,
+  readKleiString,
   writeKleiString
 } from "../parser";
 import { SaveGameWorld } from "../save-structure/world";
@@ -27,8 +27,8 @@ export function* parseWorld({
 
 export function* writeWorld(
   world: SaveGameWorld,
-  { writeByTemplate }: TemplateWriter
-): WriteIterator {
+  { unparseByTemplate }: TemplateUnparser
+): UnparseIterator {
   yield writeKleiString(AssemblyTypeName);
-  yield* writeByTemplate(AssemblyTypeName, world);
+  yield* unparseByTemplate(AssemblyTypeName, world);
 }
