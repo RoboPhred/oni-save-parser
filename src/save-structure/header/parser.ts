@@ -7,7 +7,8 @@ import {
   readUInt32,
   readBytes,
   writeUInt32,
-  writeBytes
+  writeBytes,
+  UnparseIterator
 } from "../../parser";
 
 import { SaveGameHeader, headerSchema } from "./header";
@@ -31,7 +32,7 @@ export function* parseHeader(): ParseIterator<SaveGameHeader> {
   return header;
 }
 
-export function* unparseHeader(header: SaveGameHeader) {
+export function* unparseHeader(header: SaveGameHeader): UnparseIterator {
   validate(header, headerSchema, { throwError: true });
 
   const { buildVersion, headerVersion, isCompressed, gameInfo } = header;
