@@ -7,7 +7,8 @@ import {
   readBytes,
   readUInt32,
   writeUInt32,
-  writeBytes
+  writeBytes,
+  WriteIterator
 } from "../parser";
 
 import { SaveGameHeader } from "../save-structure";
@@ -50,7 +51,7 @@ export function* parseHeader(): ParseIterator<SaveGameHeader> {
   return header;
 }
 
-export function* writeHeader(header: SaveGameHeader) {
+export function* writeHeader(header: SaveGameHeader): WriteIterator {
   validate(header, headerSchema, { throwError: true });
 
   const { buildVersion, headerVersion, isCompressed, gameInfo } = header;
