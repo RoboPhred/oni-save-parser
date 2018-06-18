@@ -1,8 +1,8 @@
-import { TemplateParser, TemplateWriter } from "./templates/type-parser";
+import { TemplateParser, TemplateUnparser } from "./templates";
 import {
   ParseIterator,
+  UnparseIterator,
   readKleiString,
-  WriteIterator,
   writeKleiString
 } from "../parser";
 import { validateDotNetIdentifierName } from "../utils";
@@ -27,8 +27,8 @@ export function* parseGameData({
 
 export function* writeGameData(
   gameData: SaveGameData,
-  { writeByTemplate }: TemplateWriter
-): WriteIterator {
+  { unparseByTemplate }: TemplateUnparser
+): UnparseIterator {
   yield writeKleiString(AssemblyTypeName);
-  yield* writeByTemplate(AssemblyTypeName, gameData);
+  yield* unparseByTemplate(AssemblyTypeName, gameData);
 }

@@ -1,5 +1,7 @@
 import {
   ParseIterator,
+  UnparseIterator,
+  DataLengthToken,
   readInt32,
   readBytes,
   readByte,
@@ -13,7 +15,6 @@ import {
   readUInt32,
   readUInt64,
   getReaderPosition,
-  WriteIterator,
   writeInt32,
   writeBytes,
   writeByte,
@@ -27,7 +28,6 @@ import {
   writeUInt32,
   writeUInt64,
   writeDataLengthBegin,
-  DataLengthToken,
   getWriterPosition,
   writeDataLengthEnd
 } from "../../parser";
@@ -38,69 +38,18 @@ import {
   SerializationTypeCode,
   isValueType
 } from "../../save-structure/type-templates";
-
-export interface TemplateParser {
-  parseByTemplate<T>(templateName: string): ParseIterator<T>;
-}
-export interface TemplateWriter {
-  writeByTemplate<T>(templateName: string, value: T): WriteIterator;
-}
-
-export function* parseByTemplate<T>(
-  templates: TypeTemplates,
-  templateName: string
-): ParseIterator<T> {
-  const template = templates.find(x => x.name === templateName);
-  if (!template) {
-    throw new Error(`Template "${templateName}" not found.`);
-  }
-
-  const result: any = {};
-
-  for (let field of template.fields) {
-    const { name, type } = field;
-    const value = yield* parseByType(type, templates);
-    result[name] = value;
-  }
-
-  for (let prop of template.properties) {
-    const { name, type } = prop;
-    const value = yield* parseByType(type, templates);
-    result[name] = value;
-  }
-
-  return result;
-}
-
-export function* writeByTemplate<T>(
-  templates: TypeTemplates,
-  templateName: string,
-  obj: T
-): WriteIterator {
-  const template = templates.find(x => x.name === templateName);
-  if (!template) {
-    throw new Error(`Template "${templateName}" not found.`);
-  }
-
-  for (let field of template.fields) {
-    const { name, type } = field;
-    const value = (obj as any)[name];
-    yield* writeByType(value, type, templates);
-  }
-
-  for (let prop of template.properties) {
-    const { name, type } = prop;
-    const value = (obj as any)[name];
-    yield* writeByType(value, type, templates);
-  }
-}
+import { parseByTemplate, unparseByTemplate } from "./template-data-parser";
 
 interface TypeParser {
-  read(info: TypeInfo, templates: TypeTemplates): ParseIterator<any>;
-  write(value: any, info: TypeInfo, templates: TypeTemplates): WriteIterator;
+  parse(info: TypeInfo, templates: TypeTemplates): ParseIterator<any>;
+  unparse(
+    value: any,
+    info: TypeInfo,
+    templates: TypeTemplates
+  ): UnparseIterator;
 }
 
-function* sharedArrayParser(info: TypeInfo, templates: TypeTemplates) {
+function* parseArrayLike(info: TypeInfo, templates: TypeTemplates) {
   const [elementType] = info.subTypes!;
 
   // data-length
@@ -146,11 +95,11 @@ function* sharedArrayParser(info: TypeInfo, templates: TypeTemplates) {
   }
 }
 
-function* sharedArrayWriter(
+function* unparseArrayLike(
   values: any,
   info: TypeInfo,
   templates: TypeTemplates
-): WriteIterator {
+): UnparseIterator {
   const [elementType] = info.subTypes!;
 
   if (values == null) {
@@ -179,11 +128,11 @@ function* sharedArrayWriter(
       //  This effectively skips out writing the data length, probably because that is also used to indicate null values.
       const templateName = elementType.templateName!;
       for (let element of values) {
-        yield* writeByTemplate(templates, templateName, element);
+        yield* unparseByTemplate(templates, templateName, element);
       }
     } else {
       for (let element of values) {
-        yield* writeByType(element, elementType, templates);
+        yield* unparseByType(element, elementType, templates);
       }
     }
 
@@ -193,28 +142,28 @@ function* sharedArrayWriter(
 
 const typeParsers: Record<SerializationTypeCode, TypeParser> = {
   [SerializationTypeCode.Array]: {
-    read: sharedArrayParser,
-    write: sharedArrayWriter
+    parse: parseArrayLike,
+    unparse: unparseArrayLike
   },
   [SerializationTypeCode.Boolean]: {
-    read: function*() {
+    parse: function*() {
       const b = yield readByte();
       return Boolean(b);
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeByte(value ? 1 : 0);
     }
   },
   [SerializationTypeCode.Byte]: {
-    read: function*() {
+    parse: function*() {
       return yield readByte();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeByte(value);
     }
   },
   [SerializationTypeCode.Colour]: {
-    read: function*() {
+    parse: function*() {
       const rb = yield readByte();
       const gb = yield readByte();
       const bb = yield readByte();
@@ -226,7 +175,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         a: ab / 255
       };
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeByte(fracToByte(value.r));
       yield writeByte(fracToByte(value.g));
       yield writeByte(fracToByte(value.b));
@@ -234,7 +183,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
     }
   },
   [SerializationTypeCode.Dictionary]: {
-    read: function*(info, templates) {
+    parse: function*(info, templates) {
       const [keyType, valueType] = info.subTypes!;
 
       // data-length.  4 if null.
@@ -260,7 +209,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         return null;
       }
     },
-    write: function*(value: [any, any][], info, templates) {
+    unparse: function*(value: [any, any][], info, templates) {
       if (value == null) {
         // ONI inconsistancy: Element count is only included
         //  in the data-length when the dictionary is null.
@@ -280,10 +229,10 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
 
         // Values come first.
         for (let element of value) {
-          yield* writeByType(element[1], valueType, templates);
+          yield* unparseByType(element[1], valueType, templates);
         }
         for (let element of value) {
-          yield* writeByType(element[0], keyType, templates);
+          yield* unparseByType(element[0], keyType, templates);
         }
 
         yield writeDataLengthEnd(lengthToken);
@@ -291,52 +240,52 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
     }
   },
   [SerializationTypeCode.Double]: {
-    read: function*() {
+    parse: function*() {
       return yield readDouble();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeDouble(value);
     }
   },
   [SerializationTypeCode.Enumeration]: {
-    read: function*() {
+    parse: function*() {
       return yield readInt32();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeInt32(value);
     }
   },
   [SerializationTypeCode.HashSet]: {
-    read: sharedArrayParser,
-    write: sharedArrayWriter
+    parse: parseArrayLike,
+    unparse: unparseArrayLike
   },
   [SerializationTypeCode.Int16]: {
-    read: function*() {
+    parse: function*() {
       return yield readInt16();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeInt16(value);
     }
   },
   [SerializationTypeCode.Int32]: {
-    read: function*() {
+    parse: function*() {
       return yield readInt32();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeInt32(value);
     }
   },
   [SerializationTypeCode.Int64]: {
-    read: function*() {
+    parse: function*() {
       return yield readInt64();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeInt64(value);
     }
   },
   [SerializationTypeCode.List]: {
-    read: sharedArrayParser,
-    write: sharedArrayWriter
+    parse: parseArrayLike,
+    unparse: unparseArrayLike
   },
   [SerializationTypeCode.Pair]: {
     // ONI BUG:
@@ -346,7 +295,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
     //  meaning it will parse a null as not-null and get the parser
     //  into an incorrect state.
     // We reproduce the faulty behavior here to remain accurate to ONI.
-    read: function*(info, templates) {
+    parse: function*(info, templates) {
       // Writer mirrors ONI code and writes unparsable data.  See ONI bug description above.
       const dataLength = yield readInt32();
       if (dataLength >= 0) {
@@ -363,7 +312,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         return null;
       }
     },
-    write: function*(value, info, templates) {
+    unparse: function*(value, info, templates) {
       // Writer mirrors ONI code and writes unparsable data.  See ONI bug description above.
       if (value == null) {
         yield writeInt32(4);
@@ -376,63 +325,63 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
 
         const lengthToken = yield writeDataLengthBegin();
 
-        yield* writeByType(value.key, keyType, templates);
-        yield* writeByType(value.value, valueType, templates);
+        yield* unparseByType(value.key, keyType, templates);
+        yield* unparseByType(value.value, valueType, templates);
 
         yield writeDataLengthEnd(lengthToken);
       }
     }
   },
   [SerializationTypeCode.SByte]: {
-    read: function*() {
+    parse: function*() {
       return yield readSByte();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeSByte(value);
     }
   },
   [SerializationTypeCode.Single]: {
-    read: function*() {
+    parse: function*() {
       return yield readSingle();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeSingle(value);
     }
   },
   [SerializationTypeCode.String]: {
-    read: function*() {
+    parse: function*() {
       return yield readKleiString();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeKleiString(value);
     }
   },
   [SerializationTypeCode.UInt16]: {
-    read: function*() {
+    parse: function*() {
       return yield readUInt16();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeUInt16(value);
     }
   },
   [SerializationTypeCode.UInt32]: {
-    read: function*() {
+    parse: function*() {
       return yield readUInt32();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeUInt32(value);
     }
   },
   [SerializationTypeCode.UInt64]: {
-    read: function*() {
+    parse: function*() {
       return yield readUInt64();
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeUInt64(value);
     }
   },
   [SerializationTypeCode.UserDefined]: {
-    read: function*(info, templates) {
+    parse: function*(info, templates) {
       const templateName = info.templateName!;
 
       const dataLength = yield readInt32();
@@ -455,19 +404,19 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
 
       return obj;
     },
-    write: function*(value, info, templates) {
+    unparse: function*(value, info, templates) {
       const templateName = info.templateName!;
       if (value == null) {
         yield writeInt32(-1);
       } else {
         const lengthToken = yield writeDataLengthBegin();
-        yield* writeByTemplate(templates, templateName, value);
+        yield* unparseByTemplate(templates, templateName, value);
         yield writeDataLengthEnd(lengthToken);
       }
     }
   },
   [SerializationTypeCode.Vector2]: {
-    read: function*() {
+    parse: function*() {
       const x = yield readSingle();
       const y = yield readSingle();
       return {
@@ -475,13 +424,13 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         y
       };
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeSingle(value.x);
       yield writeSingle(value.y);
     }
   },
   [SerializationTypeCode.Vector2I]: {
-    read: function*() {
+    parse: function*() {
       const x = yield readInt32();
       const y = yield readInt32();
       return {
@@ -489,13 +438,13 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         y
       };
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeInt32(value.x);
       yield writeInt32(value.y);
     }
   },
   [SerializationTypeCode.Vector3]: {
-    read: function*() {
+    parse: function*() {
       const x = yield readSingle();
       const y = yield readSingle();
       const z = yield readSingle();
@@ -505,7 +454,7 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
         z
       };
     },
-    write: function*(value) {
+    unparse: function*(value) {
       yield writeSingle(value.x);
       yield writeSingle(value.y);
       yield writeSingle(value.z);
@@ -522,10 +471,10 @@ export function* parseByType(
   if (!parser) {
     throw new Error(`Unknown type code "${type}" (typeinfo: "${info.info}").`);
   }
-  return yield* parser.read(info, templates);
+  return yield* parser.parse(info, templates);
 }
 
-export function* writeByType(
+export function* unparseByType(
   value: any,
   info: TypeInfo,
   templates: TypeTemplates
@@ -535,7 +484,7 @@ export function* writeByType(
   if (!parser) {
     throw new Error(`Unknown type code "${type}" (typeinfo: "${info.info}").`);
   }
-  return yield* parser.write(value, info, templates);
+  return yield* parser.unparse(value, info, templates);
 }
 
 function fracToByte(num: number): number {

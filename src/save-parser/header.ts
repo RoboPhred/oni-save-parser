@@ -4,8 +4,8 @@ import { Schema, validate } from "jsonschema";
 
 import {
   ParseIterator,
-  readBytes,
   readUInt32,
+  readBytes,
   writeUInt32,
   writeBytes
 } from "../parser";
@@ -50,7 +50,7 @@ export function* parseHeader(): ParseIterator<SaveGameHeader> {
   return header;
 }
 
-export function* writeHeader(header: SaveGameHeader) {
+export function* unparseHeader(header: SaveGameHeader) {
   validate(header, headerSchema, { throwError: true });
 
   const { buildVersion, headerVersion, isCompressed, gameInfo } = header;

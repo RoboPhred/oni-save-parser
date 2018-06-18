@@ -1,8 +1,5 @@
-import {
-  TemplateParser,
-  TemplateWriter
-} from "./save-parser/templates/type-parser";
+import { TemplateParser, TemplateUnparser } from "./save-parser/templates";
 import { SaveGameHeader } from "./save-structure";
 
 export type ParseContext = TemplateParser & SaveGameHeader;
-export type WriteContext = TemplateWriter & SaveGameHeader;
+export type WriteContext = TemplateUnparser & SaveGameHeader;
