@@ -9,7 +9,8 @@
     "prebuild": "npm run clean",
     "build": "tsc -p src",
     "watch": "tsc -p src -w",
-    "format": "prettier --write ./src/**/*.ts"
+    "format": "prettier --write ./src/**/*.ts",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "ONI",
@@ -32,7 +33,7 @@
     "deep-diff": "^1.0.1",
     "prettier": "^1.13.4",
     "rimraf": "^2.6.2",
-    "typescript": "^2.9.1"
+    "typescript": "^2.9.2"
   },
   "dependencies": {
     "jsonschema": "^1.2.4",
