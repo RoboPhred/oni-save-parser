@@ -12,9 +12,9 @@ export interface ReadSByteInstruction extends BasicReadInstruction {
 export declare function readSByte(): ReadSByteInstruction;
 export interface ReadBytesInstruction extends BasicReadInstruction {
     dataType: "byte-array";
-    length: number;
+    length?: number;
 }
-export declare function readBytes(length: number): ReadBytesInstruction;
+export declare function readBytes(length?: number): ReadBytesInstruction;
 export interface ReadUInt16Instruction extends BasicReadInstruction {
     dataType: "uint-16";
 }

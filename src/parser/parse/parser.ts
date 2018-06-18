@@ -57,7 +57,8 @@ type ReadParsers = { [P in ReadDataTypes]: ReadParser<P> };
 const readParsers: ReadParsers = {
   byte: r => r.readByte(),
   "signed-byte": r => r.readSByte(),
-  "byte-array": (r, i) => r.readBytes(i.length),
+  "byte-array": (r, i) =>
+    i.length == null ? r.readAllBytes() : r.readBytes(i.length),
   "uint-16": r => r.readUInt16(),
   "int-16": r => r.readInt16(),
   "uint-32": r => r.readUInt32(),

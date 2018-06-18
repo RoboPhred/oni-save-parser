@@ -25,9 +25,9 @@ export function readSByte(): ReadSByteInstruction {
 
 export interface ReadBytesInstruction extends BasicReadInstruction {
   dataType: "byte-array";
-  length: number;
+  length?: number;
 }
-export function readBytes(length: number): ReadBytesInstruction {
+export function readBytes(length?: number): ReadBytesInstruction {
   return {
     type: "read",
     dataType: "byte-array",
