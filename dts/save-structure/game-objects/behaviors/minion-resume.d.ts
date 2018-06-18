@@ -29,7 +29,7 @@ export declare const APTITUDE_NAME_HASHES: {
     Basekeeping: number;
 };
 export declare type AptitudeName = keyof typeof APTITUDE_NAME_HASHES;
-export declare const APTITUDE_NAMES: ("Farming" | "Ranching" | "Mining" | "Cooking" | "Art" | "Building" | "Management" | "Research" | "Suits" | "Hauling" | "Technicals" | "MedicalAid" | "Basekeeping")[];
+export declare const APTITUDE_NAMES: ("MedicalAid" | "Farming" | "Ranching" | "Mining" | "Cooking" | "Art" | "Building" | "Management" | "Research" | "Suits" | "Hauling" | "Technicals" | "Basekeeping")[];
 export declare const APTITUDE_HASH_NAMES: {
     [key: number]: AptitudeName;
 };
