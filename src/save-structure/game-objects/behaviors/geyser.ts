@@ -1,5 +1,5 @@
 import { GameObjectBehavior } from "../game-objects";
-import { getSDBMHash32 } from "../utils";
+import { getSDBMHash32 } from "../../utils";
 import { BehaviorName } from "./interfaces";
 
 export const GeyserBehavior: BehaviorName<GeyserBehavior> = "Geyser";

@@ -1,6 +1,6 @@
+import { getSDBMHash32 } from "../../utils";
 import { GameObjectBehavior } from "../game-objects";
 import { BehaviorName } from "./interfaces";
-import { getSDBMHash32 } from "../utils";
 
 export const MinionResumeBehavior: BehaviorName<MinionResumeBehavior> =
   "MinionResume";
