@@ -1,3 +1,5 @@
+import { UnparseIterator } from "./unparser";
+
 export interface BasicWriteInstruction {
   type: "write";
   dataType: string;
@@ -161,10 +163,10 @@ export function writeKleiString(value: string): WriteKleiStringInstruction {
   };
 }
 
-export interface GetWriterPosition extends BasicWriteInstruction {
+export interface GetWriterPositionInstruction extends BasicWriteInstruction {
   dataType: "writer-position";
 }
-export function getWriterPosition(): GetWriterPosition {
+export function getWriterPosition(): GetWriterPositionInstruction {
   return {
     type: "write",
     dataType: "writer-position"
@@ -176,13 +178,13 @@ export interface DataLengthToken {
   startPosition: number;
 }
 
-export interface WriteDataLengthBegin extends BasicWriteInstruction {
+export interface WriteDataLengthBeginInstruction extends BasicWriteInstruction {
   dataType: "data-length:begin";
   startPosition?: number;
 }
 export function writeDataLengthBegin(
   startPosition?: number
-): WriteDataLengthBegin {
+): WriteDataLengthBeginInstruction {
   return {
     type: "write",
     dataType: "data-length:begin",
@@ -190,15 +192,31 @@ export function writeDataLengthBegin(
   };
 }
 
-export interface WriteDataLengthEnd extends BasicWriteInstruction {
+export interface WriteDataLengthEndInstruction extends BasicWriteInstruction {
   dataType: "data-length:end";
   token: DataLengthToken;
 }
-export function writeDataLengthEnd(token: DataLengthToken): WriteDataLengthEnd {
+export function writeDataLengthEnd(
+  token: DataLengthToken
+): WriteDataLengthEndInstruction {
   return {
     type: "write",
     dataType: "data-length:end",
     token
+  };
+}
+
+export interface WriteCompressedInstruction extends BasicWriteInstruction {
+  dataType: "compressed";
+  unparser: UnparseIterator;
+}
+export function writeCompressed(
+  unparser: UnparseIterator
+): WriteCompressedInstruction {
+  return {
+    type: "write",
+    dataType: "compressed",
+    unparser
   };
 }
 
@@ -216,9 +234,10 @@ export type WriteInstruction =
   | WriteDoubleInstruction
   | WriteCharsInstruction
   | WriteKleiStringInstruction
-  | GetWriterPosition
-  | WriteDataLengthBegin
-  | WriteDataLengthEnd;
+  | GetWriterPositionInstruction
+  | WriteDataLengthBeginInstruction
+  | WriteDataLengthEndInstruction
+  | WriteCompressedInstruction;
 
 export type WriteDataTypes = WriteInstruction["dataType"];
 

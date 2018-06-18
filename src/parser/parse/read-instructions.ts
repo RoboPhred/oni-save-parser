@@ -1,3 +1,5 @@
+import { ParseIterator } from "./parser";
+
 export interface BasicReadInstruction {
   type: "read";
   dataType: string;
@@ -149,6 +151,20 @@ export function skipBytes(length: number): SkipBytesInstruction {
   };
 }
 
+export interface ReadCompressedInstruction extends BasicReadInstruction {
+  dataType: "compressed";
+  parser: ParseIterator<any>;
+}
+export function readCompressed(
+  parser: ParseIterator<any>
+): ReadCompressedInstruction {
+  return {
+    type: "read",
+    dataType: "compressed",
+    parser
+  };
+}
+
 export interface GetReaderPosition extends BasicReadInstruction {
   dataType: "reader-position";
 }
@@ -174,6 +190,7 @@ export type ReadInstruction =
   | ReadCharsInstruction
   | ReadKleiStringInstruction
   | SkipBytesInstruction
+  | ReadCompressedInstruction
   | GetReaderPosition;
 
 export type ReadDataTypes = ReadInstruction["dataType"];

@@ -1,4 +1,4 @@
-import { DataWriter } from "../../binary-serializer";
+import { DataWriter, ZlibDataWriter } from "../../binary-serializer";
 
 import {
   isWriteInstruction,
@@ -77,7 +77,12 @@ const writeParsers: WriteParsers = {
     r.replaceInt32(
       r.position - (i.token.startPosition + 4),
       i.token.writePosition
-    )
+    ),
+  compressed: (r, i) => {
+    const writer = new ZlibDataWriter();
+    unparse(writer, i.unparser);
+    r.writeBytes(writer.getBytesView());
+  }
 };
 
 function executeWriteInstruction<T extends WriteDataTypes>(
