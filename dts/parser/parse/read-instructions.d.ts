@@ -1,3 +1,4 @@
+import { ParseIterator } from "./parser";
 export interface BasicReadInstruction {
     type: "read";
     dataType: string;
@@ -61,10 +62,15 @@ export interface SkipBytesInstruction extends BasicReadInstruction {
     length: number;
 }
 export declare function skipBytes(length: number): SkipBytesInstruction;
+export interface ReadCompressedInstruction extends BasicReadInstruction {
+    dataType: "compressed";
+    parser: ParseIterator<any>;
+}
+export declare function readCompressed(parser: ParseIterator<any>): ReadCompressedInstruction;
 export interface GetReaderPosition extends BasicReadInstruction {
     dataType: "reader-position";
 }
 export declare function getReaderPosition(): GetReaderPosition;
-export declare type ReadInstruction = ReadByteInstruction | ReadSByteInstruction | ReadBytesInstruction | ReadUInt16Instruction | ReadInt16Instruction | ReadUInt32Instruction | ReadInt32Instruction | ReadUInt64Instruction | ReadInt64Instruction | ReadSingleInstruction | ReadDoubleInstruction | ReadCharsInstruction | ReadKleiStringInstruction | SkipBytesInstruction | GetReaderPosition;
+export declare type ReadInstruction = ReadByteInstruction | ReadSByteInstruction | ReadBytesInstruction | ReadUInt16Instruction | ReadInt16Instruction | ReadUInt32Instruction | ReadInt32Instruction | ReadUInt64Instruction | ReadInt64Instruction | ReadSingleInstruction | ReadDoubleInstruction | ReadCharsInstruction | ReadKleiStringInstruction | SkipBytesInstruction | ReadCompressedInstruction | GetReaderPosition;
 export declare type ReadDataTypes = ReadInstruction["dataType"];
 export declare function isReadInstruction(value: any): value is ReadInstruction;

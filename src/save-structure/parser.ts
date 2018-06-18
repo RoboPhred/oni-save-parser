@@ -1,19 +1,14 @@
 import {
-  ZlibDataReader,
-  DataReader,
-  ArrayDataReader,
-  ZlibDataWriter,
-  ArrayDataWriter,
-  DataWriter
-} from "../binary-serializer";
-
-import {
   ParseIterator,
   UnparseIterator,
-  parse,
-  unparse,
-  readBytes,
-  writeBytes
+  readKleiString,
+  readChars,
+  readInt32,
+  readCompressed,
+  writeCompressed,
+  writeKleiString,
+  writeChars,
+  writeInt32
 } from "../parser";
 
 import { ParseContext, WriteContext } from "./parse-context";
@@ -49,6 +44,17 @@ const SAVE_HEADER = "KSAV";
 const CURRENT_VERSION_MAJOR = 7;
 const CURRENT_VERSION_MINOR = 4;
 
+interface SaveGameBody {
+  world: SaveGameWorld;
+  settings: SaveGameSettings;
+  version: {
+    major: number;
+    minor: number;
+  };
+  gameObjects: GameObjectGroup[];
+  gameData: SaveGameData;
+}
+
 export function* parseSaveGame(): ParseIterator<SaveGame> {
   const header: SaveGameHeader = yield* parseHeader();
 
@@ -64,26 +70,34 @@ export function* parseSaveGame(): ParseIterator<SaveGame> {
 
   const templates: TypeTemplates = yield* parseTemplates();
 
-  // TODO: Implement compression support at parser level; do not
-  //  break the parse iterator chain with child parse calls.
-  let reader: DataReader;
-  if (header.isCompressed) {
-    reader = new ZlibDataReader(yield readBytes());
-  } else {
-    reader = new ArrayDataReader(yield readBytes());
-  }
-
   const context = makeSaveParserContext(header, templates);
 
-  const worldMarker = reader.readKleiString();
+  let body: SaveGameBody;
+
+  if (header.isCompressed) {
+    body = yield readCompressed(parseSaveBody(context));
+  } else {
+    body = yield* parseSaveBody(context);
+  }
+
+  const saveGame: SaveGame = {
+    header,
+    templates,
+    ...body
+  };
+  return saveGame;
+}
+
+function* parseSaveBody(context: ParseContext): ParseIterator<SaveGameBody> {
+  const worldMarker = yield readKleiString();
   if (worldMarker !== "world") {
     throw new Error(`Expected "world" string.`);
   }
 
-  const world = parse<SaveGameWorld>(reader, parseWorld(context));
-  const settings = parse<SaveGameSettings>(reader, parseSettings(context));
+  const world: SaveGameWorld = yield* parseWorld(context);
+  const settings: SaveGameSettings = yield* parseSettings(context);
 
-  const ksav = reader.readChars(SAVE_HEADER.length);
+  const ksav: string = yield readChars(SAVE_HEADER.length);
   if (ksav !== SAVE_HEADER) {
     throw new Error(
       `Failed to parse ksav header: Expected "${SAVE_HEADER}" but got "${ksav}" (${Array.from(
@@ -92,8 +106,8 @@ export function* parseSaveGame(): ParseIterator<SaveGame> {
     );
   }
 
-  const versionMajor = reader.readInt32();
-  const versionMinor = reader.readInt32();
+  const versionMajor: number = yield readInt32();
+  const versionMinor: number = yield readInt32();
 
   if (
     versionMajor !== CURRENT_VERSION_MAJOR ||
@@ -104,16 +118,11 @@ export function* parseSaveGame(): ParseIterator<SaveGame> {
     );
   }
 
-  const gameObjects = parse<GameObjectGroup[]>(
-    reader,
-    parseGameObjects(context)
-  );
+  const gameObjects: GameObjectGroup[] = yield* parseGameObjects(context);
 
-  const gameData = parse<SaveGameData>(reader, parseGameData(context));
+  const gameData: SaveGameData = yield* parseGameData(context);
 
-  const saveGame: SaveGame = {
-    header,
-    templates,
+  const body: SaveGameBody = {
     world,
     settings,
     version: {
@@ -123,7 +132,7 @@ export function* parseSaveGame(): ParseIterator<SaveGame> {
     gameObjects,
     gameData
   };
-  return saveGame;
+  return body;
 }
 
 function makeSaveParserContext(
@@ -140,36 +149,32 @@ export function* unparseSaveGame(saveGame: SaveGame): UnparseIterator {
   yield* unparseHeader(saveGame.header);
   yield* unparseTemplates(saveGame.templates);
 
-  // TODO: Implement compression support at parser level; do not
-  //  break the parse iterator chain with child parse calls.
-  const writer: DataWriter = saveGame.header.isCompressed
-    ? new ZlibDataWriter()
-    : new ArrayDataWriter();
+  const context = makeSaveWriterContext(saveGame.header, saveGame.templates);
 
-  writeCompressedData(saveGame, writer);
-
-  yield writeBytes(writer.getBytes());
+  if (saveGame.header.isCompressed) {
+    yield writeCompressed(unparseSaveBody(saveGame, context));
+  } else {
+    yield* unparseSaveBody(saveGame, context);
+  }
 }
 
-function writeCompressedData(save: SaveGame, writer: DataWriter) {
-  const context = makeSaveWriterContext(save.header, save.templates);
+function* unparseSaveBody(
+  saveGame: SaveGame,
+  context: WriteContext
+): UnparseIterator {
+  yield writeKleiString("world");
 
-  writer.writeKleiString("world");
+  yield* unparseWorld(saveGame.world, context);
+  yield* unparseSettings(saveGame.settings, context);
 
-  unparse<SaveGameWorld>(writer, unparseWorld(save.world, context));
-  unparse<SaveGameSettings>(writer, unparseSettings(save.settings, context));
+  yield writeChars(SAVE_HEADER);
 
-  writer.writeChars(SAVE_HEADER);
+  yield writeInt32(saveGame.version.major);
+  yield writeInt32(saveGame.version.minor);
 
-  writer.writeInt32(save.version.major);
-  writer.writeInt32(save.version.minor);
+  yield* unparseGameObjects(saveGame.gameObjects, context);
 
-  unparse<GameObjectGroup[]>(
-    writer,
-    unparseGameObjects(save.gameObjects, context)
-  );
-
-  unparse(writer, writeGameData(save.gameData, context));
+  yield* writeGameData(saveGame.gameData, context);
 }
 
 function makeSaveWriterContext(

@@ -1,4 +1,4 @@
-import { DataReader } from "../../binary-serializer";
+import { DataReader, ZlibDataReader } from "../../binary-serializer";
 
 import {
   isReadInstruction,
@@ -70,6 +70,13 @@ const readParsers: ReadParsers = {
   chars: (r, i) => r.readChars(i.length),
   "klei-string": r => r.readKleiString(),
   "skip-bytes": (r, i) => r.skipBytes(i.length),
+  compressed: (r, i) => {
+    const bytes = r.viewAllBytes();
+    const reader = new ZlibDataReader(bytes);
+    const result = parse(reader, i.parser);
+    r.skipBytes(reader.position);
+    return result;
+  },
   "reader-position": r => r.position
 };
 
