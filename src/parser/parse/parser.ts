@@ -5,6 +5,7 @@ import {
   ReadDataTypes,
   ReadInstruction
 } from "./read-instructions";
+import { ParseError } from "../errors";
 
 // Typescript currently does not support specifying the return value of an iterator.
 //  We could use IterableIterator<ReadInstructions | T>, but that throws errors
@@ -14,9 +15,20 @@ export type ParseIterator<T> = IterableIterator<any>;
 export function parse<T>(reader: DataReader, readParser: ParseIterator<T>): T {
   let nextValue: any = undefined;
   while (true) {
-    const { value, done } = readParser.next(nextValue);
+    let iteratorResult: IteratorResult<any>;
+    try {
+      iteratorResult = readParser.next(nextValue);
+    } catch (e) {
+      throw ParseError.create(e, reader.position);
+    }
+
+    const { value, done } = iteratorResult;
     if (isReadInstruction(value)) {
-      nextValue = executeReadInstruction(reader, value);
+      try {
+        nextValue = executeReadInstruction(reader, value);
+      } catch (e) {
+        throw ParseError.create(e, reader.position);
+      }
     } else if (!done) {
       throw new Error("Cannot yield a non-parse-instruction.");
     } else {

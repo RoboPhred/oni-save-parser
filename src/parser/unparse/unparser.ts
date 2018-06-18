@@ -6,15 +6,26 @@ import {
   WriteInstruction,
   DataLengthToken
 } from "./write-instructions";
+import { ParseError } from "../errors";
 
 export type UnparseIterator = IterableIterator<any>;
 
 export function unparse<T>(writer: DataWriter, unparser: UnparseIterator): T {
   let nextValue: any = undefined;
   while (true) {
-    const { value, done } = unparser.next(nextValue);
+    let iteratorResult: IteratorResult<any>;
+    try {
+      iteratorResult = unparser.next(nextValue);
+    } catch (e) {
+      throw ParseError.create(e, writer.position);
+    }
+    const { value, done } = iteratorResult;
     if (isWriteInstruction(value)) {
-      nextValue = executeWriteInstruction(writer, value);
+      try {
+        nextValue = executeWriteInstruction(writer, value);
+      } catch (e) {
+        throw ParseError.create(e, writer.position);
+      }
     } else if (!done) {
       throw new Error("Cannot yield a non-parse-instruction.");
     } else {
