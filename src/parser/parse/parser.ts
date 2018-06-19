@@ -71,10 +71,9 @@ const readParsers: ReadParsers = {
   "klei-string": r => r.readKleiString(),
   "skip-bytes": (r, i) => r.skipBytes(i.length),
   compressed: (r, i) => {
-    const bytes = r.viewAllBytes();
-    const reader = new ZlibDataReader(bytes);
+    const bytes = r.readAllBytes();
+    const reader = new ZlibDataReader(new Uint8Array(bytes));
     const result = parse(reader, i.parser);
-    r.skipBytes(reader.position);
     return result;
   },
   "reader-position": r => r.position
