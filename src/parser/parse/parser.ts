@@ -27,7 +27,8 @@ export function parse<T>(reader: DataReader, readParser: ParseIterator<T>): T {
       try {
         nextValue = executeReadInstruction(reader, value);
       } catch (e) {
-        throw ParseError.create(e, reader.position);
+        const err = ParseError.create(e, reader.position);
+        throw err;
       }
     } else if (!done) {
       throw new Error("Cannot yield a non-parse-instruction.");
