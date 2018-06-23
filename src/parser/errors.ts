@@ -4,7 +4,7 @@ export class ParseError extends Error {
 
   constructor(message: string, dataOffset: number) {
     super(message);
-    Object.setPrototypeOf(this, ParseError);
+    Object.setPrototypeOf(this, ParseError.prototype);
     this.dataOffset = dataOffset;
   }
 
@@ -19,9 +19,12 @@ export class ParseError extends Error {
         dataOffset
       );
       err.cause = () => error;
+      err.stack = error.stack;
       return err;
     }
 
-    return new ParseError(String(error), dataOffset);
+    const err = new ParseError(String(error), dataOffset);
+    Error.captureStackTrace(err, ParseError.create);
+    return err;
   }
 }
