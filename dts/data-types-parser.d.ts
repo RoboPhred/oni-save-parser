@@ -1,0 +1,10 @@
+import { ParseIterator, UnparseIterator } from "./parser";
+import { Vector2, Vector2I, Vector3, Quaternion } from "./data-types";
+export declare function parseVector2(): ParseIterator<Vector2>;
+export declare function unparseVector2(value: Vector2): UnparseIterator;
+export declare function parseVector2I(): ParseIterator<Vector2I>;
+export declare function unparseVector2I(value: Vector2I): UnparseIterator;
+export declare function parseVector3(): ParseIterator<Vector3>;
+export declare function unparseVector3(value: Vector3): UnparseIterator;
+export declare function parseQuaternion(): ParseIterator<Quaternion>;
+export declare function unparseQuaternion(value: Quaternion): UnparseIterator;
