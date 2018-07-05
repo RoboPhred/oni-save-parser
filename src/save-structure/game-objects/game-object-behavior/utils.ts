@@ -1,8 +1,8 @@
-import { GameObject } from "../../game-object";
+import { GameObject } from "../game-object";
 
 import { GameObjectBehavior } from "../game-object-behavior";
 
-import { BehaviorName } from "./types";
+import { BehaviorName } from "./known-behaviors";
 
 export function getBehavior<T extends GameObjectBehavior>(
   gameObject: GameObject,
