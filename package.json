@@ -1,6 +1,6 @@
 {
   "name": "oni-save-parser",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Parser for Oxygen Not Included save files.",
   "main": "lib/index.js",
   "types": "dts/index.d.ts",
@@ -25,7 +25,6 @@
   "license": "MIT",
   "devDependencies": {
     "@types/deep-diff": "0.0.31",
-    "@types/jsonschema": "^1.1.1",
     "@types/long": "^3.0.32",
     "@types/node": "^8.10.2",
     "@types/pako": "^1.0.0",
