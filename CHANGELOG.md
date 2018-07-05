@@ -1,3 +1,7 @@
+## 2.2.1
+
+- Fix getBehavior not exported.
+
 ## 2.2.0
 
 - Added support for parsing extra data of Storage behavior.
