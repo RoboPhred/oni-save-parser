@@ -10,5 +10,3 @@ export * from "./kprefabid";
 export * from "./minion-identity";
 export * from "./minion-resume";
 export * from "./uncoverable";
-
-export * from "./utils";
