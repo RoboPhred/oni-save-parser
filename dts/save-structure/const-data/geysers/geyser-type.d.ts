@@ -1,0 +1,23 @@
+import { HashedString } from "../../data-types";
+export declare const GeyserTypeNames: {
+    steam: "steam";
+    hot_steam: "hot_steam";
+    hot_water: "hot_water";
+    slush_water: "slush_water";
+    filthy_water: "filthy_water";
+    small_volcano: "small_volcano";
+    big_volcano: "big_volcano";
+    liquid_co2: "liquid_co2";
+    hot_co2: "hot_co2";
+    hot_hydrogen: "hot_hydrogen";
+    hot_po2: "hot_po2";
+    slimy_po2: "slimy_po2";
+    chlorine_gas: "chlorine_gas";
+    methane: "methane";
+    molten_copper: "molten_copper";
+    molten_iron: "molten_iron";
+    molten_gold: "molten_gold";
+    oil_drip: "oil_drip";
+};
+export declare type GeyserType = HashedString;
+export declare const GeyserTypes: import("../../../../../../RoboPhred/oni-save-parser/src/save-structure/data-types/hashed-string").HashedStringEnum<"steam" | "hot_steam" | "hot_water" | "slush_water" | "filthy_water" | "small_volcano" | "big_volcano" | "liquid_co2" | "hot_co2" | "hot_hydrogen" | "hot_po2" | "slimy_po2" | "chlorine_gas" | "methane" | "molten_copper" | "molten_iron" | "molten_gold" | "oil_drip">;

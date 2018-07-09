@@ -3,5 +3,4 @@ export * from "./header";
 export * from "./game-objects";
 export * from "./game-data";
 export * from "./type-templates";
-
-export * from "./utils";
+export * from "./const-data";

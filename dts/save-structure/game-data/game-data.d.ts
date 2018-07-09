@@ -1,4 +1,4 @@
-import { Vector2I } from "../../data-types";
+import { Vector2I } from "../../save-structure/data-types";
 export interface SaveGameData {
     gasConduitFlow: any;
     liquidConduitFlow: any;

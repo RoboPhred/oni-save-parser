@@ -1,4 +1,4 @@
-import { Vector3, Quaternion } from "../../../data-types";
+import { Vector3, Quaternion } from "../../../save-structure/data-types";
 import { GameObjectBehavior } from "../game-object-behavior";
 export interface GameObject {
     readonly position: Vector3;

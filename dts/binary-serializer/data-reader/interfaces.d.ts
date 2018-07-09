@@ -1,5 +1,5 @@
 import Long from "long";
-import { Vector3, Quaternion } from "../../data-types";
+import { Vector3, Quaternion } from "../../save-structure/data-types";
 /**
  * A little-endian streaming data reader.
  */

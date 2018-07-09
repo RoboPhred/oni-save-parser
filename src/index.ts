@@ -9,7 +9,7 @@ import {
 } from "./save-structure/parser";
 
 export * from "./save-structure";
-export * from "./data-types";
+export * from "./save-structure/data-types";
 
 export function parseSaveGame(data: ArrayBuffer): SaveGame {
   let reader = new ArrayDataReader(data);

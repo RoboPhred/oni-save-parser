@@ -5,7 +5,7 @@ import {
   writeSingle,
   readInt32,
   writeInt32
-} from "./parser";
+} from "../../parser";
 
 import { Vector2, Vector2I, Vector3, Quaternion } from "./data-types";
 

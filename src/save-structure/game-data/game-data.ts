@@ -1,4 +1,4 @@
-import { Vector2I } from "../../data-types";
+import { Vector2I } from "../../save-structure/data-types";
 
 export interface SaveGameData {
   // TODO: Several type-template types in here.  Type them.

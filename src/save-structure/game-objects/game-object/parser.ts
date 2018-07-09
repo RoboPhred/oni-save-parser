@@ -17,7 +17,7 @@ import {
   parseQuaternion,
   unparseVector3,
   unparseQuaternion
-} from "../../../data-types-parser";
+} from "../../../save-structure/data-types/data-types-parser";
 
 import { GameObject } from "../game-object";
 
