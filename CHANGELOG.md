@@ -1,3 +1,10 @@
+## 3.0.0
+
+- Include hard-coded enumeration and other constant data.
+  -- SimHashes
+  -- GeyserType
+  -- HealthState
+
 ## 2.2.1
 
 - Fix getBehavior not exported.
