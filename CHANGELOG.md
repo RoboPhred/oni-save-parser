@@ -1,3 +1,7 @@
+## 3.0.1
+
+- Export StorageBehavior.
+
 ## 3.0.0
 
 - Include hard-coded enumeration and other constant data.

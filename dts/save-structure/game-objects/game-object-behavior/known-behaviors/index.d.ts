@@ -9,4 +9,5 @@ export * from "./kprefabid";
 export * from "./minion-identity";
 export * from "./minion-resume";
 export * from "./primary-element";
+export * from "./storage";
 export * from "./uncoverable";
