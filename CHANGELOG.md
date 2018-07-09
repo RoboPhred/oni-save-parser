@@ -1,3 +1,7 @@
+## 3.0.2
+
+- Add missing templateData typings to StorageBehavior
+
 ## 3.0.1
 
 - Export StorageBehavior.

@@ -4,7 +4,11 @@ import { BehaviorName } from "../types";
 export declare const StorageBehavior: BehaviorName<StorageBehavior>;
 export interface StorageBehavior extends GameObjectBehavior {
     name: "Storage";
-    templateData: {};
+    templateData: {
+        onlyFetchMarkedItems: boolean;
+        workTimeRemaining: number;
+        numberOfUses: number;
+    };
     extraData: StoredGameObject[];
 }
 export interface StoredGameObject extends GameObject {
