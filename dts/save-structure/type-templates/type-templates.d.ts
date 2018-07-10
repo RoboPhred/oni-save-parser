@@ -135,3 +135,4 @@ export declare function isValueType(type: SerializationTypeInfo): boolean;
  * capable of being generic.
  */
 export declare const GENERIC_TYPES: SerializationTypeCode[];
+export declare const LIST_TYPES: SerializationTypeCode[];

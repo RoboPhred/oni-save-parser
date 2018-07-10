@@ -159,3 +159,9 @@ export const GENERIC_TYPES: SerializationTypeCode[] = [
   SerializationTypeCode.HashSet,
   SerializationTypeCode.UserDefined
 ];
+
+export const LIST_TYPES: SerializationTypeCode[] = [
+  SerializationTypeCode.Array,
+  SerializationTypeCode.List,
+  SerializationTypeCode.HashSet
+];
