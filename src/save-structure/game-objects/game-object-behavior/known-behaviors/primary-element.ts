@@ -6,9 +6,9 @@ import { GameObjectBehavior } from "../game-object-behavior";
 
 import { BehaviorName } from "./types";
 
-export const PrimaryElementBehavior: BehaviorName<PrimaryElement> =
+export const PrimaryElementBehavior: BehaviorName<PrimaryElementBehavior> =
   "PrimaryElement";
-export interface PrimaryElement extends GameObjectBehavior {
+export interface PrimaryElementBehavior extends GameObjectBehavior {
   name: "PrimaryElement";
   templateData: {
     ElementID: SimHashes;

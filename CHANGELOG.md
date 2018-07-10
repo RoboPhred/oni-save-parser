@@ -1,3 +1,7 @@
+## 3.0.3
+
+- Fix PrimaryElementBehavior interface name.
+
 ## 3.0.2
 
 - Add missing templateData typings to StorageBehavior
