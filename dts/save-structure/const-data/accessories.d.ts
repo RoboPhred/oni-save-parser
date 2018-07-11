@@ -8,7 +8,7 @@ export interface Accessory {
     };
 }
 export declare const ACCESSORY_TYPES: ("body" | "eyes" | "hair" | "headshape" | "mouth" | "neck" | "arm" | "hat")[];
-export declare type AccessoryType = ArrayValues<typeof ACCESSORY_TYPES>;
+export declare type AccessoryType = typeof ACCESSORY_TYPES extends (infer R)[] ? R : never;
 export declare const ACCESSORY_EYE_ORDINALS: number[];
 export declare const ACCESSORY_HEAD_ORDINALS: number[];
 export declare const ACCESSORY_MOUTH_ORDINALS: number[];

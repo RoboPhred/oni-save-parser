@@ -22,7 +22,9 @@ export const ACCESSORY_TYPES = [
   "hat" as "hat"
 ];
 
-export type AccessoryType = ArrayValues<typeof ACCESSORY_TYPES>;
+export type AccessoryType = typeof ACCESSORY_TYPES extends (infer R)[]
+  ? R
+  : never;
 
 export const ACCESSORY_EYE_ORDINALS = [1, 2, 3, 4, 5];
 

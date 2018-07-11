@@ -1,3 +1,7 @@
+## 3.2.1
+
+- Fix AccessoryType.
+
 ## 3.2.0
 
 - Add missing accessory slots.
