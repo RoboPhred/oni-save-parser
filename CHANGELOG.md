@@ -1,3 +1,9 @@
+## 4.0.0
+
+- Rework accessory type code to handle non-ordinal and prefix-clashing accessory names.
+  -- prefix clash: "hair" vs "hair_always"
+  -- non-ordinal: "hair_always_DEFAULT"
+
 ## 3.2.1
 
 - Fix AccessoryType.

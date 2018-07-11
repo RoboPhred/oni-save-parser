@@ -1,3 +1,4 @@
+export declare const ACCESSORY_ID_PREFIX = "Root.Accessories.";
 export interface Accessory {
     guid: {
         /**
@@ -7,18 +8,16 @@ export interface Accessory {
         Guid: string;
     };
 }
-export declare const ACCESSORY_TYPES: ("body" | "eyes" | "hair" | "headshape" | "mouth" | "neck" | "arm" | "hat")[];
+export declare const ACCESSORY_TYPES: ("body" | "hat" | "hat_hair" | "hair_always" | "hair" | "headshape" | "eyes" | "mouth" | "neck" | "arm")[];
 export declare type AccessoryType = typeof ACCESSORY_TYPES extends (infer R)[] ? R : never;
-export declare const ACCESSORY_EYE_ORDINALS: number[];
-export declare const ACCESSORY_HEAD_ORDINALS: number[];
-export declare const ACCESSORY_MOUTH_ORDINALS: number[];
-export declare const ACCESSORY_HAIR_ORDINALS: number[];
-export declare const ACCESSORY_BODY_ORDINALS: number[];
-export declare function Accessory(str: string): Accessory;
-export declare function Accessory(type: AccessoryType, ordinal: number): Accessory;
+export declare const ACCESSORY_EYE_NAMES: ("eyes_001" | "eyes_002" | "eyes_003" | "eyes_004" | "eyes_005")[];
+export declare const ACCESSORY_HEAD_NAMES: ("headshape_001" | "headshape_002" | "headshape_003" | "headshape_004")[];
+export declare const ACCESSORY_MOUTH_NAMES: ("mouth_001" | "mouth_002" | "mouth_003" | "mouth_004")[];
+export declare const ACCESSORY_HAIR_NAMES: ("hair_001" | "hair_002" | "hair_003" | "hair_004" | "hair_005" | "hair_006" | "hair_007" | "hair_008" | "hair_009" | "hair_010" | "hair_011" | "hair_012" | "hair_013" | "hair_014" | "hair_015" | "hair_016" | "hair_017" | "hair_018" | "hair_019" | "hair_020" | "hair_021" | "hair_022" | "hair_023" | "hair_027" | "hair_028" | "hair_029" | "hair_030" | "hair_031" | "hair_032" | "hair_033")[];
+export declare const ACCESSORY_BODY_NAMES: ("body_001" | "body_002" | "body_003" | "body_004")[];
+export declare function Accessory(name: string): Accessory;
 export declare function getIndexOfAccessoryType(accessories: Accessory[], type: AccessoryType): number;
 export declare function getAccessoryType(accessory: string | Accessory): AccessoryType | null;
-export declare function getAccessoryOrdinal(accessory: string | Accessory): number | null;
-export declare function makeAccessory(type: AccessoryType, ordinal: number): Accessory;
-export declare function makeAccessoryID(type: AccessoryType, ordinal: number): string;
+export declare function getAccessoryName(accessory: string | Accessory): string | null;
+export declare function makeAccessoryID(name: string): string;
 export declare function getAccessoryOfType(accessories: Accessory[], type: AccessoryType): Accessory | null;

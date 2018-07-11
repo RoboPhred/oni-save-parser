@@ -1,5 +1,6 @@
-const ACCESSORY_PREFIX = "Root.Accessories.";
-const TYPE_EXTRACTOR_REGEX = /^Root\.Accessories\.([a-zA-Z_]+)_(\d\d\d)$/;
+import { format } from "path";
+
+export const ACCESSORY_ID_PREFIX = "Root.Accessories.";
 
 export interface Accessory {
   guid: {
@@ -12,73 +13,89 @@ export interface Accessory {
 }
 
 export const ACCESSORY_TYPES = [
-  "eyes" as "eyes",
+  "hat" as "hat",
+  "hat_hair" as "hat_hair",
+  "hair_always" as "hair_always",
   "hair" as "hair",
   "headshape" as "headshape",
+  "eyes" as "eyes",
   "mouth" as "mouth",
   "neck" as "neck",
-  "arm" as "arm",
   "body" as "body",
-  "hat" as "hat"
+  "arm" as "arm"
 ];
 
 export type AccessoryType = typeof ACCESSORY_TYPES extends (infer R)[]
   ? R
   : never;
 
-export const ACCESSORY_EYE_ORDINALS = [1, 2, 3, 4, 5];
-
-export const ACCESSORY_HEAD_ORDINALS = [1, 2, 3, 4];
-
-export const ACCESSORY_MOUTH_ORDINALS = [1, 2, 3, 4];
-
-export const ACCESSORY_HAIR_ORDINALS = [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  27,
-  28,
-  29,
-  30,
-  31,
-  32,
-  33
+export const ACCESSORY_EYE_NAMES = [
+  "eyes_001" as "eyes_001",
+  "eyes_002" as "eyes_002",
+  "eyes_003" as "eyes_003",
+  "eyes_004" as "eyes_004",
+  "eyes_005" as "eyes_005"
 ];
 
-export const ACCESSORY_BODY_ORDINALS = [1, 2, 3, 4];
+export const ACCESSORY_HEAD_NAMES = [
+  "headshape_001" as "headshape_001",
+  "headshape_002" as "headshape_002",
+  "headshape_003" as "headshape_003",
+  "headshape_004" as "headshape_004"
+];
 
-export function Accessory(str: string): Accessory;
-export function Accessory(type: AccessoryType, ordinal: number): Accessory;
-export function Accessory(
-  type: string | AccessoryType,
-  ordinal?: number
-): Accessory {
+export const ACCESSORY_MOUTH_NAMES = [
+  "mouth_001" as "mouth_001",
+  "mouth_002" as "mouth_002",
+  "mouth_003" as "mouth_003",
+  "mouth_004" as "mouth_004"
+];
+
+export const ACCESSORY_HAIR_NAMES = [
+  "hair_001" as "hair_001",
+  "hair_002" as "hair_002",
+  "hair_003" as "hair_003",
+  "hair_004" as "hair_004",
+  "hair_005" as "hair_005",
+  "hair_006" as "hair_006",
+  "hair_007" as "hair_007",
+  "hair_008" as "hair_008",
+  "hair_009" as "hair_009",
+  "hair_010" as "hair_010",
+  "hair_011" as "hair_011",
+  "hair_012" as "hair_012",
+  "hair_013" as "hair_013",
+  "hair_014" as "hair_014",
+  "hair_015" as "hair_015",
+  "hair_016" as "hair_016",
+  "hair_017" as "hair_017",
+  "hair_018" as "hair_018",
+  "hair_019" as "hair_019",
+  "hair_020" as "hair_020",
+  "hair_021" as "hair_021",
+  "hair_022" as "hair_022",
+  "hair_023" as "hair_023",
+  "hair_027" as "hair_027",
+  "hair_028" as "hair_028",
+  "hair_029" as "hair_029",
+  "hair_030" as "hair_030",
+  "hair_031" as "hair_031",
+  "hair_032" as "hair_032",
+  "hair_033" as "hair_033"
+];
+
+export const ACCESSORY_BODY_NAMES = [
+  "body_001" as "body_001",
+  "body_002" as "body_002",
+  "body_003" as "body_003",
+  "body_004" as "body_004"
+];
+
+export function Accessory(name: string): Accessory {
   let target: Accessory = (new.target || {}) as any;
-  if (arguments.length === 1) {
-    target.guid.Guid = type;
-  } else {
-    target.guid.Guid = makeAccessoryID(type as AccessoryType, ordinal!);
-  }
+  target.guid = {
+    Guid: makeAccessoryID(name)
+  };
   return target;
 }
 
@@ -87,42 +104,47 @@ export function getIndexOfAccessoryType(
   type: AccessoryType
 ): number {
   return accessories.findIndex(acc => {
-    const guid = acc.guid.Guid;
-    const match = TYPE_EXTRACTOR_REGEX.exec(guid);
-    if (!match) return false;
-    return match[1] === type;
+    const accType = getAccessoryType(acc);
+    return type === accType;
   });
 }
 
 export function getAccessoryType(
   accessory: string | Accessory
 ): AccessoryType | null {
-  accessory = accessoryToId(accessory);
-  const match = TYPE_EXTRACTOR_REGEX.exec(accessory);
-  if (!match) return null;
-  return match[1] as AccessoryType;
-}
-
-export function getAccessoryOrdinal(
-  accessory: string | Accessory
-): number | null {
-  accessory = accessoryToId(accessory);
-  const match = TYPE_EXTRACTOR_REGEX.exec(accessory);
-  if (!match) return null;
-  // These all start at 1, so its safe to assume null here if we
-  //  didn't parse a number.
-  return Number(match[2]) || null;
-}
-
-export function makeAccessory(type: AccessoryType, ordinal: number): Accessory {
-  return {
-    guid: {
-      Guid: makeAccessoryID(type, ordinal)
+  const guid = accessoryToGuid(accessory);
+  if (!guid.startsWith(ACCESSORY_ID_PREFIX)) {
+    return null;
+  }
+  const id = guid.substr(ACCESSORY_ID_PREFIX.length);
+  // Determining the type is a bit problematic, as we have
+  //  some types that are prefixes of other types.
+  // The game itself can resolve this as it looks up
+  //  exact matches, but we need to be able to handle
+  //  values we are not aware of.
+  // Below is an attempt at a solution in which we find the longest
+  //  matching type
+  return ACCESSORY_TYPES.reduce((matchType: AccessoryType | null, type) => {
+    if (
+      id.startsWith(type + "_") &&
+      (matchType == null || type.length > matchType.length)
+    ) {
+      return type;
     }
-  };
+    return matchType;
+  }, null);
 }
-export function makeAccessoryID(type: AccessoryType, ordinal: number): string {
-  return `${ACCESSORY_PREFIX}${type}_${leftPad(ordinal, "0", 3)}`;
+
+export function getAccessoryName(accessory: string | Accessory): string | null {
+  const guid = accessoryToGuid(accessory);
+  if (!guid.startsWith(ACCESSORY_ID_PREFIX)) {
+    return null;
+  }
+  return guid.substr(ACCESSORY_ID_PREFIX.length);
+}
+
+export function makeAccessoryID(name: string): string {
+  return `${ACCESSORY_ID_PREFIX}${name}`;
 }
 
 export function getAccessoryOfType(
@@ -134,20 +156,9 @@ export function getAccessoryOfType(
   return accessories[index];
 }
 
-function accessoryToId(accessory: string | Accessory): string {
+function accessoryToGuid(accessory: string | Accessory): string {
   if (typeof accessory === "string") {
     return accessory;
   }
   return accessory.guid.Guid;
-}
-
-function leftPad(str: any, pad: string, length: number): string {
-  str = String(str);
-  if (pad.length == 0) return str;
-
-  while (str.length < length) {
-    str = pad + str;
-  }
-
-  return str;
 }
