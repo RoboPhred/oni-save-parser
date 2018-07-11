@@ -1,3 +1,4 @@
+export * from "./accessories";
 export * from "./geysers";
 export * from "./roles";
 

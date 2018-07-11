@@ -1,3 +1,8 @@
+## 3.1.0
+
+- Add missing accessory slots.
+- Added map tying minion identity bodyData slots to accessories.
+
 ## 3.0.3
 
 - Fix PrimaryElementBehavior interface name.
