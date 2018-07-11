@@ -1,13 +1,13 @@
-## 3.1.0
+## 3.2.0
 
 - Add missing accessory slots.
 - Added map tying minion identity bodyData slots to accessories.
 
-## 3.0.3
+## 3.1.1
 
 - Fix PrimaryElementBehavior interface name.
 
-## 3.0.2
+## 3.1.0
 
 - Add missing templateData typings to StorageBehavior
 
