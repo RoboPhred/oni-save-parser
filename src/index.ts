@@ -1,6 +1,6 @@
 import { ArrayDataReader, ArrayDataWriter } from "./binary-serializer";
 
-import { parse, unparse } from "./parser";
+import { parse, unparse, ParseInterceptor, UnparseInterceptor } from "./parser";
 
 import { SaveGame } from "./save-structure";
 import {
@@ -11,14 +11,22 @@ import {
 export * from "./save-structure";
 export * from "./save-structure/data-types";
 
-export function parseSaveGame(data: ArrayBuffer): SaveGame {
+export { progressReporter } from "./progress";
+
+export function parseSaveGame(
+  data: ArrayBuffer,
+  interceptor?: ParseInterceptor
+): SaveGame {
   let reader = new ArrayDataReader(data);
-  const saveGame = parse<SaveGame>(reader, saveGameParser());
+  const saveGame = parse<SaveGame>(reader, saveGameParser(), interceptor);
   return saveGame;
 }
 
-export function writeSaveGame(save: SaveGame): ArrayBuffer {
+export function writeSaveGame(
+  save: SaveGame,
+  interceptor?: UnparseInterceptor
+): ArrayBuffer {
   const writer = new ArrayDataWriter();
-  unparse<SaveGame>(writer, saveGameUnparser(save));
+  unparse<SaveGame>(writer, saveGameUnparser(save), interceptor);
   return writer.getBytes();
 }

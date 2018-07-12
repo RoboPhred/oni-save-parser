@@ -2,10 +2,18 @@ import { readFileSync, writeFileSync } from "fs";
 
 import { diff } from "deep-diff";
 
-import { parseSaveGame, writeSaveGame } from "../index";
+import { parseSaveGame, writeSaveGame, progressReporter } from "../index";
 import { SaveGame } from "../save-structure";
 
-const fileName = process.argv.length > 2 ? process.argv[2] : "TestShennanigans";
+import minimist from "minimist";
+
+const args = minimist(process.argv.slice(2), {
+  boolean: "progress"
+});
+
+const showProgress = args.progress;
+
+const fileName = args._[0] || "TestShennanigans";
 
 console.log("Loading save");
 const saveData = loadFile(fileName);
@@ -53,10 +61,19 @@ function checkDiff(original: SaveGame, modified: SaveGame) {
 
 function loadFile(fileName: string): SaveGame {
   const fileData = readFileSync(`./test-data/${fileName}.sav`);
-  return parseSaveGame(fileData.buffer);
+
+  const interceptor = showProgress
+    ? progressReporter(console.log.bind(console, "LOADING"))
+    : undefined;
+
+  return parseSaveGame(fileData.buffer, interceptor);
 }
 
 function saveFile(fileName: string, save: SaveGame) {
-  const fileData = writeSaveGame(save);
+  const interceptor = showProgress
+    ? progressReporter(console.log.bind(console, "SAVING"))
+    : undefined;
+
+  const fileData = writeSaveGame(save, interceptor);
   writeFileSync(`./test-data/${fileName}.sav`, new Uint8Array(fileData));
 }

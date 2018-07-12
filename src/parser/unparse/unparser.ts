@@ -7,10 +7,16 @@ import {
   DataLengthToken
 } from "./write-instructions";
 import { ParseError } from "../errors";
+import { isMetaInstruction } from "../types";
 
 export type UnparseIterator = IterableIterator<any>;
+export type UnparseInterceptor = (value: any) => any;
 
-export function unparse<T>(writer: DataWriter, unparser: UnparseIterator): T {
+export function unparse<T>(
+  writer: DataWriter,
+  unparser: UnparseIterator,
+  interceptor?: UnparseInterceptor
+): T {
   let nextValue: any = undefined;
   while (true) {
     let iteratorResult: IteratorResult<any>;
@@ -19,17 +25,21 @@ export function unparse<T>(writer: DataWriter, unparser: UnparseIterator): T {
     } catch (e) {
       throw ParseError.create(e, writer.position);
     }
-    const { value, done } = iteratorResult;
-    if (isWriteInstruction(value)) {
-      try {
-        nextValue = executeWriteInstruction(writer, value);
-      } catch (e) {
-        throw ParseError.create(e, writer.position);
+    let { value, done } = iteratorResult;
+    value = interceptor ? interceptor(value) : value;
+
+    if (!isMetaInstruction(value)) {
+      if (isWriteInstruction(value)) {
+        try {
+          nextValue = executeWriteInstruction(writer, value);
+        } catch (e) {
+          throw ParseError.create(e, writer.position);
+        }
+      } else if (!done) {
+        throw new Error("Cannot yield a non-parse-instruction.");
+      } else {
+        nextValue = value;
       }
-    } else if (!done) {
-      throw new Error("Cannot yield a non-parse-instruction.");
-    } else {
-      nextValue = value;
     }
 
     if (done) {
@@ -46,7 +56,8 @@ type TypedWriteInstruction<T extends WriteDataTypes> = Extract<
 >;
 type WriteParser<T extends WriteDataTypes> = (
   writer: DataWriter,
-  inst: TypedWriteInstruction<T>
+  inst: TypedWriteInstruction<T>,
+  interceptor?: UnparseInterceptor
 ) => any;
 type WriteParsers = { [P in WriteDataTypes]: WriteParser<P> };
 
@@ -78,21 +89,22 @@ const writeParsers: WriteParsers = {
       r.position - (i.token.startPosition + 4),
       i.token.writePosition
     ),
-  compressed: (r, i) => {
+  compressed: (r, i, interceptor) => {
     const writer = new ZlibDataWriter();
-    unparse(writer, i.unparser);
+    unparse(writer, i.unparser, interceptor);
     r.writeBytes(writer.getBytesView());
   }
 };
 
 function executeWriteInstruction<T extends WriteDataTypes>(
   writer: DataWriter,
-  inst: TypedWriteInstruction<T>
+  inst: TypedWriteInstruction<T>,
+  interceptor?: UnparseInterceptor
 ): any {
   if (inst.type !== "write") {
     throw new Error("Expected a write parse instruction.");
   }
 
   const writeFunc = writeParsers[inst.dataType] as WriteParser<T>;
-  return writeFunc(writer, inst);
+  return writeFunc(writer, inst, interceptor);
 }

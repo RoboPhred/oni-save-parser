@@ -21,6 +21,7 @@ import { GameObject } from "../game-object";
 import { parseGameObject, unparseGameObject } from "../game-object/parser";
 
 import { GameObjectGroup } from "./game-object-group";
+import { reportProgress } from "../../../progress";
 
 export function* parseGameObjectGroup(
   templateParser: TemplateParser
@@ -34,6 +35,7 @@ export function* parseGameObjectGroup(
 
   const gameObjects: GameObject[] = new Array(instanceCount);
   for (let i = 0; i < instanceCount; i++) {
+    yield reportProgress(`GameObjectGroup::${prefabName}::${i}`);
     gameObjects[i] = yield* parseGameObject(templateParser);
   }
 
@@ -68,7 +70,9 @@ export function* unparseGameObjectGroup(
   yield writeInt32(gameObjects.length);
 
   const lengthToken = yield writeDataLengthBegin();
-  for (const gameObject of gameObjects) {
+  for (let i = 0; i < gameObjects.length; i++) {
+    const gameObject = gameObjects[i];
+    yield reportProgress(`GameObjectGroup::${name}::${i}`);
     yield* unparseGameObject(gameObject, templateWriter);
   }
 
