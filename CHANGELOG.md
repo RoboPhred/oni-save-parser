@@ -1,3 +1,8 @@
+## 4.1.0
+
+- Basic progress reporting (game object start only)
+- Restore MinionModifiers
+
 ## 4.0.0
 
 - Rework accessory type code to handle non-ordinal and prefix-clashing accessory names.
