@@ -25,15 +25,26 @@ interface ExtraDataParser {
   unparse(value: any, templateUnparser: TemplateUnparser): UnparseIterator;
 }
 
+import { StorageBehavior } from "./known-behaviors/storage";
 import {
   parseStorageExtraData,
   unparseStorageExtraData
 } from "./known-behaviors/storage/parser";
 
+import { MinionModifiersBehavior } from "./known-behaviors/minion-modifiers";
+import {
+  parseMinionModifiersExtraData,
+  unparseMinionModifiersExtraData
+} from "./known-behaviors/minion-modifiers/parser";
+
 const EXTRA_DATA_PARSERS: Record<string, ExtraDataParser> = {
-  Storage: {
+  [StorageBehavior]: {
     parse: parseStorageExtraData,
     unparse: unparseStorageExtraData
+  },
+  [MinionModifiersBehavior]: {
+    parse: parseMinionModifiersExtraData,
+    unparse: unparseMinionModifiersExtraData
   }
 };
 
