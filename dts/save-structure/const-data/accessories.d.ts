@@ -15,6 +15,7 @@ export declare const ACCESSORY_HEAD_NAMES: ("headshape_001" | "headshape_002" | 
 export declare const ACCESSORY_MOUTH_NAMES: ("mouth_001" | "mouth_002" | "mouth_003" | "mouth_004")[];
 export declare const ACCESSORY_HAIR_NAMES: ("hair_001" | "hair_002" | "hair_003" | "hair_004" | "hair_005" | "hair_006" | "hair_007" | "hair_008" | "hair_009" | "hair_010" | "hair_011" | "hair_012" | "hair_013" | "hair_014" | "hair_015" | "hair_016" | "hair_017" | "hair_018" | "hair_019" | "hair_020" | "hair_021" | "hair_022" | "hair_023" | "hair_027" | "hair_028" | "hair_029" | "hair_030" | "hair_031" | "hair_032" | "hair_033")[];
 export declare const ACCESSORY_BODY_NAMES: ("body_001" | "body_002" | "body_003" | "body_004")[];
+export declare const ACCESSORIES_BY_TYPE: Record<AccessoryType, string[] | null>;
 export declare function Accessory(name: string): Accessory;
 export declare function getIndexOfAccessoryType(accessories: Accessory[], type: AccessoryType): number;
 export declare function getAccessoryType(accessory: string | Accessory): AccessoryType | null;
