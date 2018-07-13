@@ -1,6 +1,7 @@
-## 4.1.1
+## 4.2.0
 
 - Fix MinionModifiers not exported.
+- Add ACCESSORIES_BY_TYPE
 
 ## 4.1.0
 

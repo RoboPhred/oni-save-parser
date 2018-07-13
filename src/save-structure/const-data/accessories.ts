@@ -91,6 +91,19 @@ export const ACCESSORY_BODY_NAMES = [
   "body_004" as "body_004"
 ];
 
+export const ACCESSORIES_BY_TYPE: Record<AccessoryType, string[] | null> = {
+  body: ACCESSORY_BODY_NAMES,
+  hat: null,
+  hat_hair: null,
+  hair_always: null,
+  hair: ACCESSORY_HAIR_NAMES,
+  headshape: ACCESSORY_HEAD_NAMES,
+  eyes: ACCESSORY_EYE_NAMES,
+  mouth: ACCESSORY_MOUTH_NAMES,
+  neck: null,
+  arm: null
+};
+
 export function Accessory(name: string): Accessory {
   let target: Accessory = (new.target || {}) as any;
   target.guid = {
