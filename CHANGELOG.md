@@ -1,6 +1,10 @@
+## 4.2.2
+
+- Fix MinionModifierBehavior types. Again.
+
 ## 4.2.1
 
-- Fix MinionModifiers type.
+- Fix MinionModifierBehavior types.
 
 ## 4.2.0
 
