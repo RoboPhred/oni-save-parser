@@ -1,3 +1,7 @@
+## 4.1.1
+
+- Fix MinionModifiers not exported.
+
 ## 4.1.0
 
 - Basic progress reporting (game object start only)

@@ -8,6 +8,7 @@ export * from "./geyser";
 export * from "./health";
 export * from "./kprefabid";
 export * from "./minion-identity";
+export * from "./minion-modifiers";
 export * from "./minion-resume";
 export * from "./primary-element";
 export * from "./storage";
