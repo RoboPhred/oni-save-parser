@@ -4,7 +4,7 @@ export declare const MinionModifiersBehavior: BehaviorName<MinionModifiersBehavi
 export interface MinionModifiersBehavior extends GameObjectBehavior {
     name: "MinionModifiers";
     templateData: {};
-    extraData: MinionModifiersExtraData[];
+    extraData: MinionModifiersExtraData;
 }
 /**
  * MinionModifiers is a Modifiers object with some extra runtime behavior.
