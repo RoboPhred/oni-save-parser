@@ -29,15 +29,15 @@ export interface MinionModifiersExtraData {
 
 export interface ModificationInstance {
   name: string;
-  data: any;
+  value: any;
 }
 
 export interface AmountInstance extends ModificationInstance {
-  data: number;
+  value: { value: number };
 }
 
 export interface DiseaseInstance extends ModificationInstance {
-  data: {
+  value: {
     diseaseId: string;
     infectionSourceInfo: string;
   };

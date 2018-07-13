@@ -95,7 +95,7 @@ function* parseModifier<T extends ModificationInstance>(
   const dataLength = yield readInt32();
 
   const startPos = yield getReaderPosition();
-  const data = yield* templateParser.parseByTemplate(modifierInstanceType);
+  const value = yield* templateParser.parseByTemplate(modifierInstanceType);
   const endPos = yield getReaderPosition();
 
   const dataRemaining = dataLength - (endPos - startPos);
@@ -109,7 +109,7 @@ function* parseModifier<T extends ModificationInstance>(
 
   const instance: ModificationInstance = {
     name,
-    data: data
+    value
   };
 
   return instance as T;
@@ -124,7 +124,7 @@ function* unparseModifier<T extends ModificationInstance>(
 
   const token = yield writeDataLengthBegin();
   yield* templateUnparser.unparseByTemplate(
-    instance.data,
+    instance.value,
     modifierInstanceType
   );
   yield writeDataLengthEnd(token);
