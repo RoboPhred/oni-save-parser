@@ -31,7 +31,7 @@ export function unparse<T>(
     if (!isMetaInstruction(value)) {
       if (isWriteInstruction(value)) {
         try {
-          nextValue = executeWriteInstruction(writer, value);
+          nextValue = executeWriteInstruction(writer, value, interceptor);
         } catch (e) {
           throw ParseError.create(e, writer.position);
         }
