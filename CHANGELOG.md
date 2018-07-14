@@ -1,3 +1,7 @@
+## 4.2.3
+
+- Fix crash on save from MinionModifierBehavior.
+
 ## 4.2.2
 
 - Fix MinionModifierBehavior types. Again.
