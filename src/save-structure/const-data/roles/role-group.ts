@@ -1,6 +1,6 @@
 import { createHashedStringEnum, HashedString } from "../../data-types";
 
-export const MinionRoleNames = [
+export const MinionRoleGroupNames = [
   "Farming" as "Farming",
   "Ranching" as "Ranching",
   "Mining" as "Mining",
@@ -15,6 +15,6 @@ export const MinionRoleNames = [
   "MedicalAid" as "MedicalAid",
   "Basekeeping" as "Basekeeping"
 ];
-export type MinionRole = HashedString;
+export type MinionRoleGroup = HashedString;
 
-export const MinionRole = createHashedStringEnum(MinionRoleNames);
+export const MinionRoleGroup = createHashedStringEnum(MinionRoleGroupNames);
