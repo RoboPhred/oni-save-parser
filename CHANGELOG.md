@@ -1,3 +1,8 @@
+## 5.0.0
+
+- Make ACCOESSORY consts be CamelCase consistent with other consts.
+- Rename MinionRole to MinionRoleGroup to reflect its actual contents.
+
 ## 4.2.0
 
 - Fix MinionModifiers not exported.
