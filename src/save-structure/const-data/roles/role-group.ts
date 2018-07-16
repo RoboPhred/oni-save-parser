@@ -17,4 +17,4 @@ export const MinionRoleNames = [
 ];
 export type MinionRole = HashedString;
 
-export const MinionRoles = createHashedStringEnum(MinionRoleNames);
+export const MinionRole = createHashedStringEnum(MinionRoleNames);

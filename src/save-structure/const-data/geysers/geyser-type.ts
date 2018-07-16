@@ -23,4 +23,4 @@ export const GeyserTypeNames = [
 
 export type GeyserType = HashedString;
 
-export const GeyserTypes = createHashedStringEnum(GeyserTypeNames);
+export const GeyserType = createHashedStringEnum(GeyserTypeNames);
