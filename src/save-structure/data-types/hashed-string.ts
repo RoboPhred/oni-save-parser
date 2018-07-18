@@ -4,14 +4,14 @@ export interface HashedString {
 
 export function HashedString(str: string): HashedString {
   let target: HashedString = (new.target || {}) as any;
-  target.hash = getSDBMHash32(str);
+  target.hash = getSDBM32LowerHash(str);
   Object.freeze(target);
   return target;
 }
 
 export function getHashedString(str: string): HashedString {
   return {
-    hash: getSDBMHash32(str)
+    hash: getSDBM32LowerHash(str)
   };
 }
 
@@ -40,10 +40,11 @@ export function createHashedStringEnum<T extends string>(
  * This is the algorithm ONI uses for HashString, whose values appear through the save file.
  * @param str The string to hash
  */
-function getSDBMHash32(str: string): number {
+function getSDBM32LowerHash(str: string): number {
   if (str == null) {
     return 0;
   }
+  str = str.toLowerCase();
 
   let num = 0;
   for (let index = 0; index < str.length; ++index) {

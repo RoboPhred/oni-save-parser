@@ -2,6 +2,7 @@
 
 - Make ACCOESSORY consts be CamelCase consistent with other consts.
 - Rename MinionRole to MinionRoleGroup to reflect its actual contents.
+- Fix incorrect HashedString hashes due to case sensitivity.
 
 ## 4.2.0
 
