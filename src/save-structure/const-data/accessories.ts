@@ -12,7 +12,7 @@ export interface Accessory {
   };
 }
 
-export const ACCESSORY_TYPES = [
+export const AccessoryTypes = [
   "hat" as "hat",
   "hat_hair" as "hat_hair",
   "hair_always" as "hair_always",
@@ -25,11 +25,11 @@ export const ACCESSORY_TYPES = [
   "arm" as "arm"
 ];
 
-export type AccessoryType = typeof ACCESSORY_TYPES extends (infer R)[]
+export type AccessoryType = typeof AccessoryTypes extends (infer R)[]
   ? R
   : never;
 
-export const ACCESSORY_EYE_NAMES = [
+export const EyeAccessoryNames = [
   "eyes_001" as "eyes_001",
   "eyes_002" as "eyes_002",
   "eyes_003" as "eyes_003",
@@ -37,21 +37,21 @@ export const ACCESSORY_EYE_NAMES = [
   "eyes_005" as "eyes_005"
 ];
 
-export const ACCESSORY_HEAD_NAMES = [
+export const HeadshapeAccessoryNames = [
   "headshape_001" as "headshape_001",
   "headshape_002" as "headshape_002",
   "headshape_003" as "headshape_003",
   "headshape_004" as "headshape_004"
 ];
 
-export const ACCESSORY_MOUTH_NAMES = [
+export const MouthAccessoryNames = [
   "mouth_001" as "mouth_001",
   "mouth_002" as "mouth_002",
   "mouth_003" as "mouth_003",
   "mouth_004" as "mouth_004"
 ];
 
-export const ACCESSORY_HAIR_NAMES = [
+export const HairAccessoryNames = [
   "hair_001" as "hair_001",
   "hair_002" as "hair_002",
   "hair_003" as "hair_003",
@@ -84,22 +84,22 @@ export const ACCESSORY_HAIR_NAMES = [
   "hair_033" as "hair_033"
 ];
 
-export const ACCESSORY_BODY_NAMES = [
+export const BodyAccessoryNames = [
   "body_001" as "body_001",
   "body_002" as "body_002",
   "body_003" as "body_003",
   "body_004" as "body_004"
 ];
 
-export const ACCESSORIES_BY_TYPE: Record<AccessoryType, string[] | null> = {
-  body: ACCESSORY_BODY_NAMES,
+export const AccessoriesByType: Record<AccessoryType, string[] | null> = {
+  body: BodyAccessoryNames,
   hat: null,
   hat_hair: null,
   hair_always: null,
-  hair: ACCESSORY_HAIR_NAMES,
-  headshape: ACCESSORY_HEAD_NAMES,
-  eyes: ACCESSORY_EYE_NAMES,
-  mouth: ACCESSORY_MOUTH_NAMES,
+  hair: HairAccessoryNames,
+  headshape: HeadshapeAccessoryNames,
+  eyes: EyeAccessoryNames,
+  mouth: MouthAccessoryNames,
   neck: null,
   arm: null
 };
@@ -137,7 +137,7 @@ export function getAccessoryType(
   //  values we are not aware of.
   // Below is an attempt at a solution in which we find the longest
   //  matching type
-  return ACCESSORY_TYPES.reduce((matchType: AccessoryType | null, type) => {
+  return AccessoryTypes.reduce((matchType: AccessoryType | null, type) => {
     if (
       id.startsWith(type + "_") &&
       (matchType == null || type.length > matchType.length)
