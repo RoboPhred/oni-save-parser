@@ -1,3 +1,7 @@
+## vNext(5.1.0)
+
+- Compatibility with Expressive Update.
+
 ## 5.0.0
 
 - Make ACCOESSORY consts be CamelCase consistent with other consts.
