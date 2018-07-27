@@ -332,6 +332,10 @@ const typeParsers: Record<SerializationTypeCode, TypeParser> = {
       }
     }
   },
+  [SerializationTypeCode.Queue]: {
+    parse: parseArrayLike,
+    unparse: unparseArrayLike
+  },
   [SerializationTypeCode.SByte]: {
     parse: function*() {
       return yield readSByte();
