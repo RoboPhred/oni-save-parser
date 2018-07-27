@@ -4,15 +4,27 @@
 - Rename MinionRole to MinionRoleGroup to reflect its actual contents.
 - Fix incorrect HashedString hashes due to case sensitivity.
 
+## 4.2.3
+
+- Fix crash on save from MinionModifierBehavior.
+
+## 4.2.2
+
+- Fix MinionModifierBehavior types. Again.
+
+## 4.2.1
+
+- Fix MinionModifierBehavior types.
+
 ## 4.2.0
 
 - Fix MinionModifiers not exported.
-- Add ACCESSORIES_BY_TYPE
+- Add ACCESSORIES_BY_TYPE.
 
 ## 4.1.0
 
-- Basic progress reporting (game object start only)
-- Restore MinionModifiers
+- Basic progress reporting (game object start only).
+- Restore MinionModifiers.
 
 ## 4.0.0
 
@@ -35,7 +47,7 @@
 
 ## 3.1.0
 
-- Add missing templateData typings to StorageBehavior
+- Add missing templateData typings to StorageBehavior.
 
 ## 3.0.1
 

@@ -24,15 +24,15 @@ Typescript typedefs are included in this package, ready for use by typescript or
 
 ## Design Philosophy
 
-### Idiompotent load-save cycle
+### Idempotent load-save cycle
 
-This library intends to provide an idiompotent load/save cycle: A save file that is loaded then written should generate a new file with identical content to the original. While the resulting file may differ due to implementation differences in the zlib compression library, the uncompressed content should be identical.
+This library intends to provide an idempotent load/save cycle: A save file that is loaded then written should generate a new file with identical content to the original. While the resulting file may differ due to implementation differences in the zlib compression library, the uncompressed content should be identical.
 
-Due to this, the api uses arrays of key-value tuples rather than objects or Maps. This is required to guarentee the ordering of the elements remains the same.
+Due to this, the api uses arrays of key-value tuples rather than objects or Maps. This is required to guarantee the ordering of the elements remains the same.
 
 The intent is to ensure as little data changes in the save as possible, to guard against potential cases where the ONI code makes assumptions or contains bugs regarding the ordering of data in data structures that might otherwise seem unordered.
 
-A practical upshot of this is that the guarenteed order allows us to efficiently test the parser by round-trip loading and saving a file. By recording each parse instruction used when loading a file, we can ensure we receive the same write-equivalent instructions on saving. Any differences detected indicates that either the load or save operation is treating data differently than its counterpart, indicating a logic error. This check is made possible by the trampoline parser. See below for more information.
+A practical upshot of this is that the guaranteed order allows us to efficiently test the parser by round-trip loading and saving a file. By recording each parse instruction used when loading a file, we can ensure we receive the same write-equivalent instructions on saving. Any differences detected indicates that either the load or save operation is treating data differently than its counterpart, indicating a logic error. This check is made possible by the trampoline parser. See below for more information.
 
 ### Instruction-based 'trampoline' parser
 

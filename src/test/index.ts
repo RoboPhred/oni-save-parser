@@ -1,17 +1,27 @@
 import { readFileSync, writeFileSync } from "fs";
 
+import compose from "lodash.flowright";
+
 import { diff } from "deep-diff";
 
-import { parseSaveGame, writeSaveGame, progressReporter } from "../index";
+import {
+  parseSaveGame,
+  writeSaveGame,
+  progressReporter,
+  tagReporter
+} from "../index";
 import { SaveGame } from "../save-structure";
 
 import minimist from "minimist";
 
+const currentTagPath: string[] = [];
+
 const args = minimist(process.argv.slice(2), {
-  boolean: "progress"
+  boolean: ["progress", "progress-tags"]
 });
 
 const showProgress = args.progress;
+const showTags = args["progress-tags"];
 
 const fileName = args._[0] || "TestShennanigans";
 
@@ -62,18 +72,67 @@ function checkDiff(original: SaveGame, modified: SaveGame) {
 function loadFile(fileName: string): SaveGame {
   const fileData = readFileSync(`./test-data/${fileName}.sav`);
 
-  const interceptor = showProgress
-    ? progressReporter(console.log.bind(console, "LOADING"))
-    : undefined;
+  let interceptors = [];
 
-  return parseSaveGame(fileData.buffer, interceptor);
+  if (showProgress) {
+    interceptors.push(progressReporter(console.log.bind(console, "LOADING")));
+  }
+  if (showTags) {
+    interceptors.push(
+      tagReporter(
+        console.log.bind(console, "LOAD-TAG-START"),
+        console.log.bind(console, "LOAD-TAG-END")
+      )
+    );
+  }
+
+  const interceptor = (compose as any)((x: any) => x, ...interceptors);
+
+  try {
+    return parseSaveGame(fileData.buffer, interceptor);
+  } catch (e) {
+    console.error(`Load error at ${currentTagPath.join(" => ")}`);
+    e.tagPath = [...currentTagPath];
+    throw e;
+  }
 }
 
 function saveFile(fileName: string, save: SaveGame) {
-  const interceptor = showProgress
-    ? progressReporter(console.log.bind(console, "SAVING"))
-    : undefined;
+  let interceptors = [];
 
-  const fileData = writeSaveGame(save, interceptor);
-  writeFileSync(`./test-data/${fileName}.sav`, new Uint8Array(fileData));
+  if (showProgress) {
+    interceptors.push(progressReporter(console.log.bind(console, "SAVING")));
+  }
+
+  interceptors.push(tagReporter(onTagStart, onTagEnd));
+
+  const interceptor = (compose as any)((x: any) => x, ...interceptors);
+
+  try {
+    const fileData = writeSaveGame(save, interceptor);
+    writeFileSync(`./test-data/${fileName}.sav`, new Uint8Array(fileData));
+  } catch (e) {
+    console.error(`Save error at ${currentTagPath.join(" => ")}`);
+    e.tagPath = [...currentTagPath];
+    throw e;
+  }
+}
+
+function onTagStart(tagName: string, instanceName: string | null) {
+  if (showTags) {
+    console.log("TAG_START", tagName, instanceName);
+  }
+  const part = instanceName ? `${tagName}::${instanceName}` : tagName;
+  currentTagPath.push(part);
+}
+function onTagEnd(tagName: string, instanceName: string | null) {
+  if (showTags) {
+    console.log("TAG_END", tagName, instanceName);
+  }
+
+  const part = instanceName ? `${tagName}::${instanceName}` : tagName;
+  if (currentTagPath[currentTagPath.length - 1] !== part) {
+    debugger;
+  }
+  currentTagPath.pop();
 }

@@ -12,6 +12,7 @@ export * from "./save-structure";
 export * from "./save-structure/data-types";
 
 export { progressReporter } from "./progress";
+export { tagReporter } from "./tagger";
 
 export function parseSaveGame(
   data: ArrayBuffer,

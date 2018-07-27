@@ -124,8 +124,8 @@ function* unparseModifier<T extends ModificationInstance>(
 
   const token = yield writeDataLengthBegin();
   yield* templateUnparser.unparseByTemplate(
-    instance.value,
-    modifierInstanceType
+    modifierInstanceType,
+    instance.value
   );
   yield writeDataLengthEnd(token);
 }
