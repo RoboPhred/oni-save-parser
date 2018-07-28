@@ -1,3 +1,7 @@
+## 5.0.1
+
+- Update save header version comparison to match official EU release.
+
 ## 5.0.0
 
 - Make ACCOESSORY consts be CamelCase consistent with other consts.
