@@ -1,3 +1,7 @@
+## 5.1.1
+
+- Update header version check to match official release of Expressive Update.
+
 ## 5.1.0
 
 - Compatibility with Expressive Update.
