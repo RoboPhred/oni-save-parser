@@ -1,6 +1,14 @@
+## 5.1.1
+
+- Update header version check to match official release of Expressive Update.
+
+## 5.1.0
+
+- Compatibility with Expressive Update.
+
 ## 5.0.0
 
-- Make ACCOESSORY consts be CamelCase consistent with other consts.
+- Make ACCESSORY consts be CamelCase consistent with other consts.
 - Rename MinionRole to MinionRoleGroup to reflect its actual contents.
 - Fix incorrect HashedString hashes due to case sensitivity.
 

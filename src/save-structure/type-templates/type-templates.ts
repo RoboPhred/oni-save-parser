@@ -105,7 +105,8 @@ export enum SerializationTypeInfo {
   Dictionary = 19,
   List = 20,
   HashSet = 21,
-  Colour = 22,
+  Queue = 22,
+  Colour = 23,
   VALUE_MASK = 63,
   IS_VALUE_TYPE = 64,
   IS_GENERIC_TYPE = 128
@@ -134,7 +135,8 @@ export enum SerializationTypeCode {
   Dictionary = 19,
   List = 20,
   HashSet = 21,
-  Colour = 22
+  Queue = 22,
+  Colour = 23
 }
 
 // TODO: This needs to be changed based on the current version due to cosmos update changing the VALUE_MASK constant.
@@ -157,11 +159,13 @@ export const GENERIC_TYPES: SerializationTypeCode[] = [
   SerializationTypeCode.Dictionary,
   SerializationTypeCode.List,
   SerializationTypeCode.HashSet,
-  SerializationTypeCode.UserDefined
+  SerializationTypeCode.UserDefined,
+  SerializationTypeCode.Queue
 ];
 
 export const LIST_TYPES: SerializationTypeCode[] = [
   SerializationTypeCode.Array,
   SerializationTypeCode.List,
-  SerializationTypeCode.HashSet
+  SerializationTypeCode.HashSet,
+  SerializationTypeCode.Queue
 ];

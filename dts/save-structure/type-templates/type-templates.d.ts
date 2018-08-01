@@ -98,7 +98,8 @@ export declare enum SerializationTypeInfo {
     Dictionary = 19,
     List = 20,
     HashSet = 21,
-    Colour = 22,
+    Queue = 22,
+    Colour = 23,
     VALUE_MASK = 63,
     IS_VALUE_TYPE = 64,
     IS_GENERIC_TYPE = 128
@@ -126,7 +127,8 @@ export declare enum SerializationTypeCode {
     Dictionary = 19,
     List = 20,
     HashSet = 21,
-    Colour = 22
+    Queue = 22,
+    Colour = 23
 }
 export declare function getTypeCode(type: SerializationTypeInfo): SerializationTypeCode;
 export declare function isValueType(type: SerializationTypeInfo): boolean;

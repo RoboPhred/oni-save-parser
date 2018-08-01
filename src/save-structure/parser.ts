@@ -42,7 +42,7 @@ import { SaveGame } from "./save-game";
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
-const CURRENT_VERSION_MINOR = 4;
+const CURRENT_VERSION_MINOR = 5;
 
 interface SaveGameBody {
   world: SaveGameWorld;
