@@ -1,3 +1,7 @@
+## 5.1.2
+
+- Bump save file version to match rocketry update. No parser changes
+
 ## 5.1.1
 
 - Update header version check to match official release of Expressive Update.

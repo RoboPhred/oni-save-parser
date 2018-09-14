@@ -50,6 +50,7 @@ for (const minion of minions.gameObjects) {
 }
 console.log("saving tweak");
 saveFile(`${fileName}-tweaked`, saveData);
+console.log("done");
 
 function checkDiff(original: SaveGame, modified: SaveGame) {
   original = {
