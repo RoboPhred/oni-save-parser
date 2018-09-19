@@ -126,7 +126,7 @@ export function getAccessoryType(
   accessory: string | Accessory
 ): AccessoryType | null {
   const guid = accessoryToGuid(accessory);
-  if (!guid.startsWith(ACCESSORY_ID_PREFIX)) {
+  if (!guid || !guid.startsWith(ACCESSORY_ID_PREFIX)) {
     return null;
   }
   const id = guid.substr(ACCESSORY_ID_PREFIX.length);
@@ -150,7 +150,7 @@ export function getAccessoryType(
 
 export function getAccessoryName(accessory: string | Accessory): string | null {
   const guid = accessoryToGuid(accessory);
-  if (!guid.startsWith(ACCESSORY_ID_PREFIX)) {
+  if (!guid || !guid.startsWith(ACCESSORY_ID_PREFIX)) {
     return null;
   }
   return guid.substr(ACCESSORY_ID_PREFIX.length);
@@ -169,9 +169,16 @@ export function getAccessoryOfType(
   return accessories[index];
 }
 
-function accessoryToGuid(accessory: string | Accessory): string {
+function accessoryToGuid(accessory: string | Accessory): string | undefined {
   if (typeof accessory === "string") {
     return accessory;
   }
-  return accessory.guid.Guid;
+  if (
+    accessory.guid != null &&
+    typeof accessory.guid === "object" &&
+    typeof accessory.guid.Guid === "string"
+  ) {
+    return accessory.guid.Guid;
+  }
+  return undefined;
 }

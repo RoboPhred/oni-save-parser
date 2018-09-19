@@ -1,3 +1,7 @@
+## 5.1.3
+
+- Fix crash in accessory utilities when encountering game-generated null guid.
+
 ## 5.1.2
 
 - Bump save file version to match rocketry update. No parser changes
