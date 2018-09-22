@@ -1,3 +1,7 @@
+## 5.1.4
+
+- Add missing Foodie and SimpleTastes traits. Remove non-traits Caring and MedicalAid from traits list.
+
 ## 5.1.3
 
 - Fix crash in accessory utilities when encountering game-generated null guid.
