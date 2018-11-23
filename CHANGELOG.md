@@ -1,3 +1,7 @@
+## vNext
+
+- Sync sim hashes with game for space update.
+
 ## 5.1.4
 
 - Add missing Foodie and SimpleTastes traits. Remove non-traits Caring and MedicalAid from traits list.
