@@ -42,14 +42,26 @@ if (writebackDiff) {
   console.dir(writebackDiff);
 }
 
-console.log("tweaking");
-const minions = saveData.gameObjects.find(x => x.name === "Minion")!;
-for (const minion of minions.gameObjects) {
-  minion.scale.x = 0.25;
-  minion.scale.y = 3;
-}
-console.log("saving tweak");
-saveFile(`${fileName}-tweaked`, saveData);
+writeFileSync(
+  `./test-data/${fileName}.json`,
+  JSON.stringify(
+    {
+      ...saveData,
+      world: "~snip~"
+    },
+    null,
+    2
+  )
+);
+
+// console.log("tweaking");
+// const minions = saveData.gameObjects.find(x => x.name === "Minion")!;
+// for (const minion of minions.gameObjects) {
+//   minion.scale.x = 0.25;
+//   minion.scale.y = 3;
+// }
+// console.log("saving tweak");
+// saveFile(`${fileName}-tweaked`, saveData);
 console.log("done");
 
 function checkDiff(original: SaveGame, modified: SaveGame) {

@@ -13,3 +13,4 @@ export * from "./minion-resume";
 export * from "./primary-element";
 export * from "./storage";
 export * from "./uncoverable";
+export * from "./modifiers";

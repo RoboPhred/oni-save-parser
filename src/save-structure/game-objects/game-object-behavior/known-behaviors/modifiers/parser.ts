@@ -18,46 +18,48 @@ import {
 } from "../../../../type-templates/template-data-parser";
 
 import {
-  MinionModifiersExtraData,
-  MinionAmountInstance,
-  MinionDiseaseInstance,
-  MinionModificationInstance
-} from "./minion-modifiers";
+  ModifiersExtraData,
+  AmountInstance,
+  DiseaseInstance,
+  ModificationInstance
+} from "./modifiers";
 
-export function* parseMinionModifiersExtraData(
+export function* parseModifiersExtraData(
   templateParser: TemplateParser
-): ParseIterator<MinionModifiersExtraData> {
-  const amounts: MinionAmountInstance[] = yield* parseModifiers<
-    MinionAmountInstance
-  >("Klei.AI.AmountInstance", templateParser);
-  const diseases: MinionDiseaseInstance[] = yield* parseModifiers<
-    MinionDiseaseInstance
-  >("Klei.AI.DiseaseInstance", templateParser);
+): ParseIterator<ModifiersExtraData> {
+  const amounts: AmountInstance[] = yield* parseModifiers<AmountInstance>(
+    "Klei.AI.AmountInstance",
+    templateParser
+  );
+  const diseases: DiseaseInstance[] = yield* parseModifiers<DiseaseInstance>(
+    "Klei.AI.DiseaseInstance",
+    templateParser
+  );
 
-  const extraData: MinionModifiersExtraData = {
+  const extraData: ModifiersExtraData = {
     amounts,
     diseases
   };
   return extraData;
 }
 
-export function* unparseMinionModifiersExtraData(
-  extraData: MinionModifiersExtraData,
+export function* unparseModifiersExtraData(
+  extraData: ModifiersExtraData,
   templateUnparser: TemplateUnparser
 ): UnparseIterator {
-  yield* unparseModifiers<MinionAmountInstance>(
+  yield* unparseModifiers<AmountInstance>(
     extraData.amounts,
     "Klei.AI.AmountInstance",
     templateUnparser
   );
-  yield* unparseModifiers<MinionDiseaseInstance>(
+  yield* unparseModifiers<DiseaseInstance>(
     extraData.diseases,
     "Klei.AI.DiseaseInstance",
     templateUnparser
   );
 }
 
-function* parseModifiers<T extends MinionModificationInstance>(
+function* parseModifiers<T extends ModificationInstance>(
   modifierInstanceType: string,
   templateParser: TemplateParser
 ): ParseIterator<T[]> {
@@ -73,7 +75,7 @@ function* parseModifiers<T extends MinionModificationInstance>(
   return items;
 }
 
-function* unparseModifiers<T extends MinionModificationInstance>(
+function* unparseModifiers<T extends ModificationInstance>(
   instances: T[],
   modifierInstanceType: string,
   templateUnparser: TemplateUnparser
@@ -84,7 +86,7 @@ function* unparseModifiers<T extends MinionModificationInstance>(
   }
 }
 
-function* parseModifier<T extends MinionModificationInstance>(
+function* parseModifier<T extends ModificationInstance>(
   modifierInstanceType: string,
   templateParser: TemplateParser
 ): ParseIterator<T> {
@@ -105,7 +107,7 @@ function* parseModifier<T extends MinionModificationInstance>(
     );
   }
 
-  const instance: MinionModificationInstance = {
+  const instance: ModificationInstance = {
     name,
     value
   };
@@ -113,7 +115,7 @@ function* parseModifier<T extends MinionModificationInstance>(
   return instance as T;
 }
 
-function* unparseModifier<T extends MinionModificationInstance>(
+function* unparseModifier<T extends ModificationInstance>(
   instance: T,
   modifierInstanceType: string,
   templateUnparser: TemplateUnparser

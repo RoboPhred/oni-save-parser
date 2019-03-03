@@ -39,6 +39,12 @@ import {
   unparseMinionModifiersExtraData
 } from "./known-behaviors/minion-modifiers/parser";
 
+import { ModifiersBehavior } from "./known-behaviors/modifiers";
+import {
+  parseModifiersExtraData,
+  unparseModifiersExtraData
+} from "./known-behaviors/modifiers/parser";
+
 const EXTRA_DATA_PARSERS: Record<string, ExtraDataParser> = {
   [StorageBehavior]: {
     parse: parseStorageExtraData,
@@ -47,6 +53,10 @@ const EXTRA_DATA_PARSERS: Record<string, ExtraDataParser> = {
   [MinionModifiersBehavior]: {
     parse: parseMinionModifiersExtraData,
     unparse: unparseMinionModifiersExtraData
+  },
+  [ModifiersBehavior]: {
+    parse: parseModifiersExtraData,
+    unparse: unparseModifiersExtraData
   }
 };
 
