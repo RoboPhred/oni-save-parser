@@ -5,3 +5,4 @@
  * @param name The name to validate.
  */
 export declare function validateDotNetIdentifierName(name: string | null | undefined): string;
+export declare function typed<T extends string>(s: T): T;

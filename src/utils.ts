@@ -36,3 +36,7 @@ export function validateDotNetIdentifierName(
 
   return name;
 }
+
+export function typed<T extends string>(s: T): T {
+  return s;
+}
