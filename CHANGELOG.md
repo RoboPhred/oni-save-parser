@@ -1,5 +1,10 @@
 ## vNext
 
+- Add typings for gameData.customGameSettings
+- Add SpacecraftManagerBehavior
+
+## 5.1.5
+
 - Sync sim hashes with game for space update.
 
 ## 5.1.4
