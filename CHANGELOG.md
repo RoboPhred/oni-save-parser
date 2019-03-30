@@ -1,4 +1,4 @@
-## vNext
+## 5.2.0
 
 - Add typings for gameData.customGameSettings
 - Add SpacecraftManagerBehavior
