@@ -10,6 +10,7 @@ export * from "./minion-identity";
 export * from "./minion-modifiers";
 export * from "./minion-resume";
 export * from "./primary-element";
+export * from "./spacecraft-manager";
 export * from "./storage";
 export * from "./uncoverable";
 export * from "./modifiers";
