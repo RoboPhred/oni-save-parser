@@ -6,7 +6,7 @@ This is a utility library for editing saves. If you are looking for a way to edi
 
 ## Game Compatibility
 
-As of version 2, this library only supports the cosmic update (save file version 7.4).
+This library currently supports up to QOL 3 (save version 7.8).
 
 This library intends to parse the most recent version of the save file as tracked by the stable (non-test) version of the game. Old versions will not be supported, and changes in test branches will not be integrated until the feature makes its way to the public stable version.
 
