@@ -42,7 +42,20 @@ import { SaveGame } from "./save-game";
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
-const CURRENT_VERSION_MINOR = 6;
+const COMPATIBLE_VERSION_MINOR_MIN = 6;
+const COMPATIBLE_VERSION_MINOR_MAX = 8;
+
+function validateVersion(major: number, minor: number) {
+  if (
+    major !== CURRENT_VERSION_MAJOR ||
+    minor < COMPATIBLE_VERSION_MINOR_MIN ||
+    minor > COMPATIBLE_VERSION_MINOR_MAX
+  ) {
+    throw new Error(
+      `Save version "${major}.${minor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${COMPATIBLE_VERSION_MINOR_MAX}".`
+    );
+  }
+}
 
 interface SaveGameBody {
   world: SaveGameWorld;
@@ -59,14 +72,7 @@ export function* parseSaveGame(): ParseIterator<SaveGame> {
   const header: SaveGameHeader = yield* parseHeader();
 
   const { saveMajorVersion, saveMinorVersion } = header.gameInfo;
-  if (
-    saveMajorVersion !== CURRENT_VERSION_MAJOR ||
-    saveMinorVersion !== CURRENT_VERSION_MINOR
-  ) {
-    throw new Error(
-      `Save version "${saveMajorVersion}.${saveMinorVersion}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
-    );
-  }
+  validateVersion(saveMajorVersion, saveMinorVersion);
 
   const templates: TypeTemplates = yield* parseTemplates();
 
@@ -108,15 +114,7 @@ function* parseSaveBody(context: ParseContext): ParseIterator<SaveGameBody> {
 
   const versionMajor: number = yield readInt32();
   const versionMinor: number = yield readInt32();
-
-  if (
-    versionMajor !== CURRENT_VERSION_MAJOR ||
-    versionMinor !== CURRENT_VERSION_MINOR
-  ) {
-    throw new Error(
-      `Save version "${versionMajor}.${versionMinor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
-    );
-  }
+  validateVersion(versionMajor, versionMinor);
 
   const gameObjects: GameObjectGroup[] = yield* parseGameObjects(context);
 

@@ -1,3 +1,7 @@
+## vNext
+
+- Enable loading versions 7.6 to 7.8.
+
 ## 5.2.0
 
 - Add typings for gameData.customGameSettings
