@@ -19,24 +19,25 @@ import {
 
 import {
   MinionModifiersExtraData,
-  MinionAmountInstance,
-  MinionDiseaseInstance,
+  AIAmountInstance,
+  AISicknessInstance,
   MinionModificationInstance
 } from "./minion-modifiers";
 
 export function* parseMinionModifiersExtraData(
   templateParser: TemplateParser
 ): ParseIterator<MinionModifiersExtraData> {
-  const amounts: MinionAmountInstance[] = yield* parseModifiers<
-    MinionAmountInstance
-  >("Klei.AI.AmountInstance", templateParser);
-  const diseases: MinionDiseaseInstance[] = yield* parseModifiers<
-    MinionDiseaseInstance
-  >("Klei.AI.DiseaseInstance", templateParser);
+  const amounts: AIAmountInstance[] = yield* parseModifiers<AIAmountInstance>(
+    "Klei.AI.AmountInstance",
+    templateParser
+  );
+  const sicknesses: AISicknessInstance[] = yield* parseModifiers<
+    AISicknessInstance
+  >("Klei.AI.SicknessInstance", templateParser);
 
   const extraData: MinionModifiersExtraData = {
     amounts,
-    diseases
+    sicknesses
   };
   return extraData;
 }
@@ -45,14 +46,14 @@ export function* unparseMinionModifiersExtraData(
   extraData: MinionModifiersExtraData,
   templateUnparser: TemplateUnparser
 ): UnparseIterator {
-  yield* unparseModifiers<MinionAmountInstance>(
+  yield* unparseModifiers<AIAmountInstance>(
     extraData.amounts,
     "Klei.AI.AmountInstance",
     templateUnparser
   );
-  yield* unparseModifiers<MinionDiseaseInstance>(
-    extraData.diseases,
-    "Klei.AI.DiseaseInstance",
+  yield* unparseModifiers<AISicknessInstance>(
+    extraData.sicknesses,
+    "Klei.AI.SicknessInstance",
     templateUnparser
   );
 }

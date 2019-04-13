@@ -23,8 +23,8 @@ export interface MinionModifiersBehavior extends GameObjectBehavior {
  * -- field "exposureInfo" { diseaseID: string; infectionSourceInfo: string}
  */
 export interface MinionModifiersExtraData {
-  amounts: MinionAmountInstance[];
-  diseases: MinionDiseaseInstance[];
+  amounts: AIAmountInstance[];
+  sicknesses: AISicknessInstance[];
 }
 
 export interface MinionModificationInstance {
@@ -32,13 +32,16 @@ export interface MinionModificationInstance {
   value: any;
 }
 
-export interface MinionAmountInstance extends MinionModificationInstance {
+export interface AIAmountInstance extends MinionModificationInstance {
   value: { value: number };
 }
 
-export interface MinionDiseaseInstance extends MinionModificationInstance {
+export interface AISicknessInstance extends MinionModificationInstance {
   value: {
     diseaseId: string;
-    infectionSourceInfo: string;
+    exposureInfo: {
+      sicknessID: string;
+      sourceInfo: string;
+    };
   };
 }
