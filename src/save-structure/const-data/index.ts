@@ -1,5 +1,5 @@
 export * from "./accessories";
 export * from "./geysers";
-export * from "./roles";
+export * from "./skills";
 
 export * from "./template-enumerations";

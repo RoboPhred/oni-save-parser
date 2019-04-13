@@ -1,3 +1,7 @@
+## 6.0.1
+
+- Update MinionResume for QOL3.
+
 ## 6.0.0
 
 - Fix parsing 7.8. Requires backwards-incompatible change; no longer able to parse 7.7 and below.
