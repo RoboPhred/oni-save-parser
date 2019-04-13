@@ -10,7 +10,11 @@ import {
   progressReporter,
   tagReporter
 } from "../index";
-import { SaveGame } from "../save-structure";
+import {
+  SaveGame,
+  MinionModifiersBehavior,
+  getBehavior
+} from "../save-structure";
 
 import minimist from "minimist";
 
@@ -27,6 +31,12 @@ const fileName = args._[0] || "TestShennanigans";
 
 console.log("Loading save");
 const saveData = loadFile(fileName);
+
+const modifiers = getBehavior(
+  saveData.gameObjects.find(x => x.name === "Minion")!.gameObjects[0],
+  MinionModifiersBehavior
+)!;
+console.log("modifiers", JSON.stringify(modifiers, null, 2));
 
 console.log("re-saving");
 const writebackName = `${fileName}-writeback`;

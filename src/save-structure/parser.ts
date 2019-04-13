@@ -42,17 +42,12 @@ import { SaveGame } from "./save-game";
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
-const COMPATIBLE_VERSION_MINOR_MIN = 6;
-const COMPATIBLE_VERSION_MINOR_MAX = 8;
+const CURRENT_VERSION_MINOR = 8;
 
 function validateVersion(major: number, minor: number) {
-  if (
-    major !== CURRENT_VERSION_MAJOR ||
-    minor < COMPATIBLE_VERSION_MINOR_MIN ||
-    minor > COMPATIBLE_VERSION_MINOR_MAX
-  ) {
+  if (major !== CURRENT_VERSION_MAJOR || minor !== CURRENT_VERSION_MINOR) {
     throw new Error(
-      `Save version "${major}.${minor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${COMPATIBLE_VERSION_MINOR_MAX}".`
+      `Save version "${major}.${minor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
     );
   }
 }
