@@ -1,4 +1,4 @@
-## vNext
+## 6.0.2
 
 - Provide MinionSkillNames constant.
 
