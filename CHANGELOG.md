@@ -1,3 +1,7 @@
+## vNext
+
+- Provide MinionSkillNames constant.
+
 ## 6.0.1
 
 - Update MinionResume for QOL3.
