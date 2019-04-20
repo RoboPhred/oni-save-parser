@@ -1,4 +1,4 @@
-/// <reference types="long" />
+import { LongNum } from "../../binary-serializer";
 import { UnparseIterator } from "./unparser";
 export interface BasicWriteInstruction {
     type: "write";
@@ -41,14 +41,14 @@ export interface WriteInt32Instruction extends BasicWriteInstruction {
 export declare function writeInt32(value: number): WriteInt32Instruction;
 export interface WriteUInt64Instruction extends BasicWriteInstruction {
     dataType: "uint-64";
-    value: Long;
+    value: LongNum;
 }
-export declare function writeUInt64(value: Long): WriteUInt64Instruction;
+export declare function writeUInt64(value: LongNum): WriteUInt64Instruction;
 export interface WriteInt64Instruction extends BasicWriteInstruction {
     dataType: "int-64";
-    value: Long;
+    value: LongNum;
 }
-export declare function writeInt64(value: Long): WriteInt64Instruction;
+export declare function writeInt64(value: LongNum): WriteInt64Instruction;
 export interface WriteSingleInstruction extends BasicWriteInstruction {
     dataType: "single";
     value: number;

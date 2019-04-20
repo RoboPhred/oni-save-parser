@@ -1,5 +1,5 @@
-import Long from "long";
 import { Vector3, Quaternion } from "../../save-structure/data-types";
+import { LongNum } from "../types";
 import { DataReader } from "./interfaces";
 export declare class ArrayDataReader implements DataReader {
     private _buffer;
@@ -18,8 +18,8 @@ export declare class ArrayDataReader implements DataReader {
     readInt16(): number;
     readUInt32(): number;
     readInt32(): number;
-    readUInt64(): Long;
-    readInt64(): Long;
+    readUInt64(): LongNum;
+    readInt64(): LongNum;
     readSingle(): number;
     readDouble(): number;
     readChars(length: number): string;

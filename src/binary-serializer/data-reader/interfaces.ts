@@ -1,6 +1,6 @@
-import Long from "long";
-
 import { Vector3, Quaternion } from "../../save-structure/data-types";
+
+import { LongNum } from "../types";
 
 /**
  * A little-endian streaming data reader.
@@ -34,8 +34,8 @@ export interface DataReader {
   readUInt32(): number;
   readInt32(): number;
 
-  readUInt64(): Long;
-  readInt64(): Long;
+  readUInt64(): LongNum;
+  readInt64(): LongNum;
 
   readSingle(): number;
   readDouble(): number;

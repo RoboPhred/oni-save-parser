@@ -2,6 +2,8 @@ import { TextEncoder } from "text-encoding";
 
 import { Vector3, Quaternion } from "../../save-structure/data-types";
 
+import { LongNum } from "../types";
+
 import { DataWriter } from "./interfaces";
 
 /**
@@ -83,18 +85,16 @@ export class ArrayDataWriter implements DataWriter {
     this._view.setInt32(position, value, true);
   }
 
-  writeUInt64(value: Long): void {
-    value = value.toUnsigned();
+  writeUInt64(value: LongNum): void {
     // little-endian, lower comes first.
-    this.writeInt32(value.low);
-    this.writeInt32(value.high);
+    this.writeInt32(value.lower);
+    this.writeInt32(value.upper);
   }
 
-  writeInt64(value: Long): void {
-    value = value.toSigned();
+  writeInt64(value: LongNum): void {
     // little-endian, lower comes first.
-    this.writeInt32(value.low);
-    this.writeInt32(value.high);
+    this.writeInt32(value.lower);
+    this.writeInt32(value.upper);
   }
 
   writeSingle(value: number): void {

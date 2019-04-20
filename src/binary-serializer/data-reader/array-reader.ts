@@ -1,8 +1,8 @@
 import { TextDecoder } from "text-encoding";
 
-import Long from "long";
-
 import { Vector3, Quaternion } from "../../save-structure/data-types";
+
+import { LongNum } from "../types";
 
 import { DataReader } from "./interfaces";
 
@@ -91,18 +91,27 @@ export class ArrayDataReader implements DataReader {
     return val;
   }
 
-  readUInt64(): Long {
+  readUInt64(): LongNum {
     // little-endian, lower comes first.
     const lower = this.readInt32();
     const upper = this.readInt32();
-    return new Long(lower, upper, true);
+    //return new Long(lower, upper, true);
+    return {
+      unsigned: true,
+      lower,
+      upper
+    };
   }
 
-  readInt64(): Long {
+  readInt64(): LongNum {
     // little-endian, lower comes first.
     const lower = this.readInt32();
     const upper = this.readInt32();
-    return new Long(lower, upper, false);
+    return {
+      unsigned: false,
+      lower,
+      upper
+    };
   }
 
   readSingle(): number {
