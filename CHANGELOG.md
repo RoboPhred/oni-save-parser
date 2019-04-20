@@ -1,3 +1,7 @@
+## 6.0.3
+
+- Return json-safe values for int64/uint64
+
 ## 6.0.2
 
 - Provide MinionSkillNames constant.
