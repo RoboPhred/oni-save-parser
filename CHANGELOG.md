@@ -1,3 +1,7 @@
+## vNext
+
+- Bump version lock to 7.11.
+
 ## 6.0.2
 
 - Provide MinionSkillNames constant.

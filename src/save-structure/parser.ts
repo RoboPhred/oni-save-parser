@@ -42,7 +42,7 @@ import { SaveGame } from "./save-game";
 const SAVE_HEADER = "KSAV";
 
 const CURRENT_VERSION_MAJOR = 7;
-const CURRENT_VERSION_MINOR = 8;
+const CURRENT_VERSION_MINOR = 11;
 
 function validateVersion(major: number, minor: number) {
   if (major !== CURRENT_VERSION_MAJOR || minor !== CURRENT_VERSION_MINOR) {
