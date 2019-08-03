@@ -48,7 +48,9 @@ Parsing and unparsing is done through functions that generate and yield instruct
 ```
 const {
     parseOniSave,
-    writeOniSave
+    writeOniSave,
+    getBehavior,
+    AIAttributeLevelsBehavior
 } = require("oni-save-parser");
 
 function loadFile(fileName) {
@@ -63,11 +65,20 @@ function saveFile(fileName, save) {
 
 const saveData = loadFile(fileName);
 
-// Make all dups half-sized
+// Make all duplicants half-sized
 const minions = saveData.gameObjects.find(x => x.name === "Minion")!;
 for (const minion of minions.gameObjects) {
   minion.scale.x = 0.5;
   minion.scale.y = 0.5;
+}
+
+// Modify attributes of all duplicants
+for (const minion of minions.gameObjects) {
+  const skillBehavior = getBehavior(minion, AIAttributeLevelsBehavior);
+  // Set each attribute to 10
+  for (const attribute of skillBehavior.templateData.saveLoadLevels) {
+    attribute.level = 10
+  }
 }
 
 saveFile(`${fileName}-tweaked`, saveData);
