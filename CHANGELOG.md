@@ -1,3 +1,7 @@
+## vNext
+
+- Bump version lock to 7.11.
+
 ## 6.0.3
 
 - Return json-safe values for int64/uint64
