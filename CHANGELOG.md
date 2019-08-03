@@ -1,6 +1,6 @@
-## vNext
+## 7.0.0
 
-- Bump version lock to 7.11.
+- Bump version lock to 7.11 for LU.
 
 ## 6.0.3
 
