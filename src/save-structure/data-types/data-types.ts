@@ -15,6 +15,7 @@ export interface Vector3 {
   z: number;
 }
 export const vec3_zero: Readonly<Vector3> = Object.freeze({ x: 0, y: 0, z: 0 });
+export const vec3_one: Readonly<Vector3> = Object.freeze({ x: 1, y: 1, z: 1 });
 
 export interface Quaternion {
   x: number;
@@ -27,4 +28,10 @@ export const quat_zero: Readonly<Quaternion> = Object.freeze({
   y: 0,
   z: 0,
   w: 0
+});
+export const quat_default: Readonly<Quaternion> = Object.freeze({
+  x: 0,
+  y: 0,
+  z: 0,
+  w: 1
 });
