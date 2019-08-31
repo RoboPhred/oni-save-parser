@@ -19,7 +19,7 @@ export type HashedStringEnum<T extends string> = Record<T, HashedString> &
   Record<number, T>;
 
 export function createHashedStringEnum<T extends string>(
-  strings: T[]
+  strings: readonly T[]
 ): HashedStringEnum<T> {
   // Using T as a type here annoys the configuration lines below,
   //  but it otherwise works fine.
