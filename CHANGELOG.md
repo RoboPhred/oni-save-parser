@@ -1,3 +1,7 @@
+## 7.0.1
+
+- Add salt water geyser to geyser names list.
+
 ## 7.0.0
 
 - Bump version lock to 7.11 for LU.
