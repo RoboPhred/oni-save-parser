@@ -1,3 +1,7 @@
+## 7.0.2
+
+- Fix parse validator throwing errors on generic fields.
+
 ## 7.0.1
 
 - Add salt water geyser to geyser names list.
