@@ -1,3 +1,8 @@
+## 7.0.3
+
+- Add assignableProxy to MinionIdentity
+- Add various data structure default value helpers.
+
 ## 7.0.2
 
 - Fix parse validator throwing errors on generic fields.
