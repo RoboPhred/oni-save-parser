@@ -13,6 +13,9 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
         arrivalTime: number;
         voiceIdx: number;
         bodyData: BodyData;
+        assignableProxy: {
+            id: number;
+        };
     };
 }
 export interface BodyData {
