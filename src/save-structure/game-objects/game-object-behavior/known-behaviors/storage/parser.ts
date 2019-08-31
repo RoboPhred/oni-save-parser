@@ -24,7 +24,7 @@ import { StoredGameObject } from "./storage";
 export function* parseStorageExtraData(
   templateParser: TemplateParser
 ): ParseIterator<StoredGameObject[]> {
-  const itemCount = yield readInt32();
+  const itemCount: number = yield readInt32();
   const items = new Array(itemCount);
   for (let i = 0; i < itemCount; i++) {
     const name = yield readKleiString();

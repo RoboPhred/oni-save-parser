@@ -105,6 +105,6 @@ function executeWriteInstruction<T extends WriteDataTypes>(
     throw new Error("Expected a write parse instruction.");
   }
 
-  const writeFunc = writeParsers[inst.dataType] as WriteParser<T>;
+  const writeFunc = (writeParsers[inst.dataType] as any) as WriteParser<T>;
   return writeFunc(writer, inst, interceptor);
 }

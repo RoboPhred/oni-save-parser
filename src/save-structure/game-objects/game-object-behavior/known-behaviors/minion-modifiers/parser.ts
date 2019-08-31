@@ -62,7 +62,7 @@ function* parseModifiers<T extends MinionModificationInstance>(
   modifierInstanceType: string,
   templateParser: TemplateParser
 ): ParseIterator<T[]> {
-  const count = yield readInt32();
+  const count: number = yield readInt32();
   const items = new Array(count);
   for (let i = 0; i < count; i++) {
     const modifier = yield* parseModifier<T>(
@@ -89,13 +89,15 @@ function* parseModifier<T extends MinionModificationInstance>(
   modifierInstanceType: string,
   templateParser: TemplateParser
 ): ParseIterator<T> {
-  const name = yield readKleiString();
+  const name: string = yield readKleiString();
   validateDotNetIdentifierName(name);
-  const dataLength = yield readInt32();
+  const dataLength: number = yield readInt32();
 
-  const startPos = yield getReaderPosition();
-  const value = yield* templateParser.parseByTemplate(modifierInstanceType);
-  const endPos = yield getReaderPosition();
+  const startPos: number = yield getReaderPosition();
+  const value: number = yield* templateParser.parseByTemplate(
+    modifierInstanceType
+  );
+  const endPos: number = yield getReaderPosition();
 
   const dataRemaining = dataLength - (endPos - startPos);
   if (dataRemaining !== 0) {

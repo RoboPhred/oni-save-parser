@@ -41,7 +41,7 @@ export function* parseTypeInfo(): ParseIterator<TypeInfo> {
         `Unsupported non-generic type ${type} marked as generic.`
       );
     }
-    const subTypeCount = yield readByte();
+    const subTypeCount: number = yield readByte();
     subTypes = new Array(subTypeCount);
     for (let i = 0; i < subTypeCount; i++) {
       subTypes[i] = yield* parseTypeInfo();

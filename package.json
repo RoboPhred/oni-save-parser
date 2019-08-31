@@ -28,7 +28,7 @@
     "@types/lodash.flowright": "^3.5.3",
     "@types/long": "^3.0.32",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^8.10.21",
+    "@types/node": "^12.7.3",
     "@types/pako": "^1.0.0",
     "@types/text-encoding": "0.0.33",
     "deep-diff": "^1.0.1",
@@ -36,7 +36,7 @@
     "minimist": "^1.2.0",
     "prettier": "^1.13.4",
     "rimraf": "^2.6.2",
-    "typescript": "^3.6.2"
+    "typescript": "^3.5.3"
   },
   "dependencies": {
     "jsonschema": "^1.2.4",

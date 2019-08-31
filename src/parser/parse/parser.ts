@@ -100,6 +100,6 @@ function executeReadInstruction<T extends ReadDataTypes>(
     throw new Error("Expected a read parse instruction.");
   }
 
-  const readFunc = readParsers[inst.dataType] as ReadParser<T>;
+  const readFunc = (readParsers[inst.dataType] as any) as ReadParser<T>;
   return readFunc(reader, inst, interceptor);
 }
