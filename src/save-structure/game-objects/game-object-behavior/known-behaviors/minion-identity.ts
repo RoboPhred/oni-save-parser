@@ -21,6 +21,10 @@ export interface MinionIdentityBehavior extends GameObjectBehavior {
     voiceIdx: number;
 
     bodyData: BodyData;
+
+    assignableProxy: {
+      id: number;
+    };
   };
 }
 
