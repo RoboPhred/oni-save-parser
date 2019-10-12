@@ -1,3 +1,7 @@
+## 7.1.0
+
+- Update for save version 7.12
+
 ## 7.0.3
 
 - Add assignableProxy to MinionIdentity
