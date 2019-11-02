@@ -1,3 +1,7 @@
+## 7.2.0
+
+- Add Allergies and Archaeologist traits.
+
 ## 7.1.0
 
 - Update for save version 7.12
