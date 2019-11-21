@@ -1,3 +1,7 @@
+## 8.0.0
+
+- Bump version lock to 7.15 for RP.
+
 ## 7.2.0
 
 - Add Allergies and Archaeologist traits.
