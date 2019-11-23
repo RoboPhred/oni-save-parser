@@ -1,3 +1,7 @@
+## 8.1.0
+
+- Update traits for RP.
+
 ## 8.0.0
 
 - Bump version lock to 7.15 for RP.
