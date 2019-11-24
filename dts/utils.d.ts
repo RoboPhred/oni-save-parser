@@ -6,3 +6,4 @@
  */
 export declare function validateDotNetIdentifierName(name: string | null | undefined): string;
 export declare function typed<T extends string>(s: T): T;
+export declare function typedKeys<T>(x: T): (keyof T)[];

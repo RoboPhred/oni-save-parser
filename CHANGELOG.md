@@ -1,3 +1,8 @@
+## vNext
+
+- Update SimHashes
+- Update SpacecraftManager types.
+
 ## 8.1.0
 
 - Update traits for RP.
