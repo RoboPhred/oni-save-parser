@@ -1,6 +1,8 @@
 import { SimHashName } from "./template-enumerations";
 export interface SpaceDestinationType {
     name: string;
+    maximumMass: number;
+    minimumMass: number;
     materials: SimHashName[];
     entities: string[];
 }
