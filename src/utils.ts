@@ -3,7 +3,7 @@
 //  "SerializedList`1[[Message, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"
 // "WorkChore`1+StatesInstance[[Clinic, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"
 // "<SomeType>k__BackingField"
-const REGEX_IDENTIFIER = /^(\<[a-zA-Z0-9\_]+\>)?[a-zA-Z0-9\_\+\.]+(\`\d+)?(\+[a-zA-Z0-9\_\+\.]+)?(\[\[.+\]\])?$/;
+const REGEX_IDENTIFIER = /^(\<[a-zA-Z0-9\_]+\>)?[a-zA-Z0-9\_\+\.\-]+(\`\d+)?(\+[a-zA-Z0-9\_\+\.]+)?(\[\[.+\]\])?$/;
 
 /**
  * Check if we parsed a meaningful .NET identifier name.
