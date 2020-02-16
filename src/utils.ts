@@ -5,6 +5,11 @@
 // "<SomeType>k__BackingField"
 const REGEX_IDENTIFIER = /^(\<[a-zA-Z0-9\_]+\>)?[a-zA-Z0-9\_\+\.]+(\`\d+)?(\+[a-zA-Z0-9\_\+\.]+)?(\[\[.+\]\])?$/;
 
+// Any non-printable character shouldn't be in an identifier name, regardless of CLR standards.
+// This doesn't check for formats, start-with-number, or symbols.  Giving up on vetting those,
+//  lots of mods doing weird things.
+const REGEX_IDENTIFIER_INVAL_CHARS = /[\x00-\x1F]/;
+
 /**
  * Check if we parsed a meaningful .NET identifier name.
  * If the name looks valid, the name is returned.
@@ -29,13 +34,34 @@ export function validateDotNetIdentifierName(
     );
   }
 
+  // Since we can no longer check against the regex, we need another way to catch
+  //  rogue strings due to parser errors.
+  // Null check is the best I can think of right now.
+  if (REGEX_IDENTIFIER_INVAL_CHARS.test(name)) {
+    throw new Error(
+      "A .NET identifier name contains non-printable characters.  This most likely indicates a parser error."
+    );
+  }
+
+  // Disabled as mods are using non-conformant property names.
+  //  This probably means a different ruleset applied to property names,
+  //  or the properties are being written in IL rather than through the C# compiler.
+  //validateCLRConformantVariableName();
+
+  return name;
+}
+
+/**
+ * Validate a name against the apparent rules for CLR variable names.
+ * 'Apparant', as many mods are using names that do not conform, including
+ * dashes, expanded unicode characters, and other such nonsense.
+ */
+function validateCLRConformantVariableName(name: string) {
   if (!REGEX_IDENTIFIER.test(name)) {
     throw new Error(
       `Identifier "${name}" has invalid characters.  This most likely indicates a parser error or change in serializer standards.`
     );
   }
-
-  return name;
 }
 
 export function typed<T extends string>(s: T): T {

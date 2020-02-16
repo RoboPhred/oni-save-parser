@@ -1,3 +1,7 @@
+## 8.1.1
+
+- Greatly loosened strictness of .NET identifier validation. This should improve compatibility with mods, especially non-english ones.
+
 ## 8.1.0
 
 - Update traits for RP.
