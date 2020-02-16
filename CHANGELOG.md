@@ -1,5 +1,7 @@
-## 8.1.1
+## vNext
 
+- Update SimHashes
+- Update SpacecraftManager types.
 - Greatly loosened strictness of .NET identifier validation. This should improve compatibility with mods, especially non-english ones.
 
 ## 8.1.0

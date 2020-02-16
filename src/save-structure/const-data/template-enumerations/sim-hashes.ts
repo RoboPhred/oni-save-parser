@@ -4,6 +4,7 @@ export enum SimHashes {
   Diamond = -2079931820, // -0x7BF93DAC
   Aerogel = -2070223827, // -0x7B651BD3
   Isoresin = -2008682336, // -0x77BA0F60
+  SaltGas = -1946026749, // -0x73FE02FD
   LiquidHelium = -1934139602, // -0x7348A0D2
   LiquidOxygen = -1908044868, // -0x71BA7444
   PhosphateNodules = -1901832310, // -0x715BA876
@@ -15,7 +16,11 @@ export enum SimHashes {
   CrushedRock = -1714565729, // -0x66323261
   SuperInsulator = -1713958528, // -0x6628EE80
   ViscoGel = -1683093854, // -0x6451F95E
+  MoltenAluminum = -1637472877, // -0x6199DA6D
+  Yellowcake = -1624413844, // -0x60D29694
   NiobiumGas = -1616033402, // -0x6052B67A
+  BrineIce = -1561279013, // -0x5D0F3A25
+  MoltenLead = -1558864561, // -0x5CEA62B1
   Helium = -1554872654, // -0x5CAD794E
   Oxygen = -1528777920, // -0x5B1F4CC0
   LiquidCarbonDioxide = -1526513293, // -0x5AFCBE8D
@@ -49,9 +54,12 @@ export enum SimHashes {
   MercuryGas = -839856666, // -0x320F321A
   BleachStone = -839728230, // -0x320D3C66
   GoldGas = -805366663, // -0x3000EB87
+  EthanolGas = -756961258, // -0x2D1E4FEA
+  Lead = -755153220, // -0x2D02B944
   LiquidHydrogen = -751997156, // -0x2CD290E4
   Sulfur = -729385479, // -0x2B798A07
   Lime = -721320011, // -0x2AFE784B
+  SolidSyngas = -690658692, // -0x292A9D84
   SolidChlorine = -690060127, // -0x29217B5F
   LiquidPropane = -645698215, // -0x267C92A7
   SolidMercury = -537625624, // -0x200B8418
@@ -60,24 +68,34 @@ export enum SimHashes {
   Obsidian = -474151749, // -0x1C42FB45
   SolidPetroleum = -473261502, // -0x1C3565BE
   RockGas = -432557516, // -0x19C84DCC
+  MoltenSalt = -422045879, // -0x1927E8B7
   SolidSuperCoolant = -389019570, // -0x172FF7B2
   IgneousRock = -355957251, // -0x15377A03
+  EnrichedUranium = -348942381, // -0x14CC702D
   Brick = -325269471, // -0x136337DF
+  Brine = -324547888, // -0x13583530
   CarbonGas = -314016756, // -0x12B783F4
   Gold = -279785280, // -0x10AD2F40
+  Rust = -233232444, // -0x0DE6D83C
+  NuclearWaste = -232430636, // -0x0DDA9C2C
   Phosphorus = -220394187, // -0x0D22F2CB
   SuperCoolant = -123825053, // -0x07616B9D
   Granite = -105943486, // -0x065091BE
+  Ethanol = -87974045, // -0x053E609D
   Radium = -47820500, // -0x02D9AED4
   SuperCoolantGas = -3376362, // -0x003384EA
   Electrum = 28407099, // 0x01B1753B
   SolidCarbonDioxide = 83003332, // 0x04F287C4
+  AluminumGas = 100766521, // 0x06019339
   CarbonFibre = 118518245, // 0x071071E5
+  UraniumOre = 134298891, // 0x08013D0B
   SolidPropane = 166493482, // 0x09EC7D2A
+  AluminumOre = 167973730, // 0x0A031362
   SedimentaryRock = 183408504, // 0x0AEE9778
   Fullerene = 245514112, // 0x0EA23F80
   GoldAmalgam = 361868060, // 0x1591AB1C
   LiquidMethane = 371787440, // 0x162906B0
+  Salt = 381665462, // 0x16BFC0B6
   Sand = 381796644, // 0x16C1C124
   TungstenGas = 431998133, // 0x19BFC4B5
   Snow = 489261827, // 0x1D298B03
@@ -85,15 +103,19 @@ export enum SimHashes {
   MoltenIron = 502659099, // 0x1DF5F81B
   MoltenCarbon = 505665536, // 0x1E23D800
   Glass = 623986332, // 0x2531469C
+  MoltenSyngas = 660593444, // 0x275FDB24
   ContaminatedOxygen = 721531317, // 0x2B01B1B5
   Vacuum = 758759285, // 0x2D39BF75
   Clay = 867327137, // 0x33B25CA1
   ToxicSand = 869554203, // 0x33D4581B
   Ice = 873952427, // 0x341774AB
+  LeadGas = 905042813, // 0x35F1DB7D
   Carbon = 947100397, // 0x38739AED
   SolidOxygen = 973502379, // 0x3A0677AB
   Creature = 976099455, // 0x3A2E187F
+  DepletedUranium = 1064294988, // 0x3F6FDA4C
   Katairite = 1071649902, // 0x3FE0146E
+  Syngas = 1102028305, // 0x41AF9E11
   Naphtha = 1157157570, // 0x44F8D2C2
   SolidMethane = 1183979137, // 0x46921681
   OxyRock = 1262005685, // 0x4B38ADB5
@@ -118,134 +140,17 @@ export enum SimHashes {
   Water = 1836671383, // 0x6D796197
   Unobtanium = 1838482828, // 0x6D95058C
   PhosphorusGas = 1887387588, // 0x707F3FC4
+  SaltWater = 1911997537, // 0x71F6C461
+  SolidEthanol = 1937241528, // 0x7377F5B8
+  MoltenUranium = 1937473860, // 0x737B8144
   CarbonDioxide = 1960575215, // 0x74DC00EF
   CopperGas = 1966552544, // 0x753735E0
   FoolsGold = 2059777261, // 0x7AC5B4ED
+  Aluminum = 2108244480, // 0x7DA94200
   MoltenCopper = 2128494380 // 0x7EDE3F2C
 }
 
-export const SimHashNames = [
-  "CrushedIce",
-  "SulfurGas",
-  "Diamond",
-  "Aerogel",
-  "Isoresin",
-  "LiquidHelium",
-  "LiquidOxygen",
-  "PhosphateNodules",
-  "Algae",
-  "Propane",
-  "Niobium",
-  "Cuprite",
-  "Copper",
-  "CrushedRock",
-  "SuperInsulator",
-  "ViscoGel",
-  "NiobiumGas",
-  "Helium",
-  "Oxygen",
-  "LiquidCarbonDioxide",
-  "SolidViscoGel",
-  "Ceramic",
-  "Void",
-  "CrudeOil",
-  "SteelGas",
-  "Fertilizer",
-  "ChlorineGas",
-  "MoltenGlass",
-  "SolidCrudeOil",
-  "Wolframite",
-  "SlimeMold",
-  "Polypropylene",
-  "SolidNaphtha",
-  "LiquidSulfur",
-  "MoltenGold",
-  "Magma",
-  "Tungsten",
-  "Hydrogen",
-  "SandCement",
-  "SourGas",
-  "RefinedCarbon",
-  "Steam",
-  "Steel",
-  "Chlorine",
-  "Phosphorite",
-  "SolidHydrogen",
-  "Methane",
-  "MercuryGas",
-  "BleachStone",
-  "GoldGas",
-  "LiquidHydrogen",
-  "Sulfur",
-  "Lime",
-  "SolidChlorine",
-  "LiquidPropane",
-  "SolidMercury",
-  "MoltenTungsten",
-  "Petroleum",
-  "Obsidian",
-  "SolidPetroleum",
-  "RockGas",
-  "SolidSuperCoolant",
-  "IgneousRock",
-  "Brick",
-  "CarbonGas",
-  "Gold",
-  "Phosphorus",
-  "SuperCoolant",
-  "Granite",
-  "Radium",
-  "SuperCoolantGas",
-  "Electrum",
-  "SolidCarbonDioxide",
-  "CarbonFibre",
-  "SolidPropane",
-  "SedimentaryRock",
-  "Fullerene",
-  "GoldAmalgam",
-  "LiquidMethane",
-  "Sand",
-  "TungstenGas",
-  "Snow",
-  "SandStone",
-  "MoltenIron",
-  "MoltenCarbon",
-  "Glass",
-  "ContaminatedOxygen",
-  "Vacuum",
-  "Clay",
-  "ToxicSand",
-  "Ice",
-  "Carbon",
-  "SolidOxygen",
-  "Creature",
-  "Katairite",
-  "Naphtha",
-  "SolidMethane",
-  "OxyRock",
-  "MaficRock",
-  "Iron",
-  "LiquidPhosphorus",
-  "Regolith",
-  "Slabs",
-  "Bitumen",
-  "MoltenSteel",
-  "MoltenNiobium",
-  "IronGas",
-  "TempConductorSolid",
-  "IronOre",
-  "Dirt",
-  "Cement",
-  "DirtyIce",
-  "CementMix",
-  "Mercury",
-  "Fossil",
-  "DirtyWater",
-  "Water",
-  "Unobtanium",
-  "PhosphorusGas",
-  "CarbonDioxide",
-  "CopperGas",
-  "FoolsGold",
-  "MoltenCopper"
-];
+export type SimHashName = keyof typeof SimHashes;
+export const SimHashNames: SimHashName[] = Object.keys(SimHashes)
+  .filter(x => isNaN(x as any))
+  .sort() as any;

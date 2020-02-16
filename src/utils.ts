@@ -67,3 +67,7 @@ function validateCLRConformantVariableName(name: string) {
 export function typed<T extends string>(s: T): T {
   return s;
 }
+
+export function typedKeys<T>(x: T): (keyof T)[] {
+  return Object.keys(x) as any;
+}
