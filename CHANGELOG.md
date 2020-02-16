@@ -1,4 +1,4 @@
-## vNext
+## 8.1.1
 
 - Update SimHashes
 - Update SpacecraftManager types.
