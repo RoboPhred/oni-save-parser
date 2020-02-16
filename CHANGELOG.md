@@ -1,3 +1,7 @@
+## 8.1.2
+
+- Fix mistyped `SpaceDestination.id`.
+
 ## 8.1.1
 
 - Update SimHashes

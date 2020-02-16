@@ -40,7 +40,7 @@ export enum MissionState {
 }
 
 export interface SpaceDestination {
-  id: MinionResumeBehavior;
+  id: number;
   type: SpaceDestinationTypeName;
   distance: number;
   startingOrbitPercentage: number;

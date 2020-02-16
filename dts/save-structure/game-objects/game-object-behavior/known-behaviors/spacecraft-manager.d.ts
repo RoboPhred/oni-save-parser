@@ -1,6 +1,5 @@
 import { SimHashes, SpaceDestinationTypeName } from "../../../const-data";
 import { BehaviorName } from "./types";
-import { MinionResumeBehavior } from "./minion-resume";
 export declare const SpacecraftManagerBehavior: BehaviorName<SpacecraftManagerBehavior>;
 export interface SpacecraftManagerBehavior {
     name: "SpacecraftManager";
@@ -32,7 +31,7 @@ export declare enum MissionState {
     Destroyed = "Destroyed"
 }
 export interface SpaceDestination {
-    id: MinionResumeBehavior;
+    id: number;
     type: SpaceDestinationTypeName;
     distance: number;
     startingOrbitPercentage: number;
