@@ -1,5 +1,5 @@
 export const CURRENT_VERSION_MAJOR = 7;
-export const CURRENT_VERSION_MINOR = 15;
+export const CURRENT_VERSION_MINOR = 16;
 
 export function validateVersion(
   major: number,
