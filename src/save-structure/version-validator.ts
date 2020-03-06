@@ -13,9 +13,11 @@ export function validateVersion(
     const err = new Error(
       `Save version "${major}.${minor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
     );
-    (err as any).code = E_VERSION;
+    (err as any).code =
+      major !== CURRENT_VERSION_MAJOR ? E_VERSION_MAJOR : E_VERSION_MINOR;
     throw err;
   }
 }
 
-export const E_VERSION = "E_VERSION";
+export const E_VERSION_MAJOR = "E_VERSION_MAJOR";
+export const E_VERSION_MINOR = "E_VERSION_MINOR";
