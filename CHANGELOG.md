@@ -1,3 +1,8 @@
+## 9.0.0
+
+- Bump version lock to 7.16 for AP
+- Allow option to bypass version check.
+
 ## 8.1.2
 
 - Fix mistyped `SpaceDestination.id`.

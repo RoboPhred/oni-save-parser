@@ -6,7 +6,7 @@ This is a utility library for editing saves. If you are looking for a way to edi
 
 ## Game Compatibility
 
-This library currently supports the Recreation Update (save version 7.15).
+This library currently supports the Automation Innovation Update (save version 7.16).
 
 This library intends to parse the most recent version of the save file as tracked by the stable (non-test) version of the game. Old versions will not be supported, and changes in test branches will not be integrated until the feature makes its way to the public stable version.
 
@@ -93,9 +93,3 @@ The save file and all templated data objects are loaded.
 This includes most of the interesting stuff, like duplicant stats, building attributes, and so on.
 Some information is still not parsed, such as the general world map and some specific data for a few of
 the more esoteric game objects.
-
-## Still to do
-
-- Handle the special-case manual-parse data used by a few of the game object types.
-- Better error handling: Errors should be specific error classes that describe the state of the parser and
-  provide more details on why and where the error happened.
