@@ -8,7 +8,9 @@ import {
   writeCompressed,
   writeKleiString,
   writeChars,
-  writeInt32
+  writeInt32,
+  readBytes,
+  writeBytes,
 } from "../parser";
 
 import { ParseContext, WriteContext } from "./parse-context";
@@ -19,11 +21,11 @@ import { parseHeader, unparseHeader } from "./header/parser";
 import { TypeTemplates } from "./type-templates";
 import {
   parseTemplates,
-  unparseTemplates
+  unparseTemplates,
 } from "./type-templates/template-parser";
 import {
   parseByTemplate,
-  unparseByTemplate
+  unparseByTemplate,
 } from "./type-templates/template-data-parser";
 
 import { SaveGameWorld } from "./world";
@@ -45,6 +47,7 @@ const SAVE_HEADER = "KSAV";
 interface SaveGameBody {
   world: SaveGameWorld;
   settings: SaveGameSettings;
+  simData: ArrayBuffer;
   version: {
     major: number;
     minor: number;
@@ -89,7 +92,7 @@ export function* parseSaveGame(
   const saveGame: SaveGame = {
     header,
     templates,
-    ...body
+    ...body,
   };
   return saveGame;
 }
@@ -103,12 +106,15 @@ function* parseSaveBody(context: ParseContext): ParseIterator<SaveGameBody> {
   const world: SaveGameWorld = yield* parseWorld(context);
   const settings: SaveGameSettings = yield* parseSettings(context);
 
+  const simDataLength: number = yield readInt32();
+  const simData: ArrayBuffer = yield readBytes(simDataLength);
+
   const ksav: string = yield readChars(SAVE_HEADER.length);
   if (ksav !== SAVE_HEADER) {
     throw new Error(
       `Failed to parse ksav header: Expected "${SAVE_HEADER}" but got "${ksav}" (${Array.from(
         ksav
-      ).map(x => x.charCodeAt(0))})`
+      ).map((x) => x.charCodeAt(0))})`
     );
   }
 
@@ -123,12 +129,13 @@ function* parseSaveBody(context: ParseContext): ParseIterator<SaveGameBody> {
   const body: SaveGameBody = {
     world,
     settings,
+    simData,
     version: {
       major: versionMajor,
-      minor: versionMinor
+      minor: versionMinor,
     },
     gameObjects,
-    gameData
+    gameData,
   };
   return body;
 }
@@ -139,7 +146,7 @@ function makeSaveParserContext(
 ): ParseContext {
   return {
     ...header,
-    parseByTemplate: parseByTemplate.bind(null, templates)
+    parseByTemplate: parseByTemplate.bind(null, templates),
   };
 }
 
@@ -165,6 +172,9 @@ function* unparseSaveBody(
   yield* unparseWorld(saveGame.world, context);
   yield* unparseSettings(saveGame.settings, context);
 
+  yield writeInt32(saveGame.simData.byteLength);
+  yield writeBytes(saveGame.simData);
+
   yield writeChars(SAVE_HEADER);
 
   yield writeInt32(saveGame.version.major);
@@ -181,6 +191,6 @@ function makeSaveWriterContext(
 ): WriteContext {
   return {
     ...header,
-    unparseByTemplate: unparseByTemplate.bind(null, templates)
+    unparseByTemplate: unparseByTemplate.bind(null, templates),
   };
 }
