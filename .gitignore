@@ -1,3 +1,4 @@
 node_modules/
 .vscode/launch.json
 test-data/
+/lib/tsconfig.tsbuildinfo

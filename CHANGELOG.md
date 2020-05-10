@@ -1,3 +1,8 @@
+## 10.0.0
+
+- Bump version lock to 7.17
+- Handle new sim data section in save file.
+
 ## 9.0.0
 
 - Bump version lock to 7.16 for AP

@@ -9,6 +9,7 @@ export interface SaveGame {
     templates: TypeTemplates;
     world: SaveGameWorld;
     settings: SaveGameSettings;
+    simData: ArrayBuffer;
     version: {
         major: number;
         minor: number;
