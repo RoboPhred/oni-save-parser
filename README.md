@@ -46,10 +46,10 @@ Parsing and unparsing is done through functions that generate and yield instruct
 ## Example usage
 
 ```
+const { readFileSync } = require("fs");
 const {
-    parseOniSave,
-    writeOniSave,
-    getBehavior,
+    parseSaveGame,
+    writeSaveGame,
     AIAttributeLevelsBehavior
 } = require("oni-save-parser");
 
