@@ -8,7 +8,7 @@ export interface Accessory {
         Guid: string;
     };
 }
-export declare const AccessoryTypes: ("mouth" | "neck" | "eyes" | "hair" | "body" | "hat" | "hat_hair" | "hair_always" | "headshape" | "arm")[];
+export declare const AccessoryTypes: ("body" | "hat" | "hat_hair" | "hair_always" | "hair" | "headshape" | "eyes" | "mouth" | "neck" | "arm")[];
 export declare type AccessoryType = typeof AccessoryTypes extends (infer R)[] ? R : never;
 export declare const EyeAccessoryNames: ("eyes_001" | "eyes_002" | "eyes_003" | "eyes_004" | "eyes_005")[];
 export declare const HeadshapeAccessoryNames: ("headshape_001" | "headshape_002" | "headshape_003" | "headshape_004")[];

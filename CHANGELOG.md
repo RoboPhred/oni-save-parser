@@ -1,3 +1,7 @@
+## 11.0.0
+
+- Bump version lock to 7.22
+
 ## 10.0.0
 
 - Bump version lock to 7.17
