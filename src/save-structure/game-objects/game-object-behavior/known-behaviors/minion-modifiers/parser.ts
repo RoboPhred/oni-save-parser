@@ -9,19 +9,19 @@ import {
   writeInt32,
   writeKleiString,
   writeDataLengthBegin,
-  writeDataLengthEnd
+  writeDataLengthEnd,
 } from "../../../../../parser";
 
 import {
   TemplateParser,
-  TemplateUnparser
+  TemplateUnparser,
 } from "../../../../type-templates/template-data-parser";
 
 import {
   MinionModifiersExtraData,
   AIAmountInstance,
   AISicknessInstance,
-  MinionModificationInstance
+  MinionModificationInstance,
 } from "./minion-modifiers";
 
 export function* parseMinionModifiersExtraData(
@@ -37,7 +37,7 @@ export function* parseMinionModifiersExtraData(
 
   const extraData: MinionModifiersExtraData = {
     amounts,
-    sicknesses
+    sicknesses,
   };
   return extraData;
 }
@@ -94,7 +94,7 @@ function* parseModifier<T extends MinionModificationInstance>(
   const dataLength: number = yield readInt32();
 
   const startPos: number = yield getReaderPosition();
-  const value: number = yield* templateParser.parseByTemplate(
+  const value: any = yield* templateParser.parseByTemplate(
     modifierInstanceType
   );
   const endPos: number = yield getReaderPosition();
@@ -110,7 +110,7 @@ function* parseModifier<T extends MinionModificationInstance>(
 
   const instance: MinionModificationInstance = {
     name,
-    value
+    value,
   };
 
   return instance as T;

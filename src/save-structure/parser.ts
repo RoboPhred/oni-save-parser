@@ -146,7 +146,8 @@ function makeSaveParserContext(
 ): ParseContext {
   return {
     ...header,
-    parseByTemplate: parseByTemplate.bind(null, templates),
+    parseByTemplate: <T>(templateName: string) =>
+      parseByTemplate<T>(templates, templateName),
   };
 }
 

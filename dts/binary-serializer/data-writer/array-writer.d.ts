@@ -7,7 +7,7 @@ export declare class ArrayDataWriter implements DataWriter {
     private _view;
     private _textEncoder;
     constructor();
-    readonly position: number;
+    get position(): number;
     writeByte(value: number): void;
     writeSByte(value: number): void;
     writeBytes(value: ArrayBuffer | ArrayBufferView): void;

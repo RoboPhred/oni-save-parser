@@ -4,12 +4,12 @@ import {
   isWriteInstruction,
   WriteDataTypes,
   WriteInstruction,
-  DataLengthToken
+  DataLengthToken,
 } from "./write-instructions";
 import { ParseError } from "../errors";
 import { isMetaInstruction } from "../types";
 
-export type UnparseIterator = IterableIterator<any>;
+export type UnparseIterator = Generator<any, any, any>;
 export type UnparseInterceptor = (value: any) => any;
 
 export function unparse<T>(
@@ -75,11 +75,11 @@ const writeParsers: WriteParsers = {
   double: (r, i) => r.writeDouble(i.value),
   chars: (r, i) => r.writeChars(i.value),
   "klei-string": (r, i) => r.writeKleiString(i.value),
-  "writer-position": r => r.position,
+  "writer-position": (r) => r.position,
   "data-length:begin": (r, i) => {
     const token: DataLengthToken = {
       writePosition: r.position,
-      startPosition: i.startPosition != null ? i.startPosition : r.position
+      startPosition: i.startPosition != null ? i.startPosition : r.position,
     };
     r.writeInt32(0);
     return token;
@@ -93,7 +93,7 @@ const writeParsers: WriteParsers = {
     const writer = new ZlibDataWriter();
     unparse(writer, i.unparser, interceptor);
     r.writeBytes(writer.getBytesView());
-  }
+  },
 };
 
 function executeWriteInstruction<T extends WriteDataTypes>(

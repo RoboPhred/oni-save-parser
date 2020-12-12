@@ -3,7 +3,7 @@ import { DataReader, ZlibDataReader } from "../../binary-serializer";
 import {
   isReadInstruction,
   ReadDataTypes,
-  ReadInstruction
+  ReadInstruction,
 } from "./read-instructions";
 import { ParseError } from "../errors";
 import { isMetaInstruction } from "../types";
@@ -11,7 +11,7 @@ import { isMetaInstruction } from "../types";
 // Typescript currently does not support specifying the return value of an iterator.
 //  We could use IterableIterator<ReadInstructions | T>, but that throws errors
 //  when the parser delegates to sub-generators.
-export type ParseIterator<T> = IterableIterator<any>;
+export type ParseIterator<T> = Generator<any, T, any>;
 export type ParseInterceptor = (value: any) => any;
 
 export function parse<T>(
@@ -67,20 +67,20 @@ type ReadParser<T extends ReadDataTypes> = (
 type ReadParsers = { [P in ReadDataTypes]: ReadParser<P> };
 
 const readParsers: ReadParsers = {
-  byte: r => r.readByte(),
-  "signed-byte": r => r.readSByte(),
+  byte: (r) => r.readByte(),
+  "signed-byte": (r) => r.readSByte(),
   "byte-array": (r, i) =>
     i.length == null ? r.readAllBytes() : r.readBytes(i.length),
-  "uint-16": r => r.readUInt16(),
-  "int-16": r => r.readInt16(),
-  "uint-32": r => r.readUInt32(),
-  "int-32": r => r.readInt32(),
-  "uint-64": r => r.readUInt64(),
-  "int-64": r => r.readInt64(),
-  single: r => r.readSingle(),
-  double: r => r.readDouble(),
+  "uint-16": (r) => r.readUInt16(),
+  "int-16": (r) => r.readInt16(),
+  "uint-32": (r) => r.readUInt32(),
+  "int-32": (r) => r.readInt32(),
+  "uint-64": (r) => r.readUInt64(),
+  "int-64": (r) => r.readInt64(),
+  single: (r) => r.readSingle(),
+  double: (r) => r.readDouble(),
   chars: (r, i) => r.readChars(i.length),
-  "klei-string": r => r.readKleiString(),
+  "klei-string": (r) => r.readKleiString(),
   "skip-bytes": (r, i) => r.skipBytes(i.length),
   compressed: (r, i, interceptor) => {
     const bytes = r.readAllBytes();
@@ -88,7 +88,7 @@ const readParsers: ReadParsers = {
     const result = parse(reader, i.parser, interceptor);
     return result;
   },
-  "reader-position": r => r.position
+  "reader-position": (r) => r.position,
 };
 
 function executeReadInstruction<T extends ReadDataTypes>(
