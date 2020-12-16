@@ -1,5 +1,5 @@
 export const CURRENT_VERSION_MAJOR = 7;
-export const CURRENT_VERSION_MINOR = 22;
+export const CURRENT_VERSION_MINOR = [17, 22];
 
 export function validateVersion(
   major: number,
@@ -7,8 +7,8 @@ export function validateVersion(
   strictness: "major" | "minor" = "minor"
 ) {
   if (
-    major !== CURRENT_VERSION_MAJOR ||
-    (strictness == "minor" && minor !== CURRENT_VERSION_MINOR)
+    !matchVersion(major, CURRENT_VERSION_MAJOR) ||
+    (strictness == "minor" && !matchVersion(minor, CURRENT_VERSION_MINOR))
   ) {
     const err = new Error(
       `Save version "${major}.${minor}" is not compatible with this parser.  Expected version "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}".`
@@ -17,6 +17,17 @@ export function validateVersion(
       major !== CURRENT_VERSION_MAJOR ? E_VERSION_MAJOR : E_VERSION_MINOR;
     throw err;
   }
+}
+
+function matchVersion(
+  currentVersion: number,
+  supportedVersion: number | number[]
+) {
+  if (Array.isArray(supportedVersion)) {
+    return supportedVersion.indexOf(currentVersion) !== -1;
+  }
+
+  return currentVersion === supportedVersion;
 }
 
 export const E_VERSION_MAJOR = "E_VERSION_MAJOR";
