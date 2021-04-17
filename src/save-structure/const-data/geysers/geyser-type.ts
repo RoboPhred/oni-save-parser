@@ -19,7 +19,15 @@ export const GeyserTypeNames = [
   "molten_copper",
   "molten_iron",
   "molten_gold",
+  "molten_aluminum",
+  "molten_tungsten",
+  "molten_niobium",
   "oil_drip",
+  "liquid_sulfur",
+  "molten_steel",
+  "molten_glass",
+  "liquid_coolant",
+  "liquid_ethanol",
 ] as const;
 
 export type GeyserType = HashedString;
