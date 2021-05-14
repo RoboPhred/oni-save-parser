@@ -1,3 +1,7 @@
+## 12.0.0
+
+- Bump version lock (dlc) to 7.23
+
 ## 11.1.0
 
 - Allow version 7.17 (non-dlc)
