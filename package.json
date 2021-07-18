@@ -1,6 +1,6 @@
 {
   "name": "oni-save-parser",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "description": "Parser for Oxygen Not Included save files.",
   "main": "lib/index.js",
   "types": "dts/index.d.ts",
