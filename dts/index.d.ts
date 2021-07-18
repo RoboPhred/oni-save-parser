@@ -4,9 +4,10 @@ import { SaveGameParserOptions } from "./save-structure/parser";
 export * from "./save-structure";
 export * from "./save-structure/data-types";
 export * from "./binary-serializer/types";
+export { ParseError } from "./parser";
 export { progressReporter } from "./progress";
 export { tagReporter } from "./tagger";
-export { E_VERSION_MAJOR, E_VERSION_MINOR } from "./save-structure/version-validator";
+export { E_VERSION_MAJOR, E_VERSION_MINOR, } from "./save-structure/version-validator";
 export interface ParseOptions extends SaveGameParserOptions {
     interceptor?: ParseInterceptor;
 }

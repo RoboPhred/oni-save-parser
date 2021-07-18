@@ -1,3 +1,10 @@
+## 13.0.0
+
+- Bump version lock to 7.25 (Breath of Fresh Air update)
+- Export ParseError
+- Inherit error codes on ParseError
+- Fix save version lock bypass not functioning.
+
 ## 12.0.0
 
 - Bump version lock (dlc) to 7.23

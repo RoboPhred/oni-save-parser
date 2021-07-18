@@ -117,10 +117,11 @@ function* parseSaveBody(context: ParseContext): ParseIterator<SaveGameBody> {
       ).map((x) => x.charCodeAt(0))})`
     );
   }
-
   const versionMajor: number = yield readInt32();
   const versionMinor: number = yield readInt32();
-  validateVersion(versionMajor, versionMinor);
+
+  // The header contains this same data and validates it.
+  // validateVersion(versionMajor, versionMinor);
 
   const gameObjects: GameObjectGroup[] = yield* parseGameObjects(context);
 

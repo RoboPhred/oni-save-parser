@@ -1,6 +1,7 @@
 export class ParseError extends Error {
   dataOffset: number;
   cause?: () => Error;
+  code?: string | number;
 
   constructor(message: string, dataOffset: number) {
     super(message);
@@ -18,8 +19,14 @@ export class ParseError extends Error {
         `Error while processing content: ${error.message}`,
         dataOffset
       );
+
       err.cause = () => error;
       err.stack = error.stack;
+
+      if (error.code) {
+        err.code = error.code;
+      }
+
       return err;
     }
 
