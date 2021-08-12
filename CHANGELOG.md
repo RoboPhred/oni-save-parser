@@ -1,3 +1,7 @@
+## 13.0.1
+
+- Update types for dlc marker on header.
+
 ## 13.0.0
 
 - Bump version lock to 7.25 (Breath of Fresh Air update)

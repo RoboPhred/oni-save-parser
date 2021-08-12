@@ -17,5 +17,9 @@ export interface SaveGameInfo {
     originalSaveName: string;
     saveMajorVersion: number;
     saveMinorVersion: number;
+    clusterId: string;
+    sandboxEnabled: boolean;
+    colonyGuid: string;
+    dlcId: string | null;
 }
 export declare const headerSchema: Schema;

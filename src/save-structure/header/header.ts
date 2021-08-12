@@ -19,23 +19,28 @@ export interface SaveGameInfo {
   originalSaveName: string;
   saveMajorVersion: number;
   saveMinorVersion: number;
+  clusterId: string;
+  //worldTraits: null; // Not sure what this is
+  sandboxEnabled: boolean;
+  colonyGuid: string;
+  dlcId: string | null;
 }
 
 export const headerSchema: Schema = {
   type: "object",
   properties: {
     buildVersion: {
-      type: "number"
+      type: "number",
     },
     headerVersion: {
-      type: "number"
+      type: "number",
     },
     isCompressed: {
-      type: "boolean"
+      type: "boolean",
     },
     gameInfo: {
-      type: "object"
-    }
+      type: "object",
+    },
   },
-  additionalProperties: false
+  additionalProperties: false,
 };
