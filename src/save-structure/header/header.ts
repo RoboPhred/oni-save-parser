@@ -23,7 +23,7 @@ export interface SaveGameInfo {
   //worldTraits: null; // Not sure what this is
   sandboxEnabled: boolean;
   colonyGuid: string;
-  dlcId: string | null;
+  dlcId: string;
 }
 
 export const headerSchema: Schema = {

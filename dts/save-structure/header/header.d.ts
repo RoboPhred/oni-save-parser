@@ -20,6 +20,6 @@ export interface SaveGameInfo {
     clusterId: string;
     sandboxEnabled: boolean;
     colonyGuid: string;
-    dlcId: string | null;
+    dlcId: string;
 }
 export declare const headerSchema: Schema;

@@ -1,3 +1,7 @@
+## 13.0.2
+
+- Fix "no dlc" dlc marker.
+
 ## 13.0.1
 
 - Update types for dlc marker on header.
