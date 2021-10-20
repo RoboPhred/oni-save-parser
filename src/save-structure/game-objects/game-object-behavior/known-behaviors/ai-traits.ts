@@ -69,5 +69,14 @@ export const AI_TRAIT_IDS: string[] = [
   "Fashionable",
   "Climacophobic",
   "SolitarySleeper",
-  "Workaholic"
+  "Workaholic",
+  "Ancientknowledge",
+  "Anxious",
+  "Fussy",
+  "Glowstick",
+  "Hemophobia",
+  "Loner",
+  "Nightlight",
+  "Radiationeater",
+  "Starryeyed"
 ];
