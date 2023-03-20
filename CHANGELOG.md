@@ -1,3 +1,7 @@
+## 14.0.0
+
+- Bump version lack to 7.31
+
 ## 13.0.2
 
 - Fix "no dlc" dlc marker.
