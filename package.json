@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/RoboPhred/oni-save-parser.git"
   },
-  "author": "William Matthews",
+  "author": "RoboPhred",
   "license": "MIT",
   "devDependencies": {
     "@types/deep-diff": "0.0.31",
