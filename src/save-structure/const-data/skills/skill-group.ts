@@ -13,8 +13,11 @@ export const MinionSkillGroupNames = [
   "Hauling" as "Hauling",
   "Technicals" as "Technicals",
   "MedicalAid" as "MedicalAid",
-  "Basekeeping" as "Basekeeping"
+  "Basekeeping" as "Basekeeping",
+  "Rocketry" as "Rocketry"
 ];
 export type MinionSkillGroup = HashedString;
 
 export const MinionSkillGroup = createHashedStringEnum(MinionSkillGroupNames);
+  
+  "Rocketry"
